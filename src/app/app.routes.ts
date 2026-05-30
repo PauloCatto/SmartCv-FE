@@ -1,0 +1,50 @@
+import { Routes } from '@angular/router';
+import { authGuard, guestGuard } from './core/guards/auth.guard';
+
+export const routes: Routes = [
+  {
+    path: '',
+    loadComponent: () => import('./pages/home/home.component').then(m => m.HomeComponent),
+  },
+  {
+    path: 'auth',
+    canActivate: [guestGuard],
+    children: [
+      {
+        path: 'login',
+        loadComponent: () => import('./features/auth/pages/login/login').then(m => m.Login),
+      },
+      {
+        path: 'register',
+        loadComponent: () => import('./features/auth/pages/register/register').then(m => m.Register),
+      },
+      { path: '', redirectTo: 'login', pathMatch: 'full' },
+    ],
+  },
+  {
+    path: '',
+    canActivate: [authGuard],
+    loadComponent: () => import('./layout/layout.component').then(m => m.LayoutComponent),
+    children: [
+      {
+        path: 'dashboard',
+        loadComponent: () => import('./features/dashboard/dashboard.component').then(m => m.DashboardComponent),
+      },
+    ],
+  },
+  {
+    path: 'resume',
+    canActivate: [authGuard],
+    children: [
+      {
+        path: 'new',
+        loadComponent: () => import('./features/resume/pages/builder/builder').then(m => m.BuilderComponent),
+      },
+      {
+        path: ':id/edit',
+        loadComponent: () => import('./features/resume/pages/builder/builder').then(m => m.BuilderComponent),
+      },
+    ],
+  },
+  { path: '**', redirectTo: '' },
+];
