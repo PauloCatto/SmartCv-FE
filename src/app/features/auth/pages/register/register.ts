@@ -13,9 +13,9 @@ export class Register {
   auth = inject(AuthService);
   private router = inject(Router);
 
-  name = '';
-  email = '';
-  password = '';
+  name: string = '';
+  email: string = '';
+  password: string = '';
   error = signal('');
   showPassword = signal(false);
 

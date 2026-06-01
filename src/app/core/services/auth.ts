@@ -26,7 +26,6 @@ export class AuthService {
     this._loading.set(true);
     return new Promise((resolve, reject) => {
       setTimeout(() => {
-        // Mock validation
         const stored = localStorage.getItem(`smartcv_user_${email}`);
         if (stored) {
           const userData = JSON.parse(stored);
@@ -65,7 +64,6 @@ export class AuthService {
           email,
           plan: 'free',
         };
-        // Store with password for mock auth
         localStorage.setItem(`smartcv_user_${email}`, JSON.stringify({ ...user, password: btoa(password) }));
         this._user.set(user);
         localStorage.setItem(STORAGE_KEY, JSON.stringify(user));

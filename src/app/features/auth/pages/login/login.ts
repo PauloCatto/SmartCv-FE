@@ -13,8 +13,8 @@ export class Login {
   auth = inject(AuthService);
   private router = inject(Router);
 
-  email = '';
-  password = '';
+  email: string = '';
+  password: string = '';
   error = signal('');
   submitted = signal(false);
   showPassword = signal(false);
@@ -37,7 +37,7 @@ export class Login {
     this.error.set('');
     try {
       await this.auth.register('Demo User', 'demo@smartcv.com', 'demo123');
-    } catch {}
+    } catch { }
     try {
       await this.auth.login('demo@smartcv.com', 'demo123');
       this.router.navigate(['/dashboard']);
