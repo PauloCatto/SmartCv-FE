@@ -1,6 +1,7 @@
 import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { CdkDragDrop, moveItemInArray, CdkDropList, CdkDrag, CdkDragHandle } from '@angular/cdk/drag-drop';
 import { ResumeService } from '../../../../core/services/resume';
 import { Resume, Experience, Education, Skill, TemplateType, EMPTY_RESUME } from '../../../../core/models/resume.model';
 import { EleganceTemplateComponent } from '../../components/templates/elegance-template.component';
@@ -15,6 +16,7 @@ type Step = 'personal' | 'experience' | 'education' | 'skills' | 'template';
   selector: 'app-builder',
   imports: [
     FormsModule,
+    CdkDropList, CdkDrag, CdkDragHandle,
     EleganceTemplateComponent,
     ModernTemplateComponent,
     MinimalTemplateComponent,
@@ -36,8 +38,8 @@ export class BuilderComponent implements OnInit {
     updatedAt: '',
   });
 
-  resumeTitle = '';
-  currentStep = signal<Step>('personal');
+  resumeTitle: string = '';
+  currentStep = signal<Step>('template');
   expandedItem = signal<string | null>(null);
   lastSaved = signal(false);
   exporting = signal(false);
@@ -46,13 +48,39 @@ export class BuilderComponent implements OnInit {
   newSkillLevel: 1 | 2 | 3 | 4 | 5 = 3;
   private saveTimeout: any;
   private savedIndicatorTimeout: any;
+  isAILoading = signal<string | null>(null);
+
+  atsScore = computed(() => {
+    let score = 0;
+    const d = this.draft();
+
+    if (d.personalInfo.email && d.personalInfo.phone) score += 15;
+    else if (d.personalInfo.email || d.personalInfo.phone) score += 5;
+    if (d.personalInfo.linkedin) score += 5;
+
+    if (d.personalInfo.bio && d.personalInfo.bio.length > 100) score += 20;
+    else if (d.personalInfo.bio) score += 10;
+
+    if (d.experience.length > 0) {
+      score += 20;
+      const hasDescriptions = d.experience.some(e => e.description && e.description.length > 50);
+      if (hasDescriptions) score += 10;
+    }
+
+    if (d.education.length > 0) score += 15;
+
+    if (d.skills.length >= 5) score += 15;
+    else if (d.skills.length > 0) score += 5;
+
+    return Math.min(score, 100);
+  });
 
   steps: { id: Step; label: string }[] = [
+    { id: 'template', label: 'Template' },
     { id: 'personal', label: 'Pessoal' },
     { id: 'experience', label: 'Experiência' },
     { id: 'education', label: 'Educação' },
     { id: 'skills', label: 'Skills' },
-    { id: 'template', label: 'Template' },
   ];
 
   skillSuggestions = [
@@ -155,13 +183,13 @@ export class BuilderComponent implements OnInit {
         return;
       }
     }
-    // New resume
     const created = this.resumeService.create();
     this.draft.set({ ...created });
     this.resumeTitle = created.title;
   }
 
   onFieldChange() {
+    this.draft.update(d => ({ ...d }));
     clearTimeout(this.saveTimeout);
     this.saveTimeout = setTimeout(() => this.autoSave(), 800);
   }
@@ -197,7 +225,7 @@ export class BuilderComponent implements OnInit {
   }
 
   isStepDone(step: Step): boolean {
-    const order: Step[] = ['personal', 'experience', 'education', 'skills', 'template'];
+    const order: Step[] = ['template', 'personal', 'experience', 'education', 'skills'];
     return order.indexOf(step) < order.indexOf(this.currentStep());
   }
 
@@ -206,7 +234,6 @@ export class BuilderComponent implements OnInit {
     this.expandedItem.update(v => v === key ? null : key);
   }
 
-  // Experience
   addExperience() {
     const exp: Experience = {
       id: crypto.randomUUID(), company: '', role: '',
@@ -222,7 +249,6 @@ export class BuilderComponent implements OnInit {
     this.onFieldChange();
   }
 
-  // Education
   addEducation() {
     const edu: Education = {
       id: crypto.randomUUID(), institution: '', degree: '',
@@ -238,7 +264,6 @@ export class BuilderComponent implements OnInit {
     this.onFieldChange();
   }
 
-  // Skills
   addSkill() {
     if (!this.newSkillName.trim()) return;
     if (this.skillExists(this.newSkillName)) return;
@@ -277,6 +302,124 @@ export class BuilderComponent implements OnInit {
 
   selectTemplate(id: TemplateType) {
     this.draft.update(d => ({ ...d, template: id }));
+    this.onFieldChange();
+  }
+
+  dropExperience(event: CdkDragDrop<Experience[]>) {
+    this.draft.update(d => {
+      const newExp = [...d.experience];
+      moveItemInArray(newExp, event.previousIndex, event.currentIndex);
+      return { ...d, experience: newExp };
+    });
+    this.onFieldChange();
+  }
+
+  dropEducation(event: CdkDragDrop<Education[]>) {
+    this.draft.update(d => {
+      const newEdu = [...d.education];
+      moveItemInArray(newEdu, event.previousIndex, event.currentIndex);
+      return { ...d, education: newEdu };
+    });
+    this.onFieldChange();
+  }
+
+  improveWithAI(type: 'bio' | 'experience', index: number | null, field: string) {
+    const key = `${type}-${index !== null ? index : 'all'}-${field}`;
+    this.isAILoading.set(key);
+
+    setTimeout(() => {
+      this.draft.update(d => {
+        if (type === 'bio') {
+          return {
+            ...d,
+            personalInfo: {
+              ...d.personalInfo,
+              bio: d.personalInfo.bio ? d.personalInfo.bio + ' Além disso, foco em gerar impacto real nos negócios através de soluções inovadoras e colaboração em equipes multidisciplinares.' : 'Sou um profissional dedicado, com foco em resultados e capacidade de rápida adaptação. Busco gerar valor através de soluções eficientes e trabalho em equipe.'
+            }
+          };
+        } else if (type === 'experience' && index !== null) {
+          const exp = [...d.experience];
+          exp[index] = {
+            ...exp[index],
+            description: exp[index].description ? exp[index].description + '\n• Liderou iniciativas que aumentaram a eficiência em 30%.\n• Mentorou membros juniores da equipe.' : '• Responsável por entregas de alto impacto na área.\n• Otimização de processos que geraram redução de custos e aumento de produtividade.'
+          };
+          return { ...d, experience: exp };
+        }
+        return d;
+      });
+      this.isAILoading.set(null);
+      this.onFieldChange();
+    }, 1500);
+  }
+
+  importMockData() {
+    this.draft.set({
+      id: this.draft().id,
+      title: 'Currículo Importado',
+      createdAt: this.draft().createdAt,
+      updatedAt: this.draft().updatedAt,
+      template: 'modern',
+      colorTheme: '#4f46e5',
+      fontFamily: "'Inter', sans-serif",
+      spacingMode: 'normal',
+      personalInfo: {
+        name: 'Alexandre Magno',
+        jobTitle: 'Engenheiro de Software Senior',
+        email: 'alex.magno@email.com',
+        phone: '+55 11 98765-4321',
+        location: 'São Paulo, SP - Híbrido',
+        linkedin: 'linkedin.com/in/alexmagno',
+        bio: 'Engenheiro de software apaixonado por criar arquiteturas escaláveis e produtos com excelente experiência de usuário. Com mais de 8 anos na área de tecnologia, possuo sólida experiência na liderança técnica de esquadrões ágeis e na transição de sistemas monolíticos para microsserviços na nuvem.'
+      },
+      experience: [
+        {
+          id: crypto.randomUUID(),
+          role: 'Tech Lead / Staff Engineer',
+          company: 'Fintech Solutions S.A.',
+          startDate: 'Jan 2021',
+          endDate: '',
+          current: true,
+          description: '• Liderança de uma tribo com 4 squads e mais de 20 desenvolvedores, focada no core bancário.\n• Arquitetura e migração do monolito legado para microsserviços Node.js e Go, melhorando o tempo de resposta em 45%.\n• Implementação de cultura DevOps e CI/CD com GitHub Actions, reduzindo o time-to-market.'
+        },
+        {
+          id: crypto.randomUUID(),
+          role: 'Desenvolvedor Full Stack Sênior',
+          company: 'E-commerce Varejo Global',
+          startDate: 'Fev 2018',
+          endDate: 'Dez 2020',
+          current: false,
+          description: '• Desenvolvimento do novo checkout da plataforma utilizando React e Node.js.\n• Otimização de performance no frontend que aumentou a conversão de vendas em 12%.\n• Mentoria de desenvolvedores juniores e plenos.'
+        }
+      ],
+      education: [
+        {
+          id: crypto.randomUUID(),
+          degree: 'Pós-graduação em Arquitetura de Software',
+          field: 'Tecnologia da Informação',
+          institution: 'Universidade Tecnológica',
+          startDate: '2019',
+          endDate: '2020',
+          current: false
+        },
+        {
+          id: crypto.randomUUID(),
+          degree: 'Bacharelado em Ciência da Computação',
+          field: 'Computação',
+          institution: 'Universidade Federal',
+          startDate: '2013',
+          endDate: '2017',
+          current: false
+        }
+      ],
+      skills: [
+        { id: crypto.randomUUID(), name: 'TypeScript', level: 5 },
+        { id: crypto.randomUUID(), name: 'Node.js', level: 5 },
+        { id: crypto.randomUUID(), name: 'Angular', level: 4 },
+        { id: crypto.randomUUID(), name: 'AWS Cloud', level: 4 },
+        { id: crypto.randomUUID(), name: 'Liderança', level: 5 }
+      ]
+    });
+    this.resumeTitle = 'Currículo Importado';
     this.onFieldChange();
   }
 
