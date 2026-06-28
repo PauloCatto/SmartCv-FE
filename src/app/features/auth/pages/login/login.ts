@@ -3,9 +3,11 @@ import { RouterLink, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../../core/services/auth';
 
+import { AsyncPipe } from '@angular/common';
+
 @Component({
   selector: 'app-login',
-  imports: [RouterLink, FormsModule],
+  imports: [RouterLink, FormsModule, AsyncPipe],
   templateUrl: './login.html',
   styleUrl: './login.scss'
 })
@@ -19,30 +21,42 @@ export class Login {
   submitted = signal(false);
   showPassword = signal(false);
 
-  async onSubmit() {
+  onSubmit() {
     this.submitted.set(true);
     this.error.set('');
 
     if (!this.email || !this.password) return;
 
-    try {
-      await this.auth.login(this.email, this.password);
-      this.router.navigate(['/dashboard']);
-    } catch (err: any) {
-      this.error.set(err.message);
-    }
+    this.auth.login(this.email, this.password).subscribe({
+      next: () => {
+        this.router.navigate(['/dashboard']);
+      },
+      error: (err: any) => {
+        this.error.set(err.message || 'Falha no login');
+      }
+    });
   }
 
-  async loginDemo() {
+  loginDemo() {
     this.error.set('');
-    try {
-      await this.auth.register('Demo User', 'demo@smartcv.com', 'demo123');
-    } catch { }
-    try {
-      await this.auth.login('demo@smartcv.com', 'demo123');
-      this.router.navigate(['/dashboard']);
-    } catch (err: any) {
-      this.error.set(err.message);
-    }
+    this.auth.register('Demo User', 'demo@smartcv.com', 'demo123').subscribe({
+      next: () => {
+        this.doDemoLogin();
+      },
+      error: () => {
+        this.doDemoLogin();
+      }
+    });
+  }
+
+  private doDemoLogin() {
+    this.auth.login('demo@smartcv.com', 'demo123').subscribe({
+      next: () => {
+        this.router.navigate(['/dashboard']);
+      },
+      error: (err: any) => {
+        this.error.set(err.message || 'Falha no login da conta Demo');
+      }
+    });
   }
 }

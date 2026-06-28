@@ -1,4 +1,4 @@
-<nav class="navbar" [class.scrolled]="scrolled()">
+<nav class="navbar" [class.scrolled]="scrolled()" [class.authenticated]="(auth.isAuthenticated$ | async)">
   <div class="navbar-inner">
     <a routerLink="/" class="navbar-logo">
       <div class="logo-icon">
@@ -10,49 +10,47 @@
       <span class="logo-text">Smart<span class="gradient-text">CV</span></span>
     </a>
 
-    @if (auth.isAuthenticated()) {
-    <div class="navbar-links">
-      <a routerLink="/dashboard" routerLinkActive="active" class="nav-link">Dashboard</a>
-    </div>
-    } @else {
+    @if (!(auth.isAuthenticated$ | async)) {
     <div class="navbar-links">
       <a href="#features" class="nav-link">Funcionalidades</a>
       <a href="#templates" class="nav-link">Templates</a>
       <a href="#pricing" class="nav-link">Planos</a>
     </div>
     }
-
+ 
     <div class="navbar-actions">
-      @if (auth.isAuthenticated()) {
-      <div class="user-menu">
-        <div class="user-avatar" (click)="toggleMenu()">
-          {{ getUserInitials() }}
-        </div>
-        @if (menuOpen()) {
-        <div class="dropdown-menu">
-          <div class="dropdown-header">
-            <p class="dropdown-name">{{ auth.user()?.name }}</p>
-            <p class="dropdown-email">{{ auth.user()?.email }}</p>
+      @if (auth.isAuthenticated$ | async) {
+        @if (auth.user$ | async; as user) {
+        <div class="user-menu">
+          <div class="user-avatar" (click)="toggleMenu()">
+            {{ getUserInitials(user.name) }}
           </div>
-          <div class="dropdown-divider"></div>
-          <a routerLink="/dashboard" class="dropdown-item" (click)="menuOpen.set(false)">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <rect x="3" y="3" width="7" height="7" />
-              <rect x="14" y="3" width="7" height="7" />
-              <rect x="14" y="14" width="7" height="7" />
-              <rect x="3" y="14" width="7" height="7" />
-            </svg>
-            Dashboard
-          </a>
-          <button class="dropdown-item danger" (click)="logout()">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" />
-            </svg>
-            Sair
-          </button>
+          @if (menuOpen()) {
+          <div class="dropdown-menu">
+            <div class="dropdown-header">
+              <p class="dropdown-name">{{ user.name }}</p>
+              <p class="dropdown-email">{{ user.email }}</p>
+            </div>
+            <div class="dropdown-divider"></div>
+            <a routerLink="/dashboard" class="dropdown-item" (click)="menuOpen.set(false)">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="7" height="7" />
+                <rect x="14" y="3" width="7" height="7" />
+                <rect x="14" y="14" width="7" height="7" />
+                <rect x="3" y="14" width="7" height="7" />
+              </svg>
+              Dashboard
+            </a>
+            <button class="dropdown-item danger" (click)="logout()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" />
+              </svg>
+              Sair
+            </button>
+          </div>
+          }
         </div>
         }
-      </div>
       } @else {
       <a routerLink="/auth/login" class="btn btn-ghost btn-sm">Entrar</a>
       <a routerLink="/auth/register" class="btn btn-primary btn-sm">Começar grátis</a>

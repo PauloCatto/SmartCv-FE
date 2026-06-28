@@ -3,7 +3,8 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CdkDragDrop, moveItemInArray, CdkDropList, CdkDrag, CdkDragHandle } from '@angular/cdk/drag-drop';
 import { ResumeService } from '../../../../core/services/resume';
-import { Resume, Experience, Education, Skill, TemplateType, EMPTY_RESUME } from '../../../../core/models/resume.model';
+import { AiService } from '../../../../core/services/ai';
+import { Resume, Experience, Education, Skill, TemplateType, EMPTY_RESUME, TEMPLATE_OPTIONS } from '../../../../core/models/resume.model';
 import { EleganceTemplateComponent } from '../../components/templates/elegance-template.component';
 import { MinimalTemplateComponent } from '../../components/templates/minimal-template.component';
 import { ModernTemplateComponent } from '../../components/templates/modern-template.component';
@@ -28,6 +29,7 @@ type Step = 'personal' | 'experience' | 'education' | 'skills' | 'template';
 })
 export class BuilderComponent implements OnInit {
   private resumeService = inject(ResumeService);
+  private aiService = inject(AiService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
 
@@ -89,43 +91,7 @@ export class BuilderComponent implements OnInit {
     'Comunicação', 'Liderança', 'Trabalho em equipe',
   ];
 
-  templateOptions = [
-    {
-      id: 'elegance' as TemplateType,
-      name: 'Elegance',
-      desc: 'Clássico e profissional',
-      previewBg: 'linear-gradient(135deg, #1e293b, #0f172a)',
-      preview: `<div style="background:white;width:50px;height:60px;border-radius:3px;overflow:hidden"><div style="background:#1e293b;height:18px;width:100%"></div><div style="padding:4px;display:flex;flex-direction:column;gap:3px"><div style="height:3px;background:#e2e8f0;border-radius:2px;width:90%"></div><div style="height:3px;background:#e2e8f0;border-radius:2px;width:70%"></div><div style="height:3px;background:#e2e8f0;border-radius:2px;width:80%"></div></div></div>`,
-    },
-    {
-      id: 'modern' as TemplateType,
-      name: 'Modern',
-      desc: 'Criativo com sidebar',
-      previewBg: 'linear-gradient(135deg, #4c1d95, #1e1b4b)',
-      preview: `<div style="background:white;width:50px;height:60px;border-radius:3px;overflow:hidden;display:flex"><div style="width:16px;background:linear-gradient(180deg,#6366f1,#7c3aed);flex-shrink:0"></div><div style="flex:1;padding:4px;display:flex;flex-direction:column;gap:3px"><div style="height:3px;background:#e2e8f0;border-radius:2px;width:90%"></div><div style="height:3px;background:#e2e8f0;border-radius:2px;width:70%"></div></div></div>`,
-    },
-    {
-      id: 'minimal' as TemplateType,
-      name: 'Minimal',
-      desc: 'Ultra limpo e elegante',
-      previewBg: 'linear-gradient(135deg, #1f2937, #111827)',
-      preview: `<div style="background:white;width:50px;height:60px;border-radius:3px;overflow:hidden;padding:6px;display:flex;flex-direction:column;gap:4px"><div style="height:5px;background:#111827;border-radius:2px;width:70%"></div><div style="height:3px;background:#9ca3af;border-radius:2px;width:50%"></div><div style="height:1px;background:#f3f4f6;margin:2px 0"></div><div style="height:3px;background:#e2e8f0;border-radius:2px;width:90%"></div><div style="height:3px;background:#e2e8f0;border-radius:2px;width:75%"></div></div>`,
-    },
-    {
-      id: 'creative' as TemplateType,
-      name: 'Creative',
-      desc: 'Moderno e assimétrico',
-      previewBg: 'linear-gradient(135deg, #f43f5e, #be123c)',
-      preview: `<div style="background:white;width:50px;height:60px;border-radius:3px;overflow:hidden;display:flex;justify-content:space-between"><div style="flex:1;padding:4px;display:flex;flex-direction:column;gap:3px"><div style="height:4px;background:#e11d48;width:70%"></div><div style="height:2px;background:#cbd5e1;width:90%"></div><div style="height:2px;background:#cbd5e1;width:80%"></div></div><div style="width:14px;background:#f8fafc;border-left:1px solid #f1f5f9;display:flex;flex-direction:column;align-items:center;padding-top:4px"><div style="width:8px;height:8px;border-radius:50%;background:#e2e8f0"></div></div></div>`,
-    },
-    {
-      id: 'compact' as TemplateType,
-      name: 'Compact',
-      desc: 'Preenchimento horizontal',
-      previewBg: 'linear-gradient(135deg, #0ea5e9, #0369a1)',
-      preview: `<div style="background:white;width:50px;height:60px;border-radius:3px;overflow:hidden;padding:4px;display:flex;flex-direction:column;gap:3px"><div style="display:flex;justify-content:space-between;align-items:center"><div style="height:5px;background:#0f172a;width:50%"></div><div style="height:3px;background:#94a3b8;width:30%"></div></div><div style="height:1px;background:#f1f5f9"></div><div style="display:flex;gap:4px"><div style="flex:1;height:12px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:2px"></div><div style="flex:1;height:12px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:2px"></div></div></div>`,
-    },
-  ];
+  templateOptions = TEMPLATE_OPTIONS;
 
   colorThemes = [
     { name: 'Slate', value: '#1e293b' },
@@ -162,30 +128,37 @@ export class BuilderComponent implements OnInit {
   ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
-      const existing = this.resumeService.getById(id);
-      if (existing) {
-        this.draft.set({
-          ...EMPTY_RESUME,
-          ...existing,
-          personalInfo: {
-            ...EMPTY_RESUME.personalInfo,
-            ...(existing.personalInfo || {}),
-          },
-          template: existing.template || 'elegance',
-          colorTheme: existing.colorTheme || '#1e293b',
-          fontFamily: existing.fontFamily || "'Georgia', serif",
-          spacingMode: existing.spacingMode || 'normal',
-          experience: existing.experience || [],
-          education: existing.education || [],
-          skills: existing.skills || [],
-        });
-        this.resumeTitle = existing.title;
-        return;
-      }
+      this.resumeService.getById(id).subscribe({
+        next: (existing) => {
+          if (existing) {
+            this.draft.set({
+              ...EMPTY_RESUME,
+              ...existing,
+              personalInfo: {
+                ...EMPTY_RESUME.personalInfo,
+                ...(existing.personalInfo || {}),
+              },
+              template: existing.template || 'elegance',
+              colorTheme: existing.colorTheme || '#1e293b',
+              fontFamily: existing.fontFamily || "'Georgia', serif",
+              spacingMode: existing.spacingMode || 'normal',
+              experience: existing.experience || [],
+              education: existing.education || [],
+              skills: existing.skills || [],
+            });
+            this.resumeTitle = existing.title;
+          }
+        }
+      });
+      return;
     }
-    const created = this.resumeService.create();
-    this.draft.set({ ...created });
-    this.resumeTitle = created.title;
+
+    this.resumeService.create().subscribe({
+      next: (created) => {
+        this.draft.set({ ...created });
+        this.resumeTitle = created.title;
+      }
+    });
   }
 
   onFieldChange() {
@@ -197,10 +170,13 @@ export class BuilderComponent implements OnInit {
   private autoSave() {
     const current = this.draft();
     if (!current.id) return;
-    this.resumeService.update(current.id, { ...current, title: this.resumeTitle });
-    this.lastSaved.set(true);
-    clearTimeout(this.savedIndicatorTimeout);
-    this.savedIndicatorTimeout = setTimeout(() => this.lastSaved.set(false), 2500);
+    this.resumeService.update(current.id, { ...current, title: this.resumeTitle }).subscribe({
+      next: () => {
+        this.lastSaved.set(true);
+        clearTimeout(this.savedIndicatorTimeout);
+        this.savedIndicatorTimeout = setTimeout(() => this.lastSaved.set(false), 2500);
+      }
+    });
   }
 
   saveTitle() {
@@ -327,29 +303,43 @@ export class BuilderComponent implements OnInit {
     const key = `${type}-${index !== null ? index : 'all'}-${field}`;
     this.isAILoading.set(key);
 
-    setTimeout(() => {
-      this.draft.update(d => {
-        if (type === 'bio') {
-          return {
-            ...d,
-            personalInfo: {
-              ...d.personalInfo,
-              bio: d.personalInfo.bio ? d.personalInfo.bio + ' Além disso, foco em gerar impacto real nos negócios através de soluções inovadoras e colaboração em equipes multidisciplinares.' : 'Sou um profissional dedicado, com foco em resultados e capacidade de rápida adaptação. Busco gerar valor através de soluções eficientes e trabalho em equipe.'
-            }
-          };
-        } else if (type === 'experience' && index !== null) {
-          const exp = [...d.experience];
-          exp[index] = {
-            ...exp[index],
-            description: exp[index].description ? exp[index].description + '\n• Liderou iniciativas que aumentaram a eficiência em 30%.\n• Mentorou membros juniores da equipe.' : '• Responsável por entregas de alto impacto na área.\n• Otimização de processos que geraram redução de custos e aumento de produtividade.'
-          };
-          return { ...d, experience: exp };
+    const d = this.draft();
+
+    if (type === 'bio') {
+      const bioText = d.personalInfo.bio;
+      this.aiService.improveBio(bioText).subscribe({
+        next: (improved) => {
+          this.draft.update(current => ({
+            ...current,
+            personalInfo: { ...current.personalInfo, bio: improved }
+          }));
+          this.isAILoading.set(null);
+          this.onFieldChange();
+        },
+        error: (err) => {
+          alert(err.message || 'Erro ao melhorar resumo com IA');
+          this.isAILoading.set(null);
         }
-        return d;
       });
-      this.isAILoading.set(null);
-      this.onFieldChange();
-    }, 1500);
+    } else if (type === 'experience' && index !== null) {
+      const expItem = d.experience[index];
+      const descText = expItem.description;
+      this.aiService.improveExperience(descText, expItem.role).subscribe({
+        next: (improved) => {
+          this.draft.update(current => {
+            const exp = [...current.experience];
+            exp[index] = { ...exp[index], description: improved };
+            return { ...current, experience: exp };
+          });
+          this.isAILoading.set(null);
+          this.onFieldChange();
+        },
+        error: (err) => {
+          alert(err.message || 'Erro ao melhorar experiência com IA');
+          this.isAILoading.set(null);
+        }
+      });
+    }
   }
 
   importMockData() {

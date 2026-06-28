@@ -3,9 +3,11 @@ import { RouterLink, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../../core/services/auth';
 
+import { AsyncPipe } from '@angular/common';
+
 @Component({
   selector: 'app-register',
-  imports: [RouterLink, FormsModule],
+  imports: [RouterLink, FormsModule, AsyncPipe],
   templateUrl: './register.html',
   styleUrl: './register.scss'
 })
@@ -42,7 +44,7 @@ export class Register {
     return 'Forte';
   }
 
-  async onSubmit() {
+  onSubmit() {
     this.error.set('');
     if (!this.name || !this.email || !this.password) {
       this.error.set('Preencha todos os campos');
@@ -52,11 +54,14 @@ export class Register {
       this.error.set('A senha deve ter pelo menos 6 caracteres');
       return;
     }
-    try {
-      await this.auth.register(this.name, this.email, this.password);
-      this.router.navigate(['/dashboard']);
-    } catch (err: any) {
-      this.error.set(err.message);
-    }
+
+    this.auth.register(this.name, this.email, this.password).subscribe({
+      next: () => {
+        this.router.navigate(['/dashboard']);
+      },
+      error: (err: any) => {
+        this.error.set(err.message || 'Falha no cadastro');
+      }
+    });
   }
 }

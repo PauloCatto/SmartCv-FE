@@ -1,142 +1,147 @@
 <div class="dashboard-page">
   <main class="dashboard-main">
+    @if (resumeService.resumes$ | async; as resumes) {
     <div class="dashboard-header">
       <div class="header-left">
         <h1 class="dashboard-title">
-          Olá, <span class="gradient-text">{{ firstName() }}</span> 👋
+          Olá, <span class="gradient-text">{{ firstName$ | async }}</span>
         </h1>
         <p class="dashboard-subtitle">
-          @if (resumeService.resumes().length === 0) {
-          Crie seu primeiro currículo e comece a se destacar!
-          } @else {
-          Você tem {{ resumeService.resumes().length }} currículo(s) criado(s).
-          }
+          Crie e gerencie seus currículos com o auxílio de inteligência artificial.
         </p>
       </div>
-      <a routerLink="/resume/new" class="btn btn-primary btn-lg">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <line x1="12" y1="5" x2="12" y2="19" />
-          <line x1="5" y1="12" x2="19" y2="12" />
-        </svg>
-        Novo currículo
-      </a>
     </div>
 
-    <div class="stats-row">
-      <div class="stat-card">
-        <div class="stat-icon" style="background: rgba(99,102,241,0.15)">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2">
+    <!-- Seção de Modelos de Currículo (Galeria de Templates) -->
+    <div class="templates-section">
+      <div class="section-header">
+        <h2 class="section-title">Modelos de Currículo</h2>
+        <p class="section-subtitle">Escolha um modelo abaixo para criar um currículo profissional em instantes.</p>
+      </div>
+      <div class="templates-grid">
+        @for (tmpl of templateOptions; track tmpl.id) {
+        <div class="template-card" (click)="createWithTemplate(tmpl.id)">
+          <div class="template-preview-wrapper" [style.background]="tmpl.previewBg">
+            <div class="template-preview-mini" [innerHTML]="tmpl.preview"></div>
+          </div>
+          <div class="template-info">
+            <h3 class="template-name">{{ tmpl.name }}</h3>
+            <p class="template-desc">{{ tmpl.desc }}</p>
+            <button class="btn btn-ghost btn-sm btn-select-template">
+              Usar este modelo
+            </button>
+          </div>
+        </div>
+        }
+      </div>
+    </div>
+
+    <!-- Seção de Meus Currículos e Stats -->
+    <div class="resumes-section">
+      <div class="section-header">
+        <h2 class="section-title">Meus Currículos Recentes</h2>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-icon" style="background: rgba(99,102,241,0.15)">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2">
+              <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+              <polyline points="14 2 14 8 20 8" />
+            </svg>
+          </div>
+          <div>
+            <div class="stat-value">{{ resumes.length }}</div>
+            <div class="stat-name">Currículos</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background: rgba(16,185,129,0.15)">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2">
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+          </div>
+          <div>
+            <div class="stat-value">{{ (auth.user$ | async)?.plan === 'premium' ? 'Premium' : 'Gratuito' }}</div>
+            <div class="stat-name">Plano atual</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background: rgba(245,158,11,0.15)">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2">
+              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+            </svg>
+          </div>
+          <div>
+            <div class="stat-value">IA</div>
+            <div class="stat-name">Gemini ativo</div>
+          </div>
+        </div>
+      </div>
+
+      @if (resumes.length === 0) {
+      <div class="empty-state">
+        <div class="empty-icon">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
             <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
             <polyline points="14 2 14 8 20 8" />
           </svg>
         </div>
-        <div>
-          <div class="stat-value">{{ resumeService.resumes().length }}</div>
-          <div class="stat-name">Currículos</div>
-        </div>
+        <h3 class="empty-title">Nenhum currículo ainda</h3>
+        <p class="empty-desc">Escolha um dos modelos profissionais acima para criar seu primeiro currículo.</p>
       </div>
-      <div class="stat-card">
-        <div class="stat-icon" style="background: rgba(16,185,129,0.15)">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2">
-            <polyline points="20 6 9 17 4 12" />
-          </svg>
-        </div>
-        <div>
-          <div class="stat-value">{{ auth.user()?.plan === 'premium' ? 'Premium' : 'Gratuito' }}</div>
-          <div class="stat-name">Plano atual</div>
-        </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon" style="background: rgba(245,158,11,0.15)">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2">
-            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-          </svg>
-        </div>
-        <div>
-          <div class="stat-value">IA</div>
-          <div class="stat-name">Gemini ativo</div>
-        </div>
-      </div>
-    </div>
-
-    @if (resumeService.resumes().length === 0) {
-    <div class="empty-state">
-      <div class="empty-icon">
-        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-          <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
-          <polyline points="14 2 14 8 20 8" />
-          <line x1="12" y1="18" x2="12" y2="12" />
-          <line x1="9" y1="15" x2="15" y2="15" />
-        </svg>
-      </div>
-      <h2 class="empty-title">Nenhum currículo ainda</h2>
-      <p class="empty-desc">Crie seu primeiro currículo com nossos templates profissionais e IA integrada.</p>
-      <a routerLink="/resume/new" class="btn btn-primary btn-lg">
-        Criar meu primeiro currículo
-      </a>
-    </div>
-    } @else {
-    <div class="resumes-grid">
-      <a routerLink="/resume/new" class="resume-card new-card">
-        <div class="new-card-inner">
-          <div class="new-icon">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <line x1="12" y1="5" x2="12" y2="19" />
-              <line x1="5" y1="12" x2="19" y2="12" />
-            </svg>
-          </div>
-          <span>Novo currículo</span>
-        </div>
-      </a>
-
-      @for (resume of resumeService.resumes(); track resume.id) {
-      <div class="resume-card" [class.animate-fade-in-up]="true">
-        <div class="resume-preview" [class]="'preview-' + resume.template">
-          <div class="preview-content">
-            <div class="preview-header">
-              <div class="preview-avatar"></div>
-              <div class="preview-info">
-                <div class="preview-name">{{ resume.personalInfo.name || 'Sem nome' }}</div>
-                <div class="preview-job">{{ resume.personalInfo.jobTitle || 'Cargo não definido' }}</div>
+      } @else {
+      <div class="resumes-grid">
+        @for (resume of resumes; track resume.id) {
+        <div class="resume-card" [class.animate-fade-in-up]="true">
+          <div class="resume-preview" [class]="'preview-' + resume.template">
+            <div class="preview-content">
+              <div class="preview-header">
+                <div class="preview-avatar"></div>
+                <div class="preview-info">
+                  <div class="preview-name">{{ resume.personalInfo.name || 'Sem nome' }}</div>
+                  <div class="preview-job">{{ resume.personalInfo.jobTitle || 'Cargo não definido' }}</div>
+                </div>
+              </div>
+              <div class="preview-lines">
+                <div class="preview-line"></div>
+                <div class="preview-line short"></div>
+                <div class="preview-line medium"></div>
               </div>
             </div>
-            <div class="preview-lines">
-              <div class="preview-line"></div>
-              <div class="preview-line short"></div>
-              <div class="preview-line medium"></div>
+          </div>
+
+          <div class="resume-info">
+            <div class="resume-meta">
+              <h3 class="resume-title-text">{{ resume.title }}</h3>
+              <span class="template-tag">{{ getTemplateName(resume.template) }}</span>
+            </div>
+            <p class="resume-date">Editado {{ formatDate(resume.updatedAt) }}</p>
+
+            <div class="resume-actions">
+              <a [routerLink]="['/resume', resume.id, 'edit']" class="btn btn-primary btn-sm" style="flex:1">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" />
+                  <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
+                </svg>
+                Editar
+              </a>
+              <button class="btn btn-secondary btn-sm" (click)="duplicate(resume)">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="9" y="9" width="13" height="13" rx="2" />
+                  <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" />
+                </svg>
+              </button>
+              <button class="btn btn-danger btn-sm" (click)="deleteResume(resume.id)">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="3 6 5 6 21 6" />
+                  <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a1 1 0 011-1h4a1 1 0 011 1v2" />
+                </svg>
+              </button>
             </div>
           </div>
         </div>
-
-        <div class="resume-info">
-          <div class="resume-meta">
-            <h3 class="resume-title-text">{{ resume.title }}</h3>
-            <span class="template-tag">{{ getTemplateName(resume.template) }}</span>
-          </div>
-          <p class="resume-date">Editado {{ formatDate(resume.updatedAt) }}</p>
-
-          <div class="resume-actions">
-            <a [routerLink]="['/resume', resume.id, 'edit']" class="btn btn-primary btn-sm" style="flex:1">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" />
-                <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
-              </svg>
-              Editar
-            </a>
-            <button class="btn btn-secondary btn-sm" (click)="duplicate(resume)">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="9" y="9" width="13" height="13" rx="2" />
-                <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" />
-              </svg>
-            </button>
-            <button class="btn btn-danger btn-sm" (click)="deleteResume(resume.id)">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <polyline points="3 6 5 6 21 6" />
-                <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a1 1 0 011-1h4a1 1 0 011 1v2" />
-              </svg>
-            </button>
-          </div>
-        </div>
+        }
       </div>
       }
     </div>

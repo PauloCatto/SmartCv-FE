@@ -1,10 +1,11 @@
 import { Component, inject, signal, HostListener } from '@angular/core';
-import { RouterLink, RouterLinkActive, Router } from '@angular/router';
+import { RouterLink, Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth';
+import { AsyncPipe } from '@angular/common';
 
 @Component({
   selector: 'app-header',
-  imports: [RouterLink, RouterLinkActive],
+  imports: [RouterLink, AsyncPipe],
   templateUrl: './header.html',
   styleUrl: './header.scss',
 })
@@ -31,9 +32,9 @@ export class HeaderComponent {
     this.menuOpen.update(v => !v);
   }
 
-  getUserInitials(): string {
-    const name = this.auth.user()?.name ?? '';
-    return name.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase();
+  getUserInitials(name: string | undefined): string {
+    const userName = name ?? '';
+    return userName.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase();
   }
 
   logout() {

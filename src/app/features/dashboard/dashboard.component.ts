@@ -1,12 +1,14 @@
-import { Component, inject, signal, computed, OnInit } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterLink, Router } from '@angular/router';
+import { AsyncPipe } from '@angular/common';
+import { map } from 'rxjs/operators';
 import { ResumeService } from '../../core/services/resume';
 import { AuthService } from '../../core/services/auth';
-import { Resume } from '../../core/models/resume.model';
+import { Resume, TEMPLATE_OPTIONS, TemplateType } from '../../core/models/resume.model';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [RouterLink],
+  imports: [RouterLink, AsyncPipe],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
 })
@@ -15,10 +17,14 @@ export class DashboardComponent {
   auth = inject(AuthService);
   private router = inject(Router);
 
-  firstName = computed(() => {
-    const name = this.auth.user()?.name ?? '';
-    return name.split(' ')[0];
-  });
+  templateOptions = TEMPLATE_OPTIONS;
+
+  firstName$ = this.auth.user$.pipe(
+    map(user => {
+      const name = user?.name ?? '';
+      return name.split(' ')[0];
+    })
+  );
 
   getTemplateName(template: string): string {
     const names: Record<string, string> = { elegance: 'Elegance', modern: 'Modern', minimal: 'Minimal' };
@@ -38,12 +44,20 @@ export class DashboardComponent {
   }
 
   duplicate(resume: Resume) {
-    this.resumeService.duplicate(resume.id);
+    this.resumeService.duplicate(resume.id).subscribe();
   }
 
   deleteResume(id: string) {
     if (confirm('Tem certeza que deseja excluir este currículo?')) {
-      this.resumeService.delete(id);
+      this.resumeService.delete(id).subscribe();
     }
+  }
+
+  createWithTemplate(template: TemplateType) {
+    this.resumeService.create({ template }).subscribe({
+      next: (created) => {
+        this.router.navigate(['/resume', created.id, 'edit']);
+      }
+    });
   }
 }
