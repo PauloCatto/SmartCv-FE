@@ -418,15 +418,59 @@
 
           <div class="template-options">
             @for (t of templateOptions; track t.id) {
-            <div class="template-option" [class.selected]="draft().template === t.id" (click)="selectTemplate(t.id)">
+            <div class="template-option" [class.selected]="draft().template === t.id && (!t.customColor || (draft().colorTheme || '#1e293b') === t.customColor)" (click)="selectTemplate(t)">
               <div class="template-preview-mini" [style.background]="t.previewBg">
-                <div class="template-preview-content" [innerHTML]="t.preview"></div>
+                <div class="template-preview-content">
+                  @if (t.id === 'elegance') {
+                    <div class="preview-doc doc-elegance">
+                      <div class="doc-top-bar" [style.background]="t.customColor"></div>
+                      <div class="doc-lines">
+                        <div class="doc-l text-long"></div>
+                        <div class="doc-l text-mid"></div>
+                        <div class="doc-l text-short"></div>
+                      </div>
+                    </div>
+                  } @else if (t.id === 'modern') {
+                    <div class="preview-doc doc-modern">
+                      <div class="doc-sidebar" [style.background]="t.customColor"></div>
+                      <div class="doc-body">
+                        <div class="doc-l text-long"></div>
+                        <div class="doc-l text-mid"></div>
+                      </div>
+                    </div>
+                  } @else if (t.id === 'minimal') {
+                    <div class="preview-doc doc-minimal">
+                      <div class="doc-l header-rule" [style.background]="t.customColor"></div>
+                      <div class="doc-l text-long"></div>
+                      <div class="doc-l text-mid"></div>
+                    </div>
+                  } @else if (t.id === 'creative') {
+                    <div class="preview-doc doc-creative">
+                      <div class="doc-body">
+                        <div class="doc-l header-rule" [style.background]="t.customColor"></div>
+                        <div class="doc-l text-long"></div>
+                      </div>
+                      <div class="doc-avatar"></div>
+                    </div>
+                  } @else if (t.id === 'compact') {
+                    <div class="preview-doc doc-compact">
+                      <div class="doc-header-row">
+                        <div class="header-bullet" [style.background]="t.customColor"></div>
+                        <div class="header-line"></div>
+                      </div>
+                      <div class="doc-body-flex">
+                        <div class="doc-box"></div>
+                        <div class="doc-box"></div>
+                      </div>
+                    </div>
+                  }
+                </div>
               </div>
               <div class="template-option-info">
                 <span class="template-option-name">{{ t.name }}</span>
                 <span class="template-option-desc">{{ t.desc }}</span>
               </div>
-              @if (draft().template === t.id) {
+              @if (draft().template === t.id && (!t.customColor || (draft().colorTheme || '#1e293b') === t.customColor)) {
               <div class="template-check">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3">
                   <polyline points="20 6 9 17 4 12" />

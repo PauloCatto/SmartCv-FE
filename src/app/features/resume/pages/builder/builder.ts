@@ -147,6 +147,7 @@ export class BuilderComponent implements OnInit {
               skills: existing.skills || [],
             });
             this.resumeTitle = existing.title;
+            this.scrollToSelectedTemplate();
           }
         }
       });
@@ -184,7 +185,21 @@ export class BuilderComponent implements OnInit {
     this.onFieldChange();
   }
 
-  goToStep(step: Step) { this.currentStep.set(step); }
+  goToStep(step: Step) {
+    this.currentStep.set(step);
+    if (step === 'template') {
+      this.scrollToSelectedTemplate();
+    }
+  }
+
+  scrollToSelectedTemplate() {
+    setTimeout(() => {
+      const selectedEl = document.querySelector('.template-option.selected');
+      if (selectedEl) {
+        selectedEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    }, 200);
+  }
 
   nextStep() {
     const idx = this.steps.findIndex(s => s.id === this.currentStep());
@@ -276,8 +291,13 @@ export class BuilderComponent implements OnInit {
     return this.draft().skills.some(s => s.name.toLowerCase() === name.toLowerCase());
   }
 
-  selectTemplate(id: TemplateType) {
-    this.draft.update(d => ({ ...d, template: id }));
+  selectTemplate(tmpl: any) {
+    this.draft.update(d => ({
+      ...d,
+      template: tmpl.id,
+      colorTheme: tmpl.customColor || d.colorTheme,
+      fontFamily: tmpl.customFont || d.fontFamily
+    }));
     this.onFieldChange();
   }
 

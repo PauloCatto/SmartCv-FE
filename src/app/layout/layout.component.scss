@@ -11,7 +11,7 @@
   display: flex;
   flex: 1;
   overflow: hidden;
-  margin-top: 68px; /* Offset for fixed header height */
+  margin-top: 68px;
   height: calc(100vh - 68px);
 }
 
@@ -21,6 +21,7 @@
   flex: 1;
   overflow-y: auto;
   position: relative;
+  min-width: 0;
 }
 
 .app-layout-content {
@@ -28,8 +29,16 @@
   width: 100%;
 }
 
+@media (max-width: 900px) {
+  .app-layout-body {
+    flex-direction: row;
+  }
+}
+
 @media (max-width: 768px) {
   .app-layout-body {
     flex-direction: column;
+    margin-top: 60px;
+    height: calc(100vh - 60px);
   }
 }
