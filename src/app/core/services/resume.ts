@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
-import { Resume, EMPTY_RESUME } from '../models/resume.model';
+import { Resume, DashboardStats, EMPTY_RESUME } from '../models/resume.model';
 import { environment } from '../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
@@ -94,5 +94,9 @@ export class ResumeService {
         this.resumesSubject.next([...currentList, duplicated]);
       })
     );
+  }
+
+  getDashboardStats(): Observable<DashboardStats> {
+    return this.http.get<DashboardStats>(`${environment.apiUrl}/resumes/dashboard/stats`);
   }
 }

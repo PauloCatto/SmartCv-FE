@@ -1,23 +1,31 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ViewChild, ElementRef, OnInit } from '@angular/core';
 import { RouterLink, Router } from '@angular/router';
 import { AsyncPipe } from '@angular/common';
-import { map } from 'rxjs/operators';
+import { combineLatest, map } from 'rxjs';
 import { ResumeService } from '../../core/services/resume';
 import { AuthService } from '../../core/services/auth';
-import { Resume, TEMPLATE_OPTIONS, TemplateType } from '../../core/models/resume.model';
+import { Resume, DashboardStats, TEMPLATE_OPTIONS } from '../../core/models/resume.model';
+import { JobMatcherModalComponent } from './components/job-matcher-modal/job-matcher-modal';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [RouterLink, AsyncPipe],
+  imports: [RouterLink, AsyncPipe, JobMatcherModalComponent],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
 })
-export class DashboardComponent {
+export class DashboardComponent implements OnInit {
   resumeService = inject(ResumeService);
   auth = inject(AuthService);
   private router = inject(Router);
 
+  @ViewChild('carouselContainer') carouselContainer!: ElementRef;
+
+  selectedResumeId: string | null = null;
   templateOptions = TEMPLATE_OPTIONS;
+
+  stats: DashboardStats = { totalResumes: 0, plan: 'FREE', aiActive: false };
+
+  resumes$ = this.resumeService.resumes$;
 
   firstName$ = this.auth.user$.pipe(
     map(user => {
@@ -25,6 +33,19 @@ export class DashboardComponent {
       return name.split(' ')[0];
     })
   );
+
+  dashboard$ = combineLatest([
+    this.resumeService.resumes$,
+    this.resumeService.getDashboardStats(),
+  ]).pipe(
+    map(([resumes, stats]) => ({ resumes, stats }))
+  );
+
+  ngOnInit() {
+    this.resumeService.getDashboardStats().subscribe(stats => {
+      this.stats = stats;
+    });
+  }
 
   getTemplateName(template: string): string {
     const names: Record<string, string> = { elegance: 'Elegance', modern: 'Modern', minimal: 'Minimal' };
@@ -53,11 +74,37 @@ export class DashboardComponent {
     }
   }
 
-  createWithTemplate(template: TemplateType) {
-    this.resumeService.create({ template }).subscribe({
+  createWithTemplate(tmpl: any) {
+    this.resumeService.create({
+      template: tmpl.id,
+      colorTheme: tmpl.customColor || '#1e293b',
+      fontFamily: tmpl.customFont || "'Inter', sans-serif",
+      title: `Meu Currículo - ${tmpl.name}`
+    }).subscribe({
       next: (created) => {
         this.router.navigate(['/resume', created.id, 'edit']);
       }
     });
+  }
+
+  openJobMatcher(resumeId: string) {
+    this.selectedResumeId = resumeId;
+  }
+
+  closeJobMatcher() {
+    this.selectedResumeId = null;
+  }
+
+  editResume(id: string) {
+    this.router.navigate(['/resume', id, 'edit']);
+  }
+
+  scrollCarousel(offset: number) {
+    if (this.carouselContainer) {
+      this.carouselContainer.nativeElement.scrollBy({
+        left: offset,
+        behavior: 'smooth'
+      });
+    }
   }
 }

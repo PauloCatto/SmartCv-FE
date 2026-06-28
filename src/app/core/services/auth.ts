@@ -16,9 +16,9 @@ export class AuthService {
   private userSubject = new BehaviorSubject<User | null>(this.loadCachedUser());
   private loadingSubject = new BehaviorSubject<boolean>(false);
 
-  readonly user$ = this.userSubject.asObservable();
-  readonly loading$ = this.loadingSubject.asObservable();
-  readonly isAuthenticated$ = this.user$.pipe(map(user => user !== null));
+  readonly user$: Observable<User | null> = this.userSubject.asObservable();
+  readonly loading$: Observable<boolean> = this.loadingSubject.asObservable();
+  readonly isAuthenticated$: Observable<boolean> = this.user$.pipe(map(user => user !== null));
 
   constructor() {
     if (this.getToken()) {
