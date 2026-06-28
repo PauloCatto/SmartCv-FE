@@ -1,11 +1,9 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { firstValueFrom } from 'rxjs';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
-
-interface AIResponse {
-  result: string;
-}
+import { AIResponse } from '../models/ai.model';
 
 @Injectable({
   providedIn: 'root',
@@ -13,39 +11,19 @@ interface AIResponse {
 export class AiService {
   private http = inject(HttpClient);
 
-  async improveBio(bio: string): Promise<string> {
-    try {
-      const response = await firstValueFrom(
-        this.http.post<AIResponse>(`${environment.apiUrl}/ai/improve-bio`, { bio })
-      );
-      return response.result;
-    } catch (err: any) {
-      const errMsg = err?.error?.error || 'Erro ao melhorar resumo com IA';
-      throw new Error(errMsg);
-    }
+  improveBio(bio: string): Observable<string> {
+    return this.http.post<AIResponse>(`${environment.apiUrl}/ai/improve-bio`, { bio }).pipe(
+      map(response => response.result)
+    );
   }
 
-  async improveExperience(description: string, jobTitle?: string): Promise<string> {
-    try {
-      const response = await firstValueFrom(
-        this.http.post<AIResponse>(`${environment.apiUrl}/ai/improve-experience`, { description, jobTitle })
-      );
-      return response.result;
-    } catch (err: any) {
-      const errMsg = err?.error?.error || 'Erro ao melhorar experiência com IA';
-      throw new Error(errMsg);
-    }
+  improveExperience(description: string, jobTitle?: string): Observable<string> {
+    return this.http.post<AIResponse>(`${environment.apiUrl}/ai/improve-experience`, { description, jobTitle }).pipe(
+      map(response => response.result)
+    );
   }
 
-  async suggestSkills(jobTitle: string): Promise<string[]> {
-    try {
-      const response = await firstValueFrom(
-        this.http.post<string[]>(`${environment.apiUrl}/ai/suggest-skills`, { jobTitle })
-      );
-      return response;
-    } catch (err: any) {
-      const errMsg = err?.error?.error || 'Erro ao sugerir habilidades com IA';
-      throw new Error(errMsg);
-    }
+  suggestSkills(jobTitle: string): Observable<string[]> {
+    return this.http.post<string[]>(`${environment.apiUrl}/ai/suggest-skills`, { jobTitle });
   }
 }

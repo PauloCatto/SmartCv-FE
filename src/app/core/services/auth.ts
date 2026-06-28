@@ -1,39 +1,33 @@
-import { Injectable, signal, computed, inject } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { firstValueFrom } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { map, tap } from 'rxjs/operators';
 import { User } from '../models/resume.model';
 import { environment } from '../../../environments/environment';
+import { BackendUser, AuthResponse } from '../models/auth.model';
 
 const STORAGE_KEY = 'smartcv_user';
 const STORAGE_TOKEN = 'smartcv_token';
 
-interface BackendUser {
-  id: string;
-  name: string;
-  email: string;
-  plan: 'FREE' | 'PREMIUM';
-}
-
-interface AuthResponse {
-  user: BackendUser;
-  token: string;
-}
-
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private http = inject(HttpClient);
-  private _user = signal<User | null>(this.loadCachedUser());
-  private _loading = signal(false);
 
-  readonly user = this._user.asReadonly();
-  readonly loading = this._loading.asReadonly();
-  readonly isAuthenticated = computed(() => this._user() !== null);
+  private userSubject = new BehaviorSubject<User | null>(this.loadCachedUser());
+  private loadingSubject = new BehaviorSubject<boolean>(false);
+
+  readonly user$ = this.userSubject.asObservable();
+  readonly loading$ = this.loadingSubject.asObservable();
+  readonly isAuthenticated$ = this.user$.pipe(map(user => user !== null));
 
   constructor() {
-    // If we have a token, fetch fresh user data on startup
     if (this.getToken()) {
-      this.refreshUser();
+      this.refreshUser().subscribe();
     }
+  }
+
+  get currentUserValue(): User | null {
+    return this.userSubject.value;
   }
 
   private loadCachedUser(): User | null {
@@ -54,60 +48,59 @@ export class AuthService {
     };
   }
 
-  private async refreshUser(): Promise<void> {
-    try {
-      const backendUser = await firstValueFrom(
-        this.http.get<BackendUser>(`${environment.apiUrl}/auth/me`)
-      );
-      const user = this.mapBackendUser(backendUser);
-      this._user.set(user);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
-    } catch {
-      // Token is invalid/expired
-      this.logout();
-    }
+  private refreshUser(): Observable<BackendUser> {
+    return this.http.get<BackendUser>(`${environment.apiUrl}/auth/me`).pipe(
+      tap({
+        next: (backendUser) => {
+          const user = this.mapBackendUser(backendUser);
+          this.userSubject.next(user);
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
+        },
+        error: () => {
+          this.logout();
+        }
+      })
+    );
   }
 
-  async login(email: string, password: string): Promise<void> {
-    this._loading.set(true);
-    try {
-      const response = await firstValueFrom(
-        this.http.post<AuthResponse>(`${environment.apiUrl}/auth/login`, { email, password })
-      );
-      
-      const user = this.mapBackendUser(response.user);
-      this._user.set(user);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
-      localStorage.setItem(STORAGE_TOKEN, response.token);
-    } catch (err: any) {
-      const errorMsg = err?.error?.error || 'Email ou senha inválidos';
-      throw new Error(errorMsg);
-    } finally {
-      this._loading.set(false);
-    }
+  login(email: string, password: string): Observable<AuthResponse> {
+    this.loadingSubject.next(true);
+    return this.http.post<AuthResponse>(`${environment.apiUrl}/auth/login`, { email, password }).pipe(
+      tap({
+        next: (response) => {
+          const user = this.mapBackendUser(response.user);
+          this.userSubject.next(user);
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
+          localStorage.setItem(STORAGE_TOKEN, response.token);
+          this.loadingSubject.next(false);
+        },
+        error: () => {
+          this.loadingSubject.next(false);
+        }
+      })
+    );
   }
 
-  async register(name: string, email: string, password: string): Promise<void> {
-    this._loading.set(true);
-    try {
-      const response = await firstValueFrom(
-        this.http.post<AuthResponse>(`${environment.apiUrl}/auth/register`, { name, email, password })
-      );
-
-      const user = this.mapBackendUser(response.user);
-      this._user.set(user);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
-      localStorage.setItem(STORAGE_TOKEN, response.token);
-    } catch (err: any) {
-      const errorMsg = err?.error?.error || 'Este email já está cadastrado';
-      throw new Error(errorMsg);
-    } finally {
-      this._loading.set(false);
-    }
+  register(name: string, email: string, password: string): Observable<AuthResponse> {
+    this.loadingSubject.next(true);
+    return this.http.post<AuthResponse>(`${environment.apiUrl}/auth/register`, { name, email, password }).pipe(
+      tap({
+        next: (response) => {
+          const user = this.mapBackendUser(response.user);
+          this.userSubject.next(user);
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
+          localStorage.setItem(STORAGE_TOKEN, response.token);
+          this.loadingSubject.next(false);
+        },
+        error: () => {
+          this.loadingSubject.next(false);
+        }
+      })
+    );
   }
 
   logout(): void {
-    this._user.set(null);
+    this.userSubject.next(null);
     localStorage.removeItem(STORAGE_KEY);
     localStorage.removeItem(STORAGE_TOKEN);
   }
