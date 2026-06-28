@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { tap, switchMap } from 'rxjs/operators';
 import { Resume, DashboardStats, EMPTY_RESUME } from '../models/resume.model';
 import { environment } from '../../../environments/environment';
 
@@ -71,15 +71,14 @@ export class ResumeService {
     );
   }
 
-  delete(id: string): Observable<void> {
+  delete(id: string): Observable<Resume[]> {
     return this.http.delete<void>(`${environment.apiUrl}/resumes/${id}`).pipe(
       tap(() => {
-        const currentList = this.resumesSubject.value;
-        this.resumesSubject.next(currentList.filter(r => r.id !== id));
         if (this.currentResumeSubject.value?.id === id) {
           this.currentResumeSubject.next(null);
         }
-      })
+      }),
+      switchMap(() => this.loadResumes())
     );
   }
 

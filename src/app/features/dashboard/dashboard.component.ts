@@ -48,8 +48,8 @@ export class DashboardComponent implements OnInit {
   }
 
   getTemplateName(template: string): string {
-    const names: Record<string, string> = { elegance: 'Elegance', modern: 'Modern', minimal: 'Minimal' };
-    return names[template] ?? template;
+    const opt = this.templateOptions.find(t => t.id === template);
+    return opt?.ptName ?? template;
   }
 
   formatDate(dateStr: string): string {
@@ -70,16 +70,23 @@ export class DashboardComponent implements OnInit {
 
   deleteResume(id: string) {
     if (confirm('Tem certeza que deseja excluir este currículo?')) {
-      this.resumeService.delete(id).subscribe();
+      this.resumeService.delete(id).subscribe({
+        error: () => alert('Erro ao excluir currículo. Tente novamente.')
+      });
     }
   }
 
   createWithTemplate(tmpl: any) {
+    const now = new Date();
+    const mes = now.toLocaleString('pt-BR', { month: 'short' }).replace('.', '');
+    const ano = now.getFullYear();
+    const titulo = `Currículo ${tmpl.ptName} - ${mes.charAt(0).toUpperCase() + mes.slice(1)} ${ano}`;
+
     this.resumeService.create({
       template: tmpl.id,
       colorTheme: tmpl.customColor || '#1e293b',
       fontFamily: tmpl.customFont || "'Inter', sans-serif",
-      title: `Meu Currículo - ${tmpl.name}`
+      title: titulo
     }).subscribe({
       next: (created) => {
         this.router.navigate(['/resume', created.id, 'edit']);

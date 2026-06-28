@@ -70,6 +70,7 @@ export interface DashboardStats {
 export interface TemplateOption {
   id: TemplateType;
   name: string;
+  ptName: string;
   desc: string;
   previewBg: string;
   preview: string;
@@ -81,6 +82,7 @@ export const TEMPLATE_OPTIONS: TemplateOption[] = [
   {
     id: 'elegance',
     name: 'Elegance',
+    ptName: 'Elegante Clássico',
     desc: 'Clássico e profissional',
     previewBg: 'linear-gradient(135deg, #1e293b, #0f172a)',
     preview: '',
@@ -90,6 +92,7 @@ export const TEMPLATE_OPTIONS: TemplateOption[] = [
   {
     id: 'elegance',
     name: 'Executive Gold',
+    ptName: 'Executivo Dourado',
     desc: 'Corporativo refinado em ouro',
     previewBg: 'linear-gradient(135deg, #d97706, #78350f)',
     preview: '',
@@ -99,6 +102,7 @@ export const TEMPLATE_OPTIONS: TemplateOption[] = [
   {
     id: 'modern',
     name: 'Modern Blue',
+    ptName: 'Moderno Azul',
     desc: 'Criativo com coluna lateral',
     previewBg: 'linear-gradient(135deg, #4c1d95, #1e1b4b)',
     preview: '',
@@ -108,6 +112,7 @@ export const TEMPLATE_OPTIONS: TemplateOption[] = [
   {
     id: 'modern',
     name: 'Modern Teal',
+    ptName: 'Moderno Verde',
     desc: 'Visual moderno e dinâmico',
     previewBg: 'linear-gradient(135deg, #0d9488, #115e59)',
     preview: '',
@@ -117,6 +122,7 @@ export const TEMPLATE_OPTIONS: TemplateOption[] = [
   {
     id: 'minimal',
     name: 'Minimal',
+    ptName: 'Minimalista',
     desc: 'Ultra limpo e refinado',
     previewBg: 'linear-gradient(135deg, #1f2937, #111827)',
     preview: '',
@@ -126,6 +132,7 @@ export const TEMPLATE_OPTIONS: TemplateOption[] = [
   {
     id: 'minimal',
     name: 'Tech Mono',
+    ptName: 'Técnico Mono',
     desc: 'Estilo clássico de engenharia',
     previewBg: 'linear-gradient(135deg, #0f172a, #020617)',
     preview: '',
@@ -135,7 +142,8 @@ export const TEMPLATE_OPTIONS: TemplateOption[] = [
   {
     id: 'creative',
     name: 'Creative Rose',
-    desc: 'Portfólio arrojado',
+    ptName: 'Criativo Rosa',
+    desc: 'Portfólio arroçado',
     previewBg: 'linear-gradient(135deg, #f43f5e, #be123c)',
     preview: '',
     customColor: '#e11d48',
@@ -144,6 +152,7 @@ export const TEMPLATE_OPTIONS: TemplateOption[] = [
   {
     id: 'compact',
     name: 'Compact',
+    ptName: 'Compacto',
     desc: 'Preenchimento horizontal',
     previewBg: 'linear-gradient(135deg, #0ea5e9, #0369a1)',
     preview: '',
