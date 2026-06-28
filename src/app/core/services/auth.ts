@@ -1,19 +1,42 @@
-import { Injectable, signal, computed } from '@angular/core';
+import { Injectable, signal, computed, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { firstValueFrom } from 'rxjs';
 import { User } from '../models/resume.model';
+import { environment } from '../../../environments/environment';
 
 const STORAGE_KEY = 'smartcv_user';
 const STORAGE_TOKEN = 'smartcv_token';
 
+interface BackendUser {
+  id: string;
+  name: string;
+  email: string;
+  plan: 'FREE' | 'PREMIUM';
+}
+
+interface AuthResponse {
+  user: BackendUser;
+  token: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private _user = signal<User | null>(this.loadUser());
+  private http = inject(HttpClient);
+  private _user = signal<User | null>(this.loadCachedUser());
   private _loading = signal(false);
 
   readonly user = this._user.asReadonly();
   readonly loading = this._loading.asReadonly();
   readonly isAuthenticated = computed(() => this._user() !== null);
 
-  private loadUser(): User | null {
+  constructor() {
+    // If we have a token, fetch fresh user data on startup
+    if (this.getToken()) {
+      this.refreshUser();
+    }
+  }
+
+  private loadCachedUser(): User | null {
     try {
       const data = localStorage.getItem(STORAGE_KEY);
       return data ? JSON.parse(data) : null;
@@ -22,56 +45,65 @@ export class AuthService {
     }
   }
 
-  login(email: string, password: string): Promise<void> {
-    this._loading.set(true);
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        const stored = localStorage.getItem(`smartcv_user_${email}`);
-        if (stored) {
-          const userData = JSON.parse(stored);
-          if (userData.password === btoa(password)) {
-            const user: User = { id: userData.id, name: userData.name, email: userData.email, plan: userData.plan };
-            this._user.set(user);
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
-            localStorage.setItem(STORAGE_TOKEN, 'mock-jwt-token');
-            this._loading.set(false);
-            resolve();
-          } else {
-            this._loading.set(false);
-            reject(new Error('Email ou senha inválidos'));
-          }
-        } else {
-          this._loading.set(false);
-          reject(new Error('Usuário não encontrado'));
-        }
-      }, 1000);
-    });
+  private mapBackendUser(user: BackendUser): User {
+    return {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      plan: user.plan.toLowerCase() as 'free' | 'premium',
+    };
   }
 
-  register(name: string, email: string, password: string): Promise<void> {
+  private async refreshUser(): Promise<void> {
+    try {
+      const backendUser = await firstValueFrom(
+        this.http.get<BackendUser>(`${environment.apiUrl}/auth/me`)
+      );
+      const user = this.mapBackendUser(backendUser);
+      this._user.set(user);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
+    } catch {
+      // Token is invalid/expired
+      this.logout();
+    }
+  }
+
+  async login(email: string, password: string): Promise<void> {
     this._loading.set(true);
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        const exists = localStorage.getItem(`smartcv_user_${email}`);
-        if (exists) {
-          this._loading.set(false);
-          reject(new Error('Este email já está cadastrado'));
-          return;
-        }
-        const user: User = {
-          id: crypto.randomUUID(),
-          name,
-          email,
-          plan: 'free',
-        };
-        localStorage.setItem(`smartcv_user_${email}`, JSON.stringify({ ...user, password: btoa(password) }));
-        this._user.set(user);
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
-        localStorage.setItem(STORAGE_TOKEN, 'mock-jwt-token');
-        this._loading.set(false);
-        resolve();
-      }, 1000);
-    });
+    try {
+      const response = await firstValueFrom(
+        this.http.post<AuthResponse>(`${environment.apiUrl}/auth/login`, { email, password })
+      );
+      
+      const user = this.mapBackendUser(response.user);
+      this._user.set(user);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
+      localStorage.setItem(STORAGE_TOKEN, response.token);
+    } catch (err: any) {
+      const errorMsg = err?.error?.error || 'Email ou senha inválidos';
+      throw new Error(errorMsg);
+    } finally {
+      this._loading.set(false);
+    }
+  }
+
+  async register(name: string, email: string, password: string): Promise<void> {
+    this._loading.set(true);
+    try {
+      const response = await firstValueFrom(
+        this.http.post<AuthResponse>(`${environment.apiUrl}/auth/register`, { name, email, password })
+      );
+
+      const user = this.mapBackendUser(response.user);
+      this._user.set(user);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
+      localStorage.setItem(STORAGE_TOKEN, response.token);
+    } catch (err: any) {
+      const errorMsg = err?.error?.error || 'Este email já está cadastrado';
+      throw new Error(errorMsg);
+    } finally {
+      this._loading.set(false);
+    }
   }
 
   logout(): void {

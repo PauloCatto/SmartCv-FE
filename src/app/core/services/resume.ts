@@ -1,80 +1,97 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, signal, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { firstValueFrom } from 'rxjs';
 import { Resume, EMPTY_RESUME } from '../models/resume.model';
-
-const STORAGE_KEY = 'smartcv_resumes';
+import { environment } from '../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class ResumeService {
-  private _resumes = signal<Resume[]>(this.loadResumes());
+  private http = inject(HttpClient);
+  private _resumes = signal<Resume[]>([]);
   private _currentResume = signal<Resume | null>(null);
 
   readonly resumes = this._resumes.asReadonly();
   readonly currentResume = this._currentResume.asReadonly();
 
-  private loadResumes(): Resume[] {
-    try {
-      const data = localStorage.getItem(STORAGE_KEY);
-      return data ? JSON.parse(data) : [];
-    } catch {
-      return [];
-    }
+  constructor() {
+    this.loadResumes();
   }
 
-  private saveResumes(resumes: Resume[]): void {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(resumes));
-    this._resumes.set(resumes);
+  async loadResumes(): Promise<void> {
+    try {
+      const resumesList = await firstValueFrom(
+        this.http.get<Resume[]>(`${environment.apiUrl}/resumes`)
+      );
+      this._resumes.set(resumesList);
+    } catch {
+      this._resumes.set([]);
+    }
   }
 
   getAll(): Resume[] {
     return this._resumes();
   }
 
-  getById(id: string): Resume | undefined {
-    return this._resumes().find(r => r.id === id);
+  async getById(id: string): Promise<Resume | null> {
+    // If already loaded, we can find it, but pulling from backend is safer for fresh data
+    try {
+      const resume = await firstValueFrom(
+        this.http.get<Resume>(`${environment.apiUrl}/resumes/${id}`)
+      );
+      this._currentResume.set(resume);
+      return resume;
+    } catch {
+      return null;
+    }
   }
 
-  create(partial?: Partial<Resume>): Resume {
-    const now = new Date().toISOString();
-    const resume: Resume = {
-      ...EMPTY_RESUME,
-      ...partial,
-      id: crypto.randomUUID(),
-      createdAt: now,
-      updatedAt: now,
-      personalInfo: { ...EMPTY_RESUME.personalInfo, ...(partial?.personalInfo ?? {}) },
-      experience: partial?.experience ?? [],
-      education: partial?.education ?? [],
-      skills: partial?.skills ?? [],
+  async create(partial?: Partial<Resume>): Promise<Resume> {
+    const resumePayload = {
+      title: partial?.title || EMPTY_RESUME.title,
+      template: partial?.template || EMPTY_RESUME.template,
+      colorTheme: partial?.colorTheme || EMPTY_RESUME.colorTheme,
+      fontFamily: partial?.fontFamily || EMPTY_RESUME.fontFamily,
+      spacingMode: partial?.spacingMode || EMPTY_RESUME.spacingMode,
+      personalInfo: partial?.personalInfo || EMPTY_RESUME.personalInfo,
+      experience: partial?.experience || EMPTY_RESUME.experience,
+      education: partial?.education || EMPTY_RESUME.education,
+      skills: partial?.skills || EMPTY_RESUME.skills,
     };
-    const updated = [...this._resumes(), resume];
-    this.saveResumes(updated);
-    this._currentResume.set(resume);
-    return resume;
+
+    const newResume = await firstValueFrom(
+      this.http.post<Resume>(`${environment.apiUrl}/resumes`, resumePayload)
+    );
+
+    this._resumes.update(list => [...list, newResume]);
+    this._currentResume.set(newResume);
+    return newResume;
   }
 
-  update(id: string, changes: Partial<Resume>): Resume | null {
-    const resumes = this._resumes();
-    const idx = resumes.findIndex(r => r.id === id);
-    if (idx === -1) return null;
+  async update(id: string, changes: Partial<Resume>): Promise<Resume | null> {
+    try {
+      const updated = await firstValueFrom(
+        this.http.put<Resume>(`${environment.apiUrl}/resumes/${id}`, changes)
+      );
 
-    const updated: Resume = {
-      ...resumes[idx],
-      ...changes,
-      id,
-      updatedAt: new Date().toISOString(),
-    };
-    const newList = [...resumes];
-    newList[idx] = updated;
-    this.saveResumes(newList);
-    this._currentResume.set(updated);
-    return updated;
+      this._resumes.update(list => list.map(r => r.id === id ? updated : r));
+      this._currentResume.set(updated);
+      return updated;
+    } catch {
+      return null;
+    }
   }
 
-  delete(id: string): void {
-    const filtered = this._resumes().filter(r => r.id !== id);
-    this.saveResumes(filtered);
-    if (this._currentResume()?.id === id) {
-      this._currentResume.set(null);
+  async delete(id: string): Promise<void> {
+    try {
+      await firstValueFrom(
+        this.http.delete<void>(`${environment.apiUrl}/resumes/${id}`)
+      );
+      this._resumes.update(list => list.filter(r => r.id !== id));
+      if (this._currentResume()?.id === id) {
+        this._currentResume.set(null);
+      }
+    } catch (err) {
+      throw new Error('Falha ao deletar currículo');
     }
   }
 
@@ -82,12 +99,15 @@ export class ResumeService {
     this._currentResume.set(resume);
   }
 
-  duplicate(id: string): Resume | null {
-    const original = this.getById(id);
-    if (!original) return null;
-    return this.create({
-      ...original,
-      title: `${original.title} (cópia)`,
-    });
+  async duplicate(id: string): Promise<Resume | null> {
+    try {
+      const duplicated = await firstValueFrom(
+        this.http.post<Resume>(`${environment.apiUrl}/resumes/${id}/duplicate`, {})
+      );
+      this._resumes.update(list => [...list, duplicated]);
+      return duplicated;
+    } catch {
+      return null;
+    }
   }
 }
