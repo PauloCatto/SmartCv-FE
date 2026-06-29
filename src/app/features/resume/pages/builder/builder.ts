@@ -46,6 +46,7 @@ export class BuilderComponent implements OnInit {
   lastSaved = signal(false);
   exporting = signal(false);
   previewScale = signal(0.75);
+  activeTab = signal<'edit' | 'preview'>('edit');
   newSkillName = '';
   newSkillLevel: 1 | 2 | 3 | 4 | 5 = 3;
   private saveTimeout: any;
@@ -436,6 +437,23 @@ export class BuilderComponent implements OnInit {
   goBack() {
     this.autoSave();
     this.router.navigate(['/dashboard']);
+  }
+
+  toggleMobileView() {
+    this.activeTab.update(t => {
+      const next = t === 'edit' ? 'preview' : 'edit';
+      if (next === 'preview') {
+        const width = window.innerWidth;
+        if (width < 500) {
+          this.previewScale.set(0.4);
+        } else if (width < 768) {
+          this.previewScale.set(0.55);
+        } else if (width < 1024) {
+          this.previewScale.set(0.7);
+        }
+      }
+      return next;
+    });
   }
 
   async exportPdf() {

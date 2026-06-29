@@ -5,7 +5,7 @@
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <polyline points="15 18 9 12 15 6" />
         </svg>
-        Voltar
+        <span>Voltar</span>
       </button>
       <div class="topbar-divider"></div>
       <input class="resume-title-input" [(ngModel)]="resumeTitle" placeholder="Nome do currículo..."
@@ -29,9 +29,9 @@
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5">
           <polyline points="20 6 9 17 4 12" />
         </svg>
-        Salvo
+        <span>Salvo</span>
       </span>
-      <button class="btn btn-secondary btn-sm" (click)="exportPdf()" [disabled]="exporting()">
+      <button class="btn btn-secondary btn-sm btn-export-pdf" (click)="exportPdf()" [disabled]="exporting()">
         @if (exporting()) {
         <div class="spinner" style="width:14px;height:14px"></div>
         } @else {
@@ -41,12 +41,12 @@
           <line x1="12" y1="15" x2="12" y2="3" />
         </svg>
         }
-        Exportar PDF
+        <span>Exportar PDF</span>
       </button>
     </div>
   </div>
 
-  <div class="builder-layout">
+  <div class="builder-layout" [class.show-preview]="activeTab() === 'preview'">
     <div class="form-panel">
       <div class="steps-nav">
         @for (s of steps; track s.id; let i = $index) {
@@ -576,9 +576,9 @@
       <div class="preview-topbar">
         <span class="preview-label">Preview ao vivo</span>
         <div class="preview-scale-btns">
+          <button class="scale-btn" [class.active]="previewScale() === 0.4" (click)="previewScale.set(0.4)">40%</button>
           <button class="scale-btn" [class.active]="previewScale() === 0.6" (click)="previewScale.set(0.6)">60%</button>
-          <button class="scale-btn" [class.active]="previewScale() === 0.75"
-            (click)="previewScale.set(0.75)">75%</button>
+          <button class="scale-btn" [class.active]="previewScale() === 0.8" (click)="previewScale.set(0.8)">80%</button>
           <button class="scale-btn" [class.active]="previewScale() === 1" (click)="previewScale.set(1)">100%</button>
         </div>
       </div>
@@ -600,4 +600,21 @@
       </div>
     </div>
   </div>
+
+  <!-- Floating mobile view switcher -->
+  <button class="mobile-view-toggle" (click)="toggleMobileView()">
+    @if (activeTab() === 'edit') {
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+        <circle cx="12" cy="12" r="3" />
+      </svg>
+      <span>Ver Prévia</span>
+    } @else {
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M12 20h9" />
+        <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" />
+      </svg>
+      <span>Editar Conteúdo</span>
+    }
+  </button>
 </div>

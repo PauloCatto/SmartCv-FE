@@ -32,7 +32,7 @@ export class ResumeService {
   }
 
   getById(id: string): Observable<Resume> {
-    return this.http.get<Resume>(`${environment.apiUrl}/resumes/${id}`).pipe(
+    return this.http.get<Resume>(`${environment.apiUrl}/resumes/detail/${id}`).pipe(
       tap(resume => {
         this.currentResumeSubject.next(resume);
       })

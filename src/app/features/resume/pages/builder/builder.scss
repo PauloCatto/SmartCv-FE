@@ -1,5 +1,7 @@
 .builder-page {
   height: 100vh;
+  width: 100vw;
+  max-width: 100vw;
   display: flex;
   flex-direction: column;
   background: var(--color-bg);
@@ -500,6 +502,7 @@
   flex-direction: column;
   gap: 2px;
   flex: 1;
+  min-width: 0;
 }
 
 .template-option-name {
@@ -1042,5 +1045,109 @@
       border: 1px solid #e2e8f0;
       border-radius: 2px;
     }
+  }
+}
+
+.mobile-view-toggle {
+  display: none;
+}
+
+@media (max-width: 1024px) {
+  .mobile-view-toggle {
+    display: flex;
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 99;
+    background: var(--color-primary);
+    color: white;
+    border: none;
+    border-radius: 100px;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 10px 25px rgba(99, 102, 241, 0.4);
+    cursor: pointer;
+    transition: all var(--transition-base);
+
+    &:hover {
+      background: var(--color-primary-dark);
+      transform: translateX(-50%) translateY(-2px);
+      box-shadow: 0 12px 30px rgba(99, 102, 241, 0.5);
+    }
+
+    &:active {
+      transform: translateX(-50%) translateY(0);
+    }
+  }
+
+  .form-panel {
+    width: 100% !important;
+    border-right: none;
+  }
+
+  .preview-panel {
+    width: 100% !important;
+  }
+
+  .builder-layout {
+    &:not(.show-preview) {
+      .preview-panel {
+        display: none !important;
+      }
+    }
+
+    &.show-preview {
+      .form-panel {
+        display: none !important;
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .topbar-left {
+    gap: 6px;
+    .btn span {
+      display: none;
+    }
+  }
+  .topbar-right {
+    gap: 6px;
+  }
+  .resume-title-input {
+    min-width: 80px !important;
+    max-width: 130px;
+    font-size: 14px;
+  }
+  .ats-score-label {
+    display: none !important;
+  }
+  .save-indicator {
+    display: none !important;
+  }
+  .btn-export-pdf span {
+    display: none;
+  }
+  .topbar-divider {
+    display: none !important;
+  }
+  .builder-topbar {
+    padding: 0 8px;
+  }
+  .step-section {
+    padding: 12px;
+  }
+  .form-grid {
+    grid-template-columns: 1fr;
+    .col-2 {
+      grid-column: span 1;
+    }
+  }
+  .preview-container {
+    padding: 10px;
   }
 }
