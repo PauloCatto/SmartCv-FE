@@ -8,7 +8,7 @@
         <rect x="14" y="14" width="7" height="7" />
         <rect x="3" y="14" width="7" height="7" />
       </svg>
-      <span>Dashboard</span>
+      <span>{{ 'SIDEBAR.DASHBOARD' | translate }}</span>
     </a>
   </div>
 
@@ -19,7 +19,7 @@
       <div class="user-details">
         <span class="user-name">{{ user.name }}</span>
         <span class="user-plan" [class.premium]="user.plan === 'premium'">
-          {{ user.plan === 'premium' ? 'Plan Premium' : 'Plan Free' }}
+          {{ user.plan === 'premium' ? ('SIDEBAR.PLAN_PREMIUM' | translate) : ('SIDEBAR.PLAN_FREE' | translate) }}
         </span>
       </div>
     </div>
@@ -30,7 +30,7 @@
         <polyline points="16 17 21 12 16 7" />
         <line x1="21" y1="12" x2="9" y2="12" />
       </svg>
-      <span>Sair</span>
+      <span>{{ 'SIDEBAR.LOGOUT' | translate }}</span>
     </button>
   </div>
 </aside>
