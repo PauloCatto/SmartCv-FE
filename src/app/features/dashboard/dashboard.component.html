@@ -4,10 +4,10 @@
     <div class="dashboard-header">
       <div class="header-left">
         <h1 class="dashboard-title">
-          Olá, <span class="gradient-text">{{ firstName$ | async }}</span>
+          {{ 'DASHBOARD.GREETING' | translate }} <span class="gradient-text">{{ firstName$ | async }}</span>
         </h1>
         <p class="dashboard-subtitle">
-          Crie e gerencie seus currículos com o auxílio de inteligência artificial.
+          {{ 'DASHBOARD.SUBTITLE' | translate }}
         </p>
       </div>
     </div>
@@ -15,8 +15,8 @@
     <!-- Seção de Modelos de Currículo (Galeria de Templates) -->
     <div class="templates-section">
       <div class="section-header">
-        <h2 class="section-title">Modelos de Currículo</h2>
-        <p class="section-subtitle">Escolha um modelo abaixo para criar um currículo profissional em instantes.</p>
+        <h2 class="section-title">{{ 'DASHBOARD.TEMPLATES_TITLE' | translate }}</h2>
+        <p class="section-subtitle">{{ 'DASHBOARD.TEMPLATES_SUBTITLE' | translate }}</p>
       </div>
       <div class="carousel-wrapper">
         <button type="button" class="carousel-arrow left" (click)="scrollCarousel(-260)" aria-label="Anterior">
@@ -79,7 +79,7 @@
               <h3 class="template-name">{{ tmpl.name }}</h3>
               <p class="template-desc">{{ tmpl.desc }}</p>
               <button class="btn btn-ghost btn-sm btn-select-template">
-                Usar este modelo
+                {{ 'DASHBOARD.USE_TEMPLATE' | translate }}
               </button>
             </div>
           </div>
@@ -97,7 +97,7 @@
     <!-- Seção de Meus Currículos e Stats -->
     <div class="resumes-section">
       <div class="section-header">
-        <h2 class="section-title">Meus Currículos Recentes</h2>
+        <h2 class="section-title">{{ 'DASHBOARD.MY_RESUMES' | translate }}</h2>
       </div>
 
       <div class="stats-row">
@@ -110,7 +110,7 @@
           </div>
           <div>
             <div class="stat-value">{{ vm.stats.totalResumes }}</div>
-            <div class="stat-name">Currículos</div>
+            <div class="stat-name">{{ 'DASHBOARD.RESUMES' | translate }}</div>
           </div>
         </div>
         <div class="stat-card">
@@ -120,8 +120,8 @@
             </svg>
           </div>
           <div>
-            <div class="stat-value">{{ vm.stats.plan === 'PREMIUM' ? 'Premium' : 'Gratuito' }}</div>
-            <div class="stat-name">Plano atual</div>
+            <div class="stat-value">{{ vm.stats.plan === 'PREMIUM' ? ('DASHBOARD.PREMIUM' | translate) : ('DASHBOARD.FREE' | translate) }}</div>
+            <div class="stat-name">{{ 'DASHBOARD.CURRENT_PLAN' | translate }}</div>
           </div>
         </div>
         <div class="stat-card">
@@ -131,13 +131,37 @@
             </svg>
           </div>
           <div>
-            <div class="stat-value">{{ vm.stats.aiActive ? 'Ativo' : 'Inativo' }}</div>
-            <div class="stat-name">Gemini ativo</div>
+            <div class="stat-value">{{ vm.stats.aiActive ? ('DASHBOARD.ACTIVE' | translate) : ('DASHBOARD.INACTIVE' | translate) }}</div>
+            <div class="stat-name">{{ 'DASHBOARD.GEMINI_ACTIVE' | translate }}</div>
           </div>
         </div>
       </div>
 
-      @if (vm.resumes.length === 0) {
+      @if (loading$ | async) {
+      <!-- Skeleton Loading State -->
+      <div class="resumes-grid">
+        @for (i of [1,2,3]; track i) {
+        <div class="skeleton-card">
+          <div class="skeleton-preview">
+            <div class="skeleton-block" style="width: 100%; height: 100%"></div>
+          </div>
+          <div class="skeleton-info">
+            <div class="skeleton-row">
+              <div class="skeleton-block" style="width: 65%; height: 16px"></div>
+              <div class="skeleton-block" style="width: 60px; height: 20px; border-radius: 100px"></div>
+            </div>
+            <div class="skeleton-block" style="width: 40%; height: 12px; margin-top: 6px"></div>
+            <div class="skeleton-actions">
+              <div class="skeleton-block" style="flex: 1; height: 32px"></div>
+              <div class="skeleton-block" style="width: 32px; height: 32px"></div>
+              <div class="skeleton-block" style="width: 32px; height: 32px"></div>
+              <div class="skeleton-block" style="width: 32px; height: 32px"></div>
+            </div>
+          </div>
+        </div>
+        }
+      </div>
+      } @else if (vm.resumes.length === 0) {
       <div class="empty-state">
         <div class="empty-icon">
           <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -145,8 +169,8 @@
             <polyline points="14 2 14 8 20 8" />
           </svg>
         </div>
-        <h3 class="empty-title">Nenhum currículo ainda</h3>
-        <p class="empty-desc">Escolha um dos modelos profissionais acima para criar seu primeiro currículo.</p>
+        <h3 class="empty-title">{{ 'DASHBOARD.EMPTY_TITLE' | translate }}</h3>
+        <p class="empty-desc">{{ 'DASHBOARD.EMPTY_DESC' | translate }}</p>
       </div>
       } @else {
       <div class="resumes-grid">
@@ -174,7 +198,7 @@
               <h3 class="resume-title-text">{{ resume.title }}</h3>
               <span class="template-tag">{{ getTemplateName(resume.template) }}</span>
             </div>
-            <p class="resume-date">Editado {{ formatDate(resume.updatedAt) }}</p>
+            <p class="resume-date">{{ 'DASHBOARD.EDITED' | translate }} {{ formatDate(resume.updatedAt) }}</p>
 
             <div class="resume-actions">
               <a [routerLink]="['/resume', resume.id, 'edit']" class="btn btn-primary btn-sm" style="flex:1" (click)="$event.stopPropagation()">
@@ -182,7 +206,7 @@
                   <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" />
                   <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
                 </svg>
-                Editar
+                {{ 'DASHBOARD.EDIT' | translate }}
               </a>
               <button class="btn btn-secondary btn-sm" (click)="openJobMatcher(resume.id); $event.stopPropagation()" title="Otimizar para Vaga com IA" style="color: #6366f1; border-color: rgba(99, 102, 241, 0.2)">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -195,7 +219,7 @@
                   <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" />
                 </svg>
               </button>
-              <button class="btn btn-danger btn-sm" (click)="deleteResume(resume.id); $event.stopPropagation()">
+              <button class="btn btn-danger btn-sm" (click)="requestDelete(resume.id); $event.stopPropagation()">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <polyline points="3 6 5 6 21 6" />
                   <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a1 1 0 011-1h4a1 1 0 011 1v2" />
@@ -216,5 +240,17 @@
       [resumeId]="selectedResumeId"
       (close)="closeJobMatcher()"
     ></app-job-matcher-modal>
+  }
+
+  @if (deleteTargetId) {
+    <app-confirm-modal
+      title="Excluir currículo"
+      message="Tem certeza que deseja excluir este currículo? Esta ação não pode ser desfeita."
+      confirmText="Excluir"
+      cancelText="Cancelar"
+      type="danger"
+      (confirm)="confirmDelete()"
+      (cancel)="cancelDelete()"
+    ></app-confirm-modal>
   }
 </div>

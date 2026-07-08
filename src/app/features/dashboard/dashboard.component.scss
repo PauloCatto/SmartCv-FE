@@ -477,6 +477,39 @@
   margin-top: 12px;
 }
 
+/* SKELETON LOADING */
+.skeleton-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+}
+
+.skeleton-preview {
+  height: 160px;
+  overflow: hidden;
+}
+
+.skeleton-info {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.skeleton-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.skeleton-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 4px;
+}
+
 /* ────────────────── RESPONSIVE ────────────────── */
 
 @media (max-width: 1024px) {

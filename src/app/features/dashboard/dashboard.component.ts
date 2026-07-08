@@ -1,27 +1,42 @@
-import { Component, inject, ViewChild, ElementRef, OnInit } from '@angular/core';
+import { Component, inject, ViewChild, ElementRef, OnInit, OnDestroy } from '@angular/core';
 import { RouterLink, Router } from '@angular/router';
 import { AsyncPipe } from '@angular/common';
-import { combineLatest, map } from 'rxjs';
+import { combineLatest, map, BehaviorSubject, Subscription, finalize, catchError, of } from 'rxjs';
 import { ResumeService } from '../../core/services/resume';
 import { AuthService } from '../../core/services/auth';
 import { Resume, DashboardStats, TEMPLATE_OPTIONS } from '../../core/models/resume.model';
 import { JobMatcherModalComponent } from './components/job-matcher-modal/job-matcher-modal';
+import { SkeletonLoaderComponent } from '../../shared/components/skeleton-loader/skeleton-loader';
+import { ConfirmModalComponent } from '../../shared/components/confirm-modal/confirm-modal';
+import { TranslateModule } from '@ngx-translate/core';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [RouterLink, AsyncPipe, JobMatcherModalComponent],
+  imports: [
+    RouterLink,
+    AsyncPipe,
+    JobMatcherModalComponent,
+    ConfirmModalComponent,
+    TranslateModule,
+  ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
 })
-export class DashboardComponent implements OnInit {
+export class DashboardComponent implements OnInit, OnDestroy {
   resumeService = inject(ResumeService);
   auth = inject(AuthService);
   private router = inject(Router);
+  private toastr = inject(ToastrService);
 
   @ViewChild('carouselContainer') carouselContainer!: ElementRef;
 
   selectedResumeId: string | null = null;
+  deleteTargetId: string | null = null;
   templateOptions = TEMPLATE_OPTIONS;
+
+  private loadingSubject = new BehaviorSubject<boolean>(true);
+  loading$ = this.loadingSubject.asObservable();
 
   stats: DashboardStats = { totalResumes: 0, plan: 'FREE', aiActive: false };
 
@@ -38,13 +53,27 @@ export class DashboardComponent implements OnInit {
     this.resumeService.resumes$,
     this.resumeService.getDashboardStats(),
   ]).pipe(
-    map(([resumes, stats]) => ({ resumes, stats }))
+    map(([resumes, stats]) => {
+      this.loadingSubject.next(false);
+      return { resumes, stats };
+    }),
+    catchError(() => {
+      this.loadingSubject.next(false);
+      return of({ resumes: [], stats: this.stats });
+    })
   );
 
+  private subs: Subscription[] = [];
+
   ngOnInit() {
-    this.resumeService.getDashboardStats().subscribe(stats => {
+    const sub = this.resumeService.getDashboardStats().subscribe(stats => {
       this.stats = stats;
     });
+    this.subs.push(sub);
+  }
+
+  ngOnDestroy() {
+    this.subs.forEach(s => s.unsubscribe());
   }
 
   getTemplateName(template: string): string {
@@ -65,15 +94,37 @@ export class DashboardComponent implements OnInit {
   }
 
   duplicate(resume: Resume) {
-    this.resumeService.duplicate(resume.id).subscribe();
+    this.resumeService.duplicate(resume.id).subscribe({
+      next: () => {
+        this.toastr.success('Currículo duplicado com sucesso!', 'Duplicado');
+      },
+      error: () => {
+        this.toastr.error('Erro ao duplicar currículo.', 'Erro');
+      }
+    });
   }
 
-  deleteResume(id: string) {
-    if (confirm('Tem certeza que deseja excluir este currículo?')) {
-      this.resumeService.delete(id).subscribe({
-        error: () => alert('Erro ao excluir currículo. Tente novamente.')
-      });
-    }
+  requestDelete(id: string) {
+    this.deleteTargetId = id;
+  }
+
+  confirmDelete() {
+    if (!this.deleteTargetId) return;
+    const id = this.deleteTargetId;
+    this.deleteTargetId = null;
+
+    this.resumeService.delete(id).subscribe({
+      next: () => {
+        this.toastr.success('Currículo excluído com sucesso!', 'Excluído');
+      },
+      error: () => {
+        this.toastr.error('Erro ao excluir currículo. Tente novamente.', 'Erro');
+      }
+    });
+  }
+
+  cancelDelete() {
+    this.deleteTargetId = null;
   }
 
   createWithTemplate(tmpl: any) {
