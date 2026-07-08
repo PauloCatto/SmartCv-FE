@@ -1,19 +1,24 @@
 import { Component, inject, signal, HostListener } from '@angular/core';
 import { RouterLink, Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth';
-import { AsyncPipe } from '@angular/common';
+import { AsyncPipe, UpperCasePipe } from '@angular/common';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-header',
-  imports: [RouterLink, AsyncPipe],
+  imports: [RouterLink, AsyncPipe, UpperCasePipe, TranslateModule],
   templateUrl: './header.html',
   styleUrl: './header.scss',
 })
 export class HeaderComponent {
   auth = inject(AuthService);
+  translate = inject(TranslateService);
   private router = inject(Router);
   scrolled = signal(false);
   menuOpen = signal(false);
+  langMenuOpen = signal(false);
+
+  currentLang = signal(this.translate.currentLang || 'pt');
 
   @HostListener('window:scroll')
   onScroll() {
@@ -26,10 +31,24 @@ export class HeaderComponent {
     if (!target.closest('.user-menu')) {
       this.menuOpen.set(false);
     }
+    if (!target.closest('.lang-switcher')) {
+      this.langMenuOpen.set(false);
+    }
   }
 
   toggleMenu() {
     this.menuOpen.update(v => !v);
+  }
+
+  toggleLangMenu() {
+    this.langMenuOpen.update(v => !v);
+  }
+
+  switchLang(lang: string) {
+    this.translate.use(lang);
+    this.currentLang.set(lang);
+    localStorage.setItem('smartcv_lang', lang);
+    this.langMenuOpen.set(false);
   }
 
   getUserInitials(name: string | undefined): string {

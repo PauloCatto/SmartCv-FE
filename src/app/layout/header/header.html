@@ -12,13 +12,47 @@
 
     @if (!(auth.isAuthenticated$ | async)) {
     <div class="navbar-links">
-      <a href="#features" class="nav-link">Funcionalidades</a>
-      <a href="#templates" class="nav-link">Templates</a>
-      <a href="#pricing" class="nav-link">Planos</a>
+      <a href="#features" class="nav-link">{{ 'HEADER.FEATURES' | translate }}</a>
+      <a href="#templates" class="nav-link">{{ 'HEADER.TEMPLATES' | translate }}</a>
+      <a href="#pricing" class="nav-link">{{ 'HEADER.PRICING' | translate }}</a>
     </div>
     }
- 
+
     <div class="navbar-actions">
+      <!-- Language Switcher -->
+      <div class="lang-switcher">
+        <button class="lang-btn" (click)="toggleLangMenu()" title="Idioma / Language">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10" />
+            <line x1="2" y1="12" x2="22" y2="12" />
+            <path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z" />
+          </svg>
+          <span class="lang-code">{{ currentLang() | uppercase }}</span>
+        </button>
+        @if (langMenuOpen()) {
+        <div class="lang-dropdown">
+          <button class="lang-option" [class.active]="currentLang() === 'pt'" (click)="switchLang('pt')">
+            <span class="lang-flag">🇧🇷</span>
+            <span>{{ 'LANG.PT' | translate }}</span>
+            @if (currentLang() === 'pt') {
+            <svg class="lang-check" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+            }
+          </button>
+          <button class="lang-option" [class.active]="currentLang() === 'en'" (click)="switchLang('en')">
+            <span class="lang-flag">🇺🇸</span>
+            <span>{{ 'LANG.EN' | translate }}</span>
+            @if (currentLang() === 'en') {
+            <svg class="lang-check" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+            }
+          </button>
+        </div>
+        }
+      </div>
+
       @if (auth.isAuthenticated$ | async) {
         @if (auth.user$ | async; as user) {
         <div class="user-menu">
@@ -39,21 +73,21 @@
                 <rect x="14" y="14" width="7" height="7" />
                 <rect x="3" y="14" width="7" height="7" />
               </svg>
-              Dashboard
+              {{ 'HEADER.DASHBOARD' | translate }}
             </a>
             <button class="dropdown-item danger" (click)="logout()">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9" />
               </svg>
-              Sair
+              {{ 'HEADER.LOGOUT' | translate }}
             </button>
           </div>
           }
         </div>
         }
       } @else {
-      <a routerLink="/auth/login" class="btn btn-ghost btn-sm">Entrar</a>
-      <a routerLink="/auth/register" class="btn btn-primary btn-sm">Começar grátis</a>
+      <a routerLink="/auth/login" class="btn btn-ghost btn-sm">{{ 'HEADER.LOGIN' | translate }}</a>
+      <a routerLink="/auth/register" class="btn btn-primary btn-sm">{{ 'HEADER.REGISTER' | translate }}</a>
       }
     </div>
   </div>

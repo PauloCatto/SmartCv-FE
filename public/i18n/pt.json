@@ -14,6 +14,89 @@
     "PLAN_PREMIUM": "Plano Premium",
     "LOGOUT": "Sair"
   },
+  "BUILDER": {
+    "BACK": "Voltar",
+    "UNTITLED_RESUME": "Nome do currículo...",
+    "SAVING": "Salvando...",
+    "SAVED": "Salvo",
+    "EXPORT_PDF": "Exportar PDF",
+    "GENERATING_PDF": "Gerando PDF...",
+    "STEPS": {
+      "TEMPLATE": "Template",
+      "PERSONAL": "Pessoal",
+      "EXPERIENCE": "Experiência",
+      "EDUCATION": "Educação",
+      "SKILLS": "Skills"
+    },
+    "PERSONAL": {
+      "TITLE": "Informações Pessoais",
+      "DESC": "Dados básicos que aparecerão no topo do seu currículo",
+      "AUTOFILL": "Auto-preencher",
+      "FULL_NAME": "Nome completo",
+      "JOB_TITLE": "Cargo / Título profissional",
+      "EMAIL": "Email",
+      "PHONE": "Telefone",
+      "LOCATION": "Localização",
+      "LINKEDIN": "LinkedIn",
+      "BIO": "Resumo profissional",
+      "BIO_PLACEHOLDER": "Breve descrição sobre você, seus valores e objetivos profissionais...",
+      "IMPROVE_AI": "✨ Melhorar com IA"
+    },
+    "EXPERIENCE": {
+      "TITLE": "Experiência Profissional",
+      "DESC": "Adicione suas experiências mais recentes primeiro",
+      "ROLE": "Cargo",
+      "COMPANY": "Empresa",
+      "START": "Início",
+      "END": "Fim",
+      "CURRENT": "Emprego atual",
+      "DESCRIPTION": "Descrição das atividades",
+      "DESCRIPTION_PLACEHOLDER": "Descreva suas principais responsabilidades e conquistas...",
+      "ADD_BTN": "Adicionar experiência",
+      "EMPTY_ROLE": "Cargo não informado"
+    },
+    "EDUCATION": {
+      "TITLE": "Educação",
+      "DESC": "Formação acadêmica e cursos relevantes",
+      "DEGREE": "Grau / Tipo",
+      "FIELD": "Área / Curso",
+      "INSTITUTION": "Instituição",
+      "START": "Início",
+      "END": "Fim",
+      "CURRENT": "Em andamento",
+      "ADD_BTN": "Adicionar formação",
+      "EMPTY_DEGREE": "Formação não informada"
+    },
+    "SKILLS": {
+      "TITLE": "Habilidades",
+      "DESC": "Adicione suas skills técnicas e comportamentais",
+      "ADD_PLACEHOLDER": "Ex: TypeScript, Liderança, Photoshop...",
+      "LEVEL": "Nível:",
+      "ADD_BTN": "Adicionar",
+      "EMPTY": "Nenhuma skill adicionada ainda. Use o campo acima!",
+      "SUGGESTIONS": "Sugestões populares:"
+    },
+    "TEMPLATE": {
+      "TITLE": "Escolha o Template",
+      "DESC": "Selecione o design que melhor representa você",
+      "COLOR": "Cor de Destaque",
+      "COLOR_DESC": "Selecione uma paleta profissional para os realces e títulos",
+      "FONT": "Tipografia (Fontes ATS)",
+      "FONT_DESC": "Selecione uma fonte legível recomendada pelo mercado de contratações",
+      "DENSITY": "Densidade do Layout (Espaçamento)",
+      "DENSITY_DESC": "Ajuste o espaçamento para preencher a folha perfeitamente",
+      "COMPACT": "Compacto",
+      "NORMAL": "Padrão",
+      "SPACIOUS": "Amplo"
+    },
+    "PREVIEW_LABEL": "Preview ao vivo",
+    "MOBILE_PREVIEW": "Ver Prévia",
+    "MOBILE_EDIT": "Editar Conteúdo",
+    "PREV": "Anterior",
+    "NEXT": "Próximo",
+    "FINISH_INFO": "Seu currículo está sendo salvo automaticamente",
+    "DOWNLOAD_PDF": "Baixar PDF"
+  },
   "FOOTER": {
     "TAGLINE": "Crie currículos incríveis com IA",
     "COPYRIGHT": "© 2026 SmartCV. Todos os direitos reservados."

@@ -12,7 +12,90 @@
     "DASHBOARD": "Dashboard",
     "PLAN_FREE": "Free Plan",
     "PLAN_PREMIUM": "Premium Plan",
-    "LOGOUT": "Sign out"
+    "LOGOUT": "Logout"
+  },
+  "BUILDER": {
+    "BACK": "Go Back",
+    "UNTITLED_RESUME": "Resume name...",
+    "SAVING": "Saving...",
+    "SAVED": "Saved",
+    "EXPORT_PDF": "Export PDF",
+    "GENERATING_PDF": "Generating PDF...",
+    "STEPS": {
+      "TEMPLATE": "Template",
+      "PERSONAL": "Personal",
+      "EXPERIENCE": "Experience",
+      "EDUCATION": "Education",
+      "SKILLS": "Skills"
+    },
+    "PERSONAL": {
+      "TITLE": "Personal Information",
+      "DESC": "Basic details that will appear at the top of your resume",
+      "AUTOFILL": "Auto-fill",
+      "FULL_NAME": "Full Name",
+      "JOB_TITLE": "Job Title",
+      "EMAIL": "Email",
+      "PHONE": "Phone",
+      "LOCATION": "Location",
+      "LINKEDIN": "LinkedIn",
+      "BIO": "Professional Summary",
+      "BIO_PLACEHOLDER": "Brief description about you, your values and professional goals...",
+      "IMPROVE_AI": "✨ Improve with AI"
+    },
+    "EXPERIENCE": {
+      "TITLE": "Professional Experience",
+      "DESC": "Add your most recent experiences first",
+      "ROLE": "Role",
+      "COMPANY": "Company",
+      "START": "Start",
+      "END": "End",
+      "CURRENT": "Current Job",
+      "DESCRIPTION": "Job Description",
+      "DESCRIPTION_PLACEHOLDER": "Describe your main responsibilities and achievements...",
+      "ADD_BTN": "Add Experience",
+      "EMPTY_ROLE": "Role not provided"
+    },
+    "EDUCATION": {
+      "TITLE": "Education",
+      "DESC": "Academic background and relevant courses",
+      "DEGREE": "Degree / Type",
+      "FIELD": "Field of Study",
+      "INSTITUTION": "Institution",
+      "START": "Start",
+      "END": "End",
+      "CURRENT": "Currently studying",
+      "ADD_BTN": "Add Education",
+      "EMPTY_DEGREE": "Degree not provided"
+    },
+    "SKILLS": {
+      "TITLE": "Skills",
+      "DESC": "Add your technical and soft skills",
+      "ADD_PLACEHOLDER": "E.g.: TypeScript, Leadership, Photoshop...",
+      "LEVEL": "Level:",
+      "ADD_BTN": "Add",
+      "EMPTY": "No skills added yet. Use the field above!",
+      "SUGGESTIONS": "Popular suggestions:"
+    },
+    "TEMPLATE": {
+      "TITLE": "Choose Template",
+      "DESC": "Select the design that best represents you",
+      "COLOR": "Accent Color",
+      "COLOR_DESC": "Select a professional palette for highlights and titles",
+      "FONT": "Typography (ATS Fonts)",
+      "FONT_DESC": "Select a readable font recommended for recruitment",
+      "DENSITY": "Layout Density (Spacing)",
+      "DENSITY_DESC": "Adjust the spacing to fill the page perfectly",
+      "COMPACT": "Compact",
+      "NORMAL": "Normal",
+      "SPACIOUS": "Spacious"
+    },
+    "PREVIEW_LABEL": "Live Preview",
+    "MOBILE_PREVIEW": "View Preview",
+    "MOBILE_EDIT": "Edit Content",
+    "PREV": "Previous",
+    "NEXT": "Next",
+    "FINISH_INFO": "Your resume is automatically saved",
+    "DOWNLOAD_PDF": "Download PDF"
   },
   "FOOTER": {
     "TAGLINE": "Create amazing resumes with AI",
