@@ -1,7 +1,11 @@
-import { Component, inject, signal, computed, OnInit } from '@angular/core';
+import { Component, inject, signal, computed, OnInit, OnDestroy } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CdkDragDrop, moveItemInArray, CdkDropList, CdkDrag, CdkDragHandle } from '@angular/cdk/drag-drop';
+import { Subject, Subscription, of } from 'rxjs';
+import { debounceTime, switchMap, finalize, tap, distinctUntilChanged, catchError } from 'rxjs/operators';
+import { HttpClient } from '@angular/common/http';
+import { UpperCasePipe } from '@angular/common';
 import { ResumeService } from '../../../../core/services/resume';
 import { AiService } from '../../../../core/services/ai';
 import { Resume, Experience, Education, Skill, TemplateType, EMPTY_RESUME, TEMPLATE_OPTIONS } from '../../../../core/models/resume.model';
@@ -10,8 +14,11 @@ import { MinimalTemplateComponent } from '../../components/templates/minimal-tem
 import { ModernTemplateComponent } from '../../components/templates/modern-template.component';
 import { CreativeTemplateComponent } from '../../components/templates/creative-template.component';
 import { CompactTemplateComponent } from '../../components/templates/compact-template.component';
+import { ToastrService } from 'ngx-toastr';
+import { TranslateModule } from '@ngx-translate/core';
 
 type Step = 'personal' | 'experience' | 'education' | 'skills' | 'template';
+type SaveState = 'idle' | 'saving' | 'saved';
 
 @Component({
   selector: 'app-builder',
@@ -22,16 +29,20 @@ type Step = 'personal' | 'experience' | 'education' | 'skills' | 'template';
     ModernTemplateComponent,
     MinimalTemplateComponent,
     CreativeTemplateComponent,
-    CompactTemplateComponent
+    CompactTemplateComponent,
+    TranslateModule,
+    UpperCasePipe
   ],
   templateUrl: './builder.html',
   styleUrl: './builder.scss',
 })
-export class BuilderComponent implements OnInit {
+export class BuilderComponent implements OnInit, OnDestroy {
   private resumeService = inject(ResumeService);
   private aiService = inject(AiService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
+  private toastr = inject(ToastrService);
+  private http = inject(HttpClient);
 
   draft = signal<Resume>({
     ...EMPTY_RESUME,
@@ -43,15 +54,24 @@ export class BuilderComponent implements OnInit {
   resumeTitle: string = '';
   currentStep = signal<Step>('template');
   expandedItem = signal<string | null>(null);
-  lastSaved = signal(false);
+  saveState = signal<SaveState>('idle');
   exporting = signal(false);
   previewScale = signal(0.75);
   activeTab = signal<'edit' | 'preview'>('edit');
   newSkillName = '';
   newSkillLevel: 1 | 2 | 3 | 4 | 5 = 3;
-  private saveTimeout: any;
-  private savedIndicatorTimeout: any;
   isAILoading = signal<string | null>(null);
+  showValidation = signal(false);
+
+  private saveSubject = new Subject<Resume>();
+  private saveSub!: Subscription;
+  private savedIndicatorTimeout: any;
+
+  locationSearch$ = new Subject<string>();
+  locationSuggestions: any[] = [];
+  isLocationLoading = false;
+  showLocationDropdown = false;
+  private locationSub!: Subscription;
 
   atsScore = computed(() => {
     let score = 0;
@@ -127,6 +147,48 @@ export class BuilderComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.locationSub = this.locationSearch$.pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      tap(() => {
+        this.isLocationLoading = true;
+        this.showLocationDropdown = true;
+      }),
+      switchMap(query => {
+        if (!query || query.length < 2) {
+          this.isLocationLoading = false;
+          this.showLocationDropdown = false;
+          return of([]);
+        }
+        return this.http.get<any[]>(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&countrycodes=br&addressdetails=1&limit=5`, {
+          headers: { 'Accept-Language': 'pt-BR' }
+        }).pipe(
+          catchError(() => of([]))
+        );
+      })
+    ).subscribe(results => {
+      this.locationSuggestions = results;
+      this.isLocationLoading = false;
+    });
+    this.saveSub = this.saveSubject.pipe(
+      tap(() => this.saveState.set('saving')),
+      debounceTime(800),
+      switchMap(current =>
+        this.resumeService.update(current.id, { ...current, title: this.resumeTitle }).pipe(
+          finalize(() => {
+            this.saveState.set('saved');
+            clearTimeout(this.savedIndicatorTimeout);
+            this.savedIndicatorTimeout = setTimeout(() => this.saveState.set('idle'), 2500);
+          })
+        )
+      )
+    ).subscribe({
+      error: () => {
+        this.saveState.set('idle');
+        this.toastr.error('Erro ao salvar. Verifique sua conexão.', 'Erro');
+      }
+    });
+
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
       this.resumeService.getById(id).subscribe({
@@ -163,22 +225,51 @@ export class BuilderComponent implements OnInit {
     });
   }
 
-  onFieldChange() {
-    this.draft.update(d => ({ ...d }));
-    clearTimeout(this.saveTimeout);
-    this.saveTimeout = setTimeout(() => this.autoSave(), 800);
+  ngOnDestroy() {
+    this.saveSub?.unsubscribe();
+    this.locationSub?.unsubscribe();
+    clearTimeout(this.savedIndicatorTimeout);
   }
 
-  private autoSave() {
+  onLocationInput(event: any) {
+    const value = event.target.value;
+    this.draft.update(d => ({
+      ...d,
+      personalInfo: { ...d.personalInfo, location: value }
+    }));
+    this.onFieldChange();
+    this.locationSearch$.next(value);
+  }
+
+  selectLocation(location: any) {
+    let formattedName = location.display_name;
+    if (location.address) {
+      const city = location.address.city || location.address.town || location.address.village;
+      const state = location.address.state;
+      if (city && state) {
+        formattedName = `${city}, ${state}`;
+      } else if (location.name) {
+        formattedName = location.name;
+      }
+    }
+
+    this.draft.update(d => ({
+      ...d,
+      personalInfo: { ...d.personalInfo, location: formattedName }
+    }));
+    this.showLocationDropdown = false;
+    this.onFieldChange();
+  }
+
+  hideLocationDropdown() {
+    setTimeout(() => this.showLocationDropdown = false, 200);
+  }
+
+  onFieldChange() {
+    this.draft.update(d => ({ ...d }));
     const current = this.draft();
     if (!current.id) return;
-    this.resumeService.update(current.id, { ...current, title: this.resumeTitle }).subscribe({
-      next: () => {
-        this.lastSaved.set(true);
-        clearTimeout(this.savedIndicatorTimeout);
-        this.savedIndicatorTimeout = setTimeout(() => this.lastSaved.set(false), 2500);
-      }
-    });
+    this.saveSubject.next(current);
   }
 
   saveTitle() {
@@ -188,6 +279,7 @@ export class BuilderComponent implements OnInit {
 
   goToStep(step: Step) {
     this.currentStep.set(step);
+    this.showValidation.set(false);
     if (step === 'template') {
       this.scrollToSelectedTemplate();
     }
@@ -203,6 +295,16 @@ export class BuilderComponent implements OnInit {
   }
 
   nextStep() {
+    if (this.currentStep() === 'personal') {
+      const d = this.draft();
+      if (!d.personalInfo.name.trim() || !d.personalInfo.email.trim()) {
+        this.showValidation.set(true);
+        this.toastr.warning('Preencha os campos obrigatórios antes de avançar.', 'Atenção');
+        return;
+      }
+    }
+
+    this.showValidation.set(false);
     const idx = this.steps.findIndex(s => s.id === this.currentStep());
     if (idx < this.steps.length - 1) {
       this.currentStep.set(this.steps[idx + 1].id);
@@ -210,6 +312,7 @@ export class BuilderComponent implements OnInit {
   }
 
   prevStep() {
+    this.showValidation.set(false);
     const idx = this.steps.findIndex(s => s.id === this.currentStep());
     if (idx > 0) {
       this.currentStep.set(this.steps[idx - 1].id);
@@ -336,9 +439,10 @@ export class BuilderComponent implements OnInit {
           }));
           this.isAILoading.set(null);
           this.onFieldChange();
+          this.toastr.success('Resumo melhorado com IA!', '✨ IA');
         },
-        error: (err) => {
-          alert(err.message || 'Erro ao melhorar resumo com IA');
+        error: () => {
+          this.toastr.error('Erro ao melhorar resumo com IA. Tente novamente.', 'Erro IA');
           this.isAILoading.set(null);
         }
       });
@@ -354,9 +458,10 @@ export class BuilderComponent implements OnInit {
           });
           this.isAILoading.set(null);
           this.onFieldChange();
+          this.toastr.success('Experiência melhorada com IA!', '✨ IA');
         },
-        error: (err) => {
-          alert(err.message || 'Erro ao melhorar experiência com IA');
+        error: () => {
+          this.toastr.error('Erro ao melhorar experiência com IA. Tente novamente.', 'Erro IA');
           this.isAILoading.set(null);
         }
       });
@@ -435,7 +540,10 @@ export class BuilderComponent implements OnInit {
   }
 
   goBack() {
-    this.autoSave();
+    const current = this.draft();
+    if (current.id) {
+      this.resumeService.update(current.id, { ...current, title: this.resumeTitle }).subscribe();
+    }
     this.router.navigate(['/dashboard']);
   }
 
@@ -478,8 +586,10 @@ export class BuilderComponent implements OnInit {
       const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
       pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
       pdf.save(`${this.resumeTitle || 'curriculo'}.pdf`);
+      this.toastr.success('PDF exportado com sucesso!', 'Download');
     } catch (e) {
       console.error('PDF export error:', e);
+      this.toastr.error('Erro ao exportar PDF. Tente novamente.', 'Erro');
     }
     this.exporting.set(false);
   }

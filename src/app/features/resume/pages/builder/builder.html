@@ -5,10 +5,10 @@
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <polyline points="15 18 9 12 15 6" />
         </svg>
-        <span>Voltar</span>
+        <span>{{ 'BUILDER.BACK' | translate }}</span>
       </button>
       <div class="topbar-divider"></div>
-      <input class="resume-title-input" [(ngModel)]="resumeTitle" placeholder="Nome do currículo..."
+      <input class="resume-title-input" [(ngModel)]="resumeTitle" [placeholder]="'BUILDER.UNTITLED_RESUME' | translate"
         (blur)="saveTitle()" />
     </div>
     <div class="topbar-right">
@@ -25,12 +25,20 @@
         <span class="ats-score-label">ATS Score</span>
       </div>
       <div class="topbar-divider"></div>
-      <span class="save-indicator" [class.visible]="lastSaved()">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5">
-          <polyline points="20 6 9 17 4 12" />
-        </svg>
-        <span>Salvo</span>
+
+      <!-- 3-State Save Indicator -->
+      <span class="save-indicator" [class.saving]="saveState() === 'saving'" [class.saved]="saveState() === 'saved'">
+        @if (saveState() === 'saving') {
+          <div class="save-spinner"></div>
+          <span>{{ 'BUILDER.SAVING' | translate }}</span>
+        } @else if (saveState() === 'saved') {
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5">
+            <polyline points="20 6 9 17 4 12" />
+          </svg>
+          <span>{{ 'BUILDER.SAVED' | translate }}</span>
+        }
       </span>
+
       <button class="btn btn-secondary btn-sm btn-export-pdf" (click)="exportPdf()" [disabled]="exporting()">
         @if (exporting()) {
         <div class="spinner" style="width:14px;height:14px"></div>
@@ -41,7 +49,7 @@
           <line x1="12" y1="15" x2="12" y2="3" />
         </svg>
         }
-        <span>Exportar PDF</span>
+        <span>{{ 'BUILDER.EXPORT_PDF' | translate }}</span>
       </button>
     </div>
   </div>
@@ -61,7 +69,7 @@
             {{ i + 1 }}
             }
           </div>
-          <span class="step-label">{{ s.label }}</span>
+          <span class="step-label">{{ 'BUILDER.STEPS.' + (s.id | uppercase) | translate }}</span>
         </button>
         }
       </div>
@@ -72,8 +80,8 @@
         <div class="step-section animate-fade-in-up">
           <div class="step-header">
             <div class="step-header-title">
-              <h2 class="step-title">Informações Pessoais</h2>
-              <p class="step-desc">Dados básicos que aparecerão no topo do seu currículo</p>
+              <h2 class="step-title">{{ 'BUILDER.PERSONAL.TITLE' | translate }}</h2>
+              <p class="step-desc">{{ 'BUILDER.PERSONAL.DESC' | translate }}</p>
             </div>
             <button class="btn btn-secondary btn-sm ai-btn" (click)="importMockData()">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -81,56 +89,90 @@
                 <polyline points="17 8 12 3 7 8" />
                 <line x1="12" y1="3" x2="12" y2="15" />
               </svg>
-              Auto-preencher
+              {{ 'BUILDER.PERSONAL.AUTOFILL' | translate }}
             </button>
           </div>
 
           <div class="form-grid">
             <div class="form-group col-2">
-              <label class="form-label">Nome completo</label>
-              <input class="form-control" [(ngModel)]="draft().personalInfo.name" (ngModelChange)="onFieldChange()"
+              <label class="form-label">
+                {{ 'BUILDER.PERSONAL.FULL_NAME' | translate }} <span class="required-star">*</span>
+              </label>
+              <input class="form-control" [class.invalid]="showValidation() && !draft().personalInfo.name.trim()"
+                [(ngModel)]="draft().personalInfo.name" (ngModelChange)="onFieldChange()"
                 placeholder="João da Silva" />
+              @if (showValidation() && !draft().personalInfo.name.trim()) {
+                <span class="field-error animate-shake">Campo obrigatório</span>
+              }
             </div>
             <div class="form-group col-2">
-              <label class="form-label">Cargo / Título profissional</label>
+              <label class="form-label">{{ 'BUILDER.PERSONAL.JOB_TITLE' | translate }}</label>
               <input class="form-control" [(ngModel)]="draft().personalInfo.jobTitle" (ngModelChange)="onFieldChange()"
                 placeholder="Desenvolvedor Full Stack" />
             </div>
             <div class="form-group">
-              <label class="form-label">Email</label>
-              <input class="form-control" type="email" [(ngModel)]="draft().personalInfo.email"
+              <label class="form-label">
+                {{ 'BUILDER.PERSONAL.EMAIL' | translate }} <span class="required-star">*</span>
+              </label>
+              <input class="form-control" type="email" [class.invalid]="showValidation() && !draft().personalInfo.email.trim()"
+                [(ngModel)]="draft().personalInfo.email"
                 (ngModelChange)="onFieldChange()" placeholder="joao@email.com" />
+              @if (showValidation() && !draft().personalInfo.email.trim()) {
+                <span class="field-error animate-shake">Campo obrigatório</span>
+              }
             </div>
             <div class="form-group">
-              <label class="form-label">Telefone</label>
+              <label class="form-label">{{ 'BUILDER.PERSONAL.PHONE' | translate }}</label>
               <input class="form-control" [(ngModel)]="draft().personalInfo.phone" (ngModelChange)="onFieldChange()"
                 placeholder="(11) 99999-0000" />
             </div>
-            <div class="form-group">
-              <label class="form-label">Localização</label>
-              <input class="form-control" [(ngModel)]="draft().personalInfo.location" (ngModelChange)="onFieldChange()"
-                placeholder="São Paulo, SP" />
+            <div class="form-group location-group">
+              <label class="form-label">{{ 'BUILDER.PERSONAL.LOCATION' | translate }}</label>
+              <input class="form-control" [value]="draft().personalInfo.location" (input)="onLocationInput($event)"
+                (blur)="hideLocationDropdown()" placeholder="São Paulo, SP" autocomplete="off" />
+              @if (showLocationDropdown) {
+              <div class="autocomplete-dropdown">
+                @if (isLocationLoading) {
+                  <div class="autocomplete-loading">
+                    <div class="spinner" style="width: 14px; height: 14px; border-width: 2px;"></div>
+                    Buscando...
+                  </div>
+                } @else if (locationSuggestions.length === 0) {
+                  <div class="autocomplete-empty">Nenhum local encontrado</div>
+                } @else {
+                  @for (loc of locationSuggestions; track loc.place_id) {
+                    <div class="autocomplete-item" (click)="selectLocation(loc)">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                        <circle cx="12" cy="10" r="3" />
+                      </svg>
+                      {{ loc.display_name }}
+                    </div>
+                  }
+                }
+              </div>
+              }
             </div>
             <div class="form-group">
-              <label class="form-label">LinkedIn</label>
+              <label class="form-label">{{ 'BUILDER.PERSONAL.LINKEDIN' | translate }}</label>
               <input class="form-control" [(ngModel)]="draft().personalInfo.linkedin" (ngModelChange)="onFieldChange()"
                 placeholder="linkedin.com/in/joaosilva" />
             </div>
             <div class="form-group col-2">
               <div class="label-with-action">
-                <label class="form-label">Resumo profissional</label>
+                <label class="form-label">{{ 'BUILDER.PERSONAL.BIO' | translate }}</label>
                 <button class="btn btn-ghost btn-sm ai-text-btn" (click)="improveWithAI('bio', null, 'bio')"
                   [disabled]="isAILoading() === 'bio-all-bio'">
                   @if (isAILoading() === 'bio-all-bio') {
                   <div class="spinner" style="width:12px;height:12px;border-width:2px"></div>
                   } @else {
-                  ✨ Melhorar com IA
+                  {{ 'BUILDER.PERSONAL.IMPROVE_AI' | translate }}
                   }
                 </button>
               </div>
               <textarea class="form-control" [(ngModel)]="draft().personalInfo.bio" (ngModelChange)="onFieldChange()"
-                placeholder="Breve descrição sobre você, seus valores e objetivos profissionais..." rows="4"></textarea>
-            </div>
+                [placeholder]="'BUILDER.PERSONAL.BIO_PLACEHOLDER' | translate" rows="4"></textarea>
+          </div>
           </div>
         </div>
         }
@@ -138,8 +180,8 @@
         @if (currentStep() === 'experience') {
         <div class="step-section animate-fade-in-up">
           <div class="step-header">
-            <h2 class="step-title">Experiência Profissional</h2>
-            <p class="step-desc">Adicione suas experiências mais recentes primeiro</p>
+            <h2 class="step-title">{{ 'BUILDER.EXPERIENCE.TITLE' | translate }}</h2>
+            <p class="step-desc">{{ 'BUILDER.EXPERIENCE.DESC' | translate }}</p>
           </div>
 
           <div class="items-list" cdkDropList (cdkDropListDropped)="dropExperience($event)">
@@ -158,7 +200,7 @@
                   </svg>
                 </div>
                 <div class="list-item-info">
-                  <span class="list-item-title">{{ exp.role || 'Cargo não informado' }}</span>
+                  <span class="list-item-title">{{ exp.role || ('BUILDER.EXPERIENCE.EMPTY_ROLE' | translate) }}</span>
                   <span class="list-item-sub">{{ exp.company }}</span>
                 </div>
                 <div class="list-item-actions">
@@ -179,23 +221,23 @@
               <div class="list-item-form animate-fade-in">
                 <div class="form-grid">
                   <div class="form-group">
-                    <label class="form-label">Cargo</label>
+                    <label class="form-label">{{ 'BUILDER.EXPERIENCE.ROLE' | translate }}</label>
                     <input class="form-control" [(ngModel)]="exp.role" (ngModelChange)="onFieldChange()"
                       placeholder="Desenvolvedor Senior" />
                   </div>
                   <div class="form-group">
-                    <label class="form-label">Empresa</label>
+                    <label class="form-label">{{ 'BUILDER.EXPERIENCE.COMPANY' | translate }}</label>
                     <input class="form-control" [(ngModel)]="exp.company" (ngModelChange)="onFieldChange()"
                       placeholder="Google Brasil" />
                   </div>
                   <div class="form-group">
-                    <label class="form-label">Início</label>
-                    <input class="form-control" [(ngModel)]="exp.startDate" (ngModelChange)="onFieldChange()"
+                    <label class="form-label">{{ 'BUILDER.EXPERIENCE.START' | translate }}</label>
+                    <input class="form-control" type="month" [(ngModel)]="exp.startDate" (ngModelChange)="onFieldChange()"
                       placeholder="Jan 2021" />
                   </div>
                   <div class="form-group">
-                    <label class="form-label">Fim</label>
-                    <input class="form-control" [(ngModel)]="exp.endDate" (ngModelChange)="onFieldChange()"
+                    <label class="form-label">{{ 'BUILDER.EXPERIENCE.END' | translate }}</label>
+                    <input class="form-control" type="month" [(ngModel)]="exp.endDate" (ngModelChange)="onFieldChange()"
                       placeholder="Dez 2023" [disabled]="exp.current" />
                   </div>
                   <div class="form-group col-2">
@@ -204,24 +246,24 @@
                         (click)="exp.current = !exp.current; onFieldChange()">
                         <div class="toggle-thumb"></div>
                       </div>
-                      Emprego atual
+                      {{ 'BUILDER.EXPERIENCE.CURRENT' | translate }}
                     </label>
                   </div>
                   <div class="form-group col-2">
                     <div class="label-with-action">
-                      <label class="form-label">Descrição das atividades</label>
+                      <label class="form-label">{{ 'BUILDER.EXPERIENCE.DESCRIPTION' | translate }}</label>
                       <button class="btn btn-ghost btn-sm ai-text-btn"
                         (click)="improveWithAI('experience', i, 'description')"
                         [disabled]="isAILoading() === 'experience-' + i + '-description'">
                         @if (isAILoading() === 'experience-' + i + '-description') {
                         <div class="spinner" style="width:12px;height:12px;border-width:2px"></div>
                         } @else {
-                        ✨ Melhorar com IA
+                        {{ 'BUILDER.PERSONAL.IMPROVE_AI' | translate }}
                         }
                       </button>
                     </div>
                     <textarea class="form-control" [(ngModel)]="exp.description" (ngModelChange)="onFieldChange()"
-                      placeholder="Descreva suas principais responsabilidades e conquistas..." rows="3"></textarea>
+                      [placeholder]="'BUILDER.EXPERIENCE.DESCRIPTION_PLACEHOLDER' | translate" rows="3"></textarea>
                   </div>
                 </div>
               </div>
@@ -235,7 +277,7 @@
               <line x1="12" y1="5" x2="12" y2="19" />
               <line x1="5" y1="12" x2="19" y2="12" />
             </svg>
-            Adicionar experiência
+            {{ 'BUILDER.EXPERIENCE.ADD_BTN' | translate }}
           </button>
         </div>
         }
@@ -243,8 +285,8 @@
         @if (currentStep() === 'education') {
         <div class="step-section animate-fade-in-up">
           <div class="step-header">
-            <h2 class="step-title">Educação</h2>
-            <p class="step-desc">Formação acadêmica e cursos relevantes</p>
+            <h2 class="step-title">{{ 'BUILDER.EDUCATION.TITLE' | translate }}</h2>
+            <p class="step-desc">{{ 'BUILDER.EDUCATION.DESC' | translate }}</p>
           </div>
 
           <div class="items-list" cdkDropList (cdkDropListDropped)="dropEducation($event)">
@@ -263,7 +305,7 @@
                   </svg>
                 </div>
                 <div class="list-item-info">
-                  <span class="list-item-title">{{ edu.degree || 'Formação não informada' }}</span>
+                  <span class="list-item-title">{{ edu.degree || ('BUILDER.EDUCATION.EMPTY_DEGREE' | translate) }}</span>
                   <span class="list-item-sub">{{ edu.institution }}</span>
                 </div>
                 <div class="list-item-actions">
@@ -284,28 +326,28 @@
               <div class="list-item-form animate-fade-in">
                 <div class="form-grid">
                   <div class="form-group">
-                    <label class="form-label">Grau / Tipo</label>
+                    <label class="form-label">{{ 'BUILDER.EDUCATION.DEGREE' | translate }}</label>
                     <input class="form-control" [(ngModel)]="edu.degree" (ngModelChange)="onFieldChange()"
                       placeholder="Bacharelado" />
                   </div>
                   <div class="form-group">
-                    <label class="form-label">Área / Curso</label>
+                    <label class="form-label">{{ 'BUILDER.EDUCATION.FIELD' | translate }}</label>
                     <input class="form-control" [(ngModel)]="edu.field" (ngModelChange)="onFieldChange()"
                       placeholder="Ciência da Computação" />
                   </div>
                   <div class="form-group col-2">
-                    <label class="form-label">Instituição</label>
+                    <label class="form-label">{{ 'BUILDER.EDUCATION.INSTITUTION' | translate }}</label>
                     <input class="form-control" [(ngModel)]="edu.institution" (ngModelChange)="onFieldChange()"
                       placeholder="Universidade de São Paulo" />
                   </div>
                   <div class="form-group">
-                    <label class="form-label">Início</label>
-                    <input class="form-control" [(ngModel)]="edu.startDate" (ngModelChange)="onFieldChange()"
+                    <label class="form-label">{{ 'BUILDER.EDUCATION.START' | translate }}</label>
+                    <input class="form-control" type="month" [(ngModel)]="edu.startDate" (ngModelChange)="onFieldChange()"
                       placeholder="2018" />
                   </div>
                   <div class="form-group">
-                    <label class="form-label">Fim</label>
-                    <input class="form-control" [(ngModel)]="edu.endDate" (ngModelChange)="onFieldChange()"
+                    <label class="form-label">{{ 'BUILDER.EDUCATION.END' | translate }}</label>
+                    <input class="form-control" type="month" [(ngModel)]="edu.endDate" (ngModelChange)="onFieldChange()"
                       placeholder="2022" [disabled]="edu.current" />
                   </div>
                   <div class="form-group col-2">
@@ -314,7 +356,7 @@
                         (click)="edu.current = !edu.current; onFieldChange()">
                         <div class="toggle-thumb"></div>
                       </div>
-                      Em andamento
+                      {{ 'BUILDER.EDUCATION.CURRENT' | translate }}
                     </label>
                   </div>
                 </div>
@@ -329,7 +371,7 @@
               <line x1="12" y1="5" x2="12" y2="19" />
               <line x1="5" y1="12" x2="19" y2="12" />
             </svg>
-            Adicionar formação
+            {{ 'BUILDER.EDUCATION.ADD_BTN' | translate }}
           </button>
         </div>
         }
@@ -337,26 +379,26 @@
         @if (currentStep() === 'skills') {
         <div class="step-section animate-fade-in-up">
           <div class="step-header">
-            <h2 class="step-title">Habilidades</h2>
-            <p class="step-desc">Adicione suas skills técnicas e comportamentais</p>
+            <h2 class="step-title">{{ 'BUILDER.SKILLS.TITLE' | translate }}</h2>
+            <p class="step-desc">{{ 'BUILDER.SKILLS.DESC' | translate }}</p>
           </div>
 
           <div class="quick-add">
-            <input class="form-control" [(ngModel)]="newSkillName" placeholder="Ex: TypeScript, Liderança, Photoshop..."
+            <input class="form-control" [(ngModel)]="newSkillName" [placeholder]="'BUILDER.SKILLS.ADD_PLACEHOLDER' | translate"
               (keydown.enter)="addSkill()" />
             <div class="quick-level">
-              <span class="level-label">Nível:</span>
+              <span class="level-label">{{ 'BUILDER.SKILLS.LEVEL' | translate }}</span>
               @for (l of [1,2,3,4,5]; track l) {
               <button class="level-btn" [class.active]="newSkillLevel === l" (click)="newSkillLevel = $any(l)">{{ l
                 }}</button>
               }
             </div>
-            <button class="btn btn-primary" (click)="addSkill()" [disabled]="!newSkillName.trim()">Adicionar</button>
+            <button class="btn btn-primary" (click)="addSkill()" [disabled]="!newSkillName.trim()">{{ 'BUILDER.SKILLS.ADD_BTN' | translate }}</button>
           </div>
 
           <div class="skills-tags">
             @if (draft().skills.length === 0) {
-            <p class="empty-skills">Nenhuma skill adicionada ainda. Use o campo acima!</p>
+            <p class="empty-skills">{{ 'BUILDER.SKILLS.EMPTY' | translate }}</p>
             }
             @for (skill of draft().skills; track skill.id; let i = $index) {
             <div class="skill-tag-item">
@@ -377,7 +419,7 @@
           </div>
 
           <div class="suggestions">
-            <p class="suggestions-label">Sugestões populares:</p>
+            <p class="suggestions-label">{{ 'BUILDER.SKILLS.SUGGESTIONS' | translate }}</p>
             <div class="suggestions-list">
               @for (s of skillSuggestions; track s) {
               <button class="suggestion-tag" (click)="addSuggestion(s)" [disabled]="skillExists(s)">{{ s }}</button>
@@ -390,19 +432,19 @@
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2">
                 <polyline points="20 6 9 17 4 12" />
               </svg>
-              <span>Seu currículo está sendo salvo automaticamente</span>
+              <span>{{ 'BUILDER.FINISH_INFO' | translate }}</span>
             </div>
             <button class="btn btn-primary btn-lg" (click)="exportPdf()" [disabled]="exporting()">
               @if (exporting()) {
               <div class="spinner"></div>
-              Gerando PDF...
+              {{ 'BUILDER.GENERATING_PDF' | translate }}
               } @else {
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
                 <polyline points="7 10 12 15 17 10" />
                 <line x1="12" y1="15" x2="12" y2="3" />
               </svg>
-              Baixar PDF
+              {{ 'BUILDER.DOWNLOAD_PDF' | translate }}
               }
             </button>
           </div>
@@ -412,8 +454,8 @@
         @if (currentStep() === 'template') {
         <div class="step-section animate-fade-in-up">
           <div class="step-header">
-            <h2 class="step-title">Escolha o Template</h2>
-            <p class="step-desc">Selecione o design que melhor representa você</p>
+            <h2 class="step-title">{{ 'BUILDER.TEMPLATE.TITLE' | translate }}</h2>
+            <p class="step-desc">{{ 'BUILDER.TEMPLATE.DESC' | translate }}</p>
           </div>
 
           <div class="template-options">
@@ -483,8 +525,8 @@
 
           <div class="customizer-section">
             <div class="customizer-header">
-              <h3 class="customizer-title">Cor de Destaque</h3>
-              <p class="customizer-desc">Selecione uma paleta profissional para os realces e títulos</p>
+              <h3 class="customizer-title">{{ 'BUILDER.TEMPLATE.COLOR' | translate }}</h3>
+              <p class="customizer-desc">{{ 'BUILDER.TEMPLATE.COLOR_DESC' | translate }}</p>
             </div>
             <div class="color-picker-grid">
               @for (c of colorThemes; track c.value) {
@@ -503,8 +545,8 @@
 
           <div class="customizer-section">
             <div class="customizer-header">
-              <h3 class="customizer-title">Tipografia (Fontes ATS)</h3>
-              <p class="customizer-desc">Selecione uma fonte legível recomendada pelo mercado de contratações</p>
+              <h3 class="customizer-title">{{ 'BUILDER.TEMPLATE.FONT' | translate }}</h3>
+              <p class="customizer-desc">{{ 'BUILDER.TEMPLATE.FONT_DESC' | translate }}</p>
             </div>
             <div class="font-picker-grid">
               @for (f of fontFamilies; track f.value) {
@@ -525,24 +567,24 @@
 
           <div class="customizer-section">
             <div class="customizer-header">
-              <h3 class="customizer-title">Densidade do Layout (Espaçamento)</h3>
-              <p class="customizer-desc">Ajuste o espaçamento para preencher a folha perfeitamente</p>
+              <h3 class="customizer-title">{{ 'BUILDER.TEMPLATE.DENSITY' | translate }}</h3>
+              <p class="customizer-desc">{{ 'BUILDER.TEMPLATE.DENSITY_DESC' | translate }}</p>
             </div>
             <div class="density-picker-row">
               <button class="density-btn" [class.active]="(draft().spacingMode || 'normal') === 'compact'"
                 (click)="selectSpacingMode('compact')">
                 <span class="density-icon">🗜️</span>
-                <span class="density-label">Compacto</span>
+                <span class="density-label">{{ 'BUILDER.TEMPLATE.COMPACT' | translate }}</span>
               </button>
               <button class="density-btn" [class.active]="(draft().spacingMode || 'normal') === 'normal'"
                 (click)="selectSpacingMode('normal')">
                 <span class="density-icon">⚖️</span>
-                <span class="density-label">Padrão</span>
+                <span class="density-label">{{ 'BUILDER.TEMPLATE.NORMAL' | translate }}</span>
               </button>
               <button class="density-btn" [class.active]="(draft().spacingMode || 'normal') === 'spacious'"
                 (click)="selectSpacingMode('spacious')">
                 <span class="density-icon">↔️</span>
-                <span class="density-label">Amplo</span>
+                <span class="density-label">{{ 'BUILDER.TEMPLATE.SPACIOUS' | translate }}</span>
               </button>
             </div>
           </div>
@@ -555,14 +597,14 @@
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <polyline points="15 18 9 12 15 6" />
             </svg>
-            Anterior
+            {{ 'BUILDER.PREV' | translate }}
           </button>
           } @else {
           <div></div>
           }
           @if (currentStep() !== 'skills') {
           <button class="btn btn-primary" (click)="nextStep()">
-            Próximo
+            {{ 'BUILDER.NEXT' | translate }}
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <polyline points="9 18 15 12 9 6" />
             </svg>
@@ -574,7 +616,7 @@
 
     <div class="preview-panel">
       <div class="preview-topbar">
-        <span class="preview-label">Preview ao vivo</span>
+        <span class="preview-label">{{ 'BUILDER.PREVIEW_LABEL' | translate }}</span>
         <div class="preview-scale-btns">
           <button class="scale-btn" [class.active]="previewScale() === 0.4" (click)="previewScale.set(0.4)">40%</button>
           <button class="scale-btn" [class.active]="previewScale() === 0.6" (click)="previewScale.set(0.6)">60%</button>
@@ -608,13 +650,13 @@
         <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
         <circle cx="12" cy="12" r="3" />
       </svg>
-      <span>Ver Prévia</span>
+      <span>{{ 'BUILDER.MOBILE_PREVIEW' | translate }}</span>
     } @else {
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <path d="M12 20h9" />
         <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" />
       </svg>
-      <span>Editar Conteúdo</span>
+      <span>{{ 'BUILDER.MOBILE_EDIT' | translate }}</span>
     }
   </button>
 </div>
