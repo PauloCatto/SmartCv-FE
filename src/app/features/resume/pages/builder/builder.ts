@@ -8,17 +8,16 @@ import { HttpClient } from '@angular/common/http';
 import { UpperCasePipe } from '@angular/common';
 import { ResumeService } from '../../../../core/services/resume';
 import { AiService } from '../../../../core/services/ai';
-import { Resume, Experience, Education, Skill, TemplateType, EMPTY_RESUME, TEMPLATE_OPTIONS } from '../../../../core/models/resume.model';
+import { Resume, Experience, Education, Skill, TemplateType, Step, SaveState, EMPTY_RESUME, TEMPLATE_OPTIONS } from '../../../../core/models/resume.model';
 import { EleganceTemplateComponent } from '../../components/templates/elegance-template.component';
 import { MinimalTemplateComponent } from '../../components/templates/minimal-template.component';
 import { ModernTemplateComponent } from '../../components/templates/modern-template.component';
 import { CreativeTemplateComponent } from '../../components/templates/creative-template.component';
 import { CompactTemplateComponent } from '../../components/templates/compact-template.component';
 import { ToastrService } from 'ngx-toastr';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
-type Step = 'personal' | 'experience' | 'education' | 'skills' | 'template';
-type SaveState = 'idle' | 'saving' | 'saved';
+
 
 @Component({
   selector: 'app-builder',
@@ -43,6 +42,7 @@ export class BuilderComponent implements OnInit, OnDestroy {
   private route = inject(ActivatedRoute);
   private toastr = inject(ToastrService);
   private http = inject(HttpClient);
+  private translate = inject(TranslateService);
 
   draft = signal<Resume>({
     ...EMPTY_RESUME,
@@ -60,8 +60,16 @@ export class BuilderComponent implements OnInit, OnDestroy {
   activeTab = signal<'edit' | 'preview'>('edit');
   newSkillName = '';
   newSkillLevel: 1 | 2 | 3 | 4 | 5 = 3;
+  newLanguageName = '';
+  newLanguageLevel: 'Básico' | 'Intermediário' | 'Avançado' | 'Fluente' | 'Nativo' = 'Básico';
   isAILoading = signal<string | null>(null);
   showValidation = signal(false);
+
+  // Cover Letter states
+  showCoverLetterModal = signal(false);
+  jobDescription = '';
+  generatedCoverLetter = signal('');
+  isGeneratingCoverLetter = signal(false);
 
   private saveSubject = new Subject<Resume>();
   private saveSub!: Subscription;
@@ -72,6 +80,12 @@ export class BuilderComponent implements OnInit, OnDestroy {
   isLocationLoading = false;
   showLocationDropdown = false;
   private locationSub!: Subscription;
+
+  languageSearch$ = new Subject<string>();
+  languageSuggestions: string[] = [];
+  isLanguageLoading = false;
+  showLanguageDropdown = false;
+  private languageSub!: Subscription;
 
   atsScore = computed(() => {
     let score = 0;
@@ -92,8 +106,11 @@ export class BuilderComponent implements OnInit, OnDestroy {
 
     if (d.education.length > 0) score += 15;
 
-    if (d.skills.length >= 5) score += 15;
+    if (d.skills.length >= 5) score += 10;
     else if (d.skills.length > 0) score += 5;
+
+    if (d.languages && d.languages.length >= 2) score += 5;
+    else if (d.languages && d.languages.length === 1) score += 2;
 
     return Math.min(score, 100);
   });
@@ -104,6 +121,7 @@ export class BuilderComponent implements OnInit, OnDestroy {
     { id: 'experience', label: 'Experiência' },
     { id: 'education', label: 'Educação' },
     { id: 'skills', label: 'Skills' },
+    { id: 'languages', label: 'Idiomas' },
   ];
 
   skillSuggestions = [
@@ -146,6 +164,19 @@ export class BuilderComponent implements OnInit, OnDestroy {
     this.onFieldChange();
   }
 
+  slugify(text: string): string {
+    return text
+      .toString()
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^\w\s-]/g, '')
+      .replace(/[\s_]+/g, '-')
+      .replace(/--+/g, '-')
+      .trim()
+      .replace(/^-+|-+$/g, '');
+  }
+
   ngOnInit() {
     this.locationSub = this.locationSearch$.pipe(
       debounceTime(300),
@@ -170,6 +201,27 @@ export class BuilderComponent implements OnInit, OnDestroy {
       this.locationSuggestions = results;
       this.isLocationLoading = false;
     });
+
+    this.languageSub = this.languageSearch$.pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      tap(() => {
+        this.isLanguageLoading = true;
+        this.showLanguageDropdown = true;
+      }),
+      switchMap(query => {
+        if (!query) {
+          return this.resumeService.getLanguages('').pipe(catchError(() => of([])));
+        }
+        return this.resumeService.getLanguages(query).pipe(
+          catchError(() => of([]))
+        );
+      })
+    ).subscribe(results => {
+      this.languageSuggestions = results;
+      this.isLanguageLoading = false;
+    });
+
     this.saveSub = this.saveSubject.pipe(
       tap(() => this.saveState.set('saving')),
       debounceTime(800),
@@ -208,9 +260,15 @@ export class BuilderComponent implements OnInit, OnDestroy {
               experience: existing.experience || [],
               education: existing.education || [],
               skills: existing.skills || [],
+              languages: existing.languages || [],
             });
             this.resumeTitle = existing.title;
             this.scrollToSelectedTemplate();
+
+            const slug = this.slugify(existing.title);
+            if (id !== slug) {
+              this.router.navigate(['/resume', slug, 'edit'], { replaceUrl: true });
+            }
           }
         }
       });
@@ -221,6 +279,7 @@ export class BuilderComponent implements OnInit, OnDestroy {
       next: (created) => {
         this.draft.set({ ...created });
         this.resumeTitle = created.title;
+        this.router.navigate(['/resume', this.slugify(created.title), 'edit'], { replaceUrl: true });
       }
     });
   }
@@ -228,6 +287,7 @@ export class BuilderComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.saveSub?.unsubscribe();
     this.locationSub?.unsubscribe();
+    this.languageSub?.unsubscribe();
     clearTimeout(this.savedIndicatorTimeout);
   }
 
@@ -265,6 +325,21 @@ export class BuilderComponent implements OnInit, OnDestroy {
     setTimeout(() => this.showLocationDropdown = false, 200);
   }
 
+  onLanguageInput(event: any) {
+    const value = event.target.value;
+    this.newLanguageName = value;
+    this.languageSearch$.next(value);
+  }
+
+  selectLanguage(lang: string) {
+    this.newLanguageName = lang;
+    this.showLanguageDropdown = false;
+  }
+
+  hideLanguageDropdown() {
+    setTimeout(() => this.showLanguageDropdown = false, 200);
+  }
+
   onFieldChange() {
     this.draft.update(d => ({ ...d }));
     const current = this.draft();
@@ -275,6 +350,9 @@ export class BuilderComponent implements OnInit, OnDestroy {
   saveTitle() {
     this.draft.update(d => ({ ...d, title: this.resumeTitle }));
     this.onFieldChange();
+    if (this.resumeTitle.trim()) {
+      this.router.navigate(['/resume', this.slugify(this.resumeTitle), 'edit'], { replaceUrl: true });
+    }
   }
 
   goToStep(step: Step) {
@@ -320,7 +398,7 @@ export class BuilderComponent implements OnInit, OnDestroy {
   }
 
   isStepDone(step: Step): boolean {
-    const order: Step[] = ['template', 'personal', 'experience', 'education', 'skills'];
+    const order: Step[] = ['template', 'personal', 'experience', 'education', 'skills', 'languages'];
     return order.indexOf(step) < order.indexOf(this.currentStep());
   }
 
@@ -377,6 +455,38 @@ export class BuilderComponent implements OnInit, OnDestroy {
     this.onFieldChange();
   }
 
+  addLanguage() {
+    if (!this.newLanguageName.trim()) return;
+    if (this.languageExists(this.newLanguageName)) return;
+    const lang = {
+      id: crypto.randomUUID(),
+      name: this.newLanguageName.trim(),
+      level: this.newLanguageLevel,
+    };
+    this.draft.update(d => ({ ...d, languages: [...(d.languages || []), lang] }));
+    this.newLanguageName = '';
+    this.onFieldChange();
+  }
+
+  removeLanguage(index: number) {
+    this.draft.update(d => ({ ...d, languages: d.languages.filter((_, i) => i !== index) }));
+    this.onFieldChange();
+  }
+
+  setLanguageLevel(index: number, level: 'Básico' | 'Intermediário' | 'Avançado' | 'Fluente' | 'Nativo') {
+    this.draft.update(d => {
+      const languages = [...d.languages];
+      languages[index] = { ...languages[index], level };
+      return { ...d, languages };
+    });
+    this.onFieldChange();
+  }
+
+  languageExists(name: string): boolean {
+    const langs = this.draft().languages || [];
+    return langs.some(l => l.name.toLowerCase() === name.toLowerCase());
+  }
+
   setSkillLevel(index: number, level: number) {
     this.draft.update(d => {
       const skills = [...d.skills];
@@ -419,6 +529,24 @@ export class BuilderComponent implements OnInit, OnDestroy {
       const newEdu = [...d.education];
       moveItemInArray(newEdu, event.previousIndex, event.currentIndex);
       return { ...d, education: newEdu };
+    });
+    this.onFieldChange();
+  }
+
+  dropSkill(event: CdkDragDrop<Skill[]>) {
+    this.draft.update(d => {
+      const newSkills = [...d.skills];
+      moveItemInArray(newSkills, event.previousIndex, event.currentIndex);
+      return { ...d, skills: newSkills };
+    });
+    this.onFieldChange();
+  }
+
+  dropLanguage(event: CdkDragDrop<any[]>) {
+    this.draft.update(d => {
+      const newLanguages = [...(d.languages || [])];
+      moveItemInArray(newLanguages, event.previousIndex, event.currentIndex);
+      return { ...d, languages: newLanguages };
     });
     this.onFieldChange();
   }
@@ -474,10 +602,10 @@ export class BuilderComponent implements OnInit, OnDestroy {
       title: 'Currículo Importado',
       createdAt: this.draft().createdAt,
       updatedAt: this.draft().updatedAt,
-      template: 'modern',
-      colorTheme: '#4f46e5',
-      fontFamily: "'Inter', sans-serif",
-      spacingMode: 'normal',
+      template: this.draft().template,
+      colorTheme: this.draft().colorTheme,
+      fontFamily: this.draft().fontFamily,
+      spacingMode: this.draft().spacingMode,
       personalInfo: {
         name: 'Alexandre Magno',
         jobTitle: 'Engenheiro de Software Senior',
@@ -533,6 +661,11 @@ export class BuilderComponent implements OnInit, OnDestroy {
         { id: crypto.randomUUID(), name: 'Angular', level: 4 },
         { id: crypto.randomUUID(), name: 'AWS Cloud', level: 4 },
         { id: crypto.randomUUID(), name: 'Liderança', level: 5 }
+      ],
+      languages: [
+        { id: crypto.randomUUID(), name: 'Português', level: 'Nativo' },
+        { id: crypto.randomUUID(), name: 'Inglês', level: 'Avançado' },
+        { id: crypto.randomUUID(), name: 'Espanhol', level: 'Intermediário' }
       ]
     });
     this.resumeTitle = 'Currículo Importado';
@@ -570,7 +703,7 @@ export class BuilderComponent implements OnInit, OnDestroy {
       const { default: jsPDF } = await import('jspdf');
       const { default: html2canvas } = await import('html2canvas');
 
-      const templateIds = ['cv-elegance', 'cv-modern', 'cv-minimal'];
+      const templateIds = ['cv-elegance', 'cv-modern', 'cv-minimal', 'cv-creative', 'cv-compact'];
       let el: HTMLElement | null = null;
       for (const id of templateIds) {
         el = document.getElementById(id);
@@ -592,5 +725,66 @@ export class BuilderComponent implements OnInit, OnDestroy {
       this.toastr.error('Erro ao exportar PDF. Tente novamente.', 'Erro');
     }
     this.exporting.set(false);
+  }
+
+  // Roast states
+  showRoastModal = signal(false);
+  isRoasting = signal(false);
+  roastResult = signal<any>(null);
+
+  generateCoverLetter() {
+    if (!this.jobDescription || this.jobDescription.length < 20) {
+      this.toastr.warning('Por favor, cole uma descrição de vaga com pelo menos 20 caracteres.', 'Atenção');
+      return;
+    }
+
+    const current = this.draft();
+    if (!current.id) return;
+
+    const lang = this.translate.currentLang || 'pt';
+    this.aiService.generateCoverLetter(current.id, this.jobDescription, lang).subscribe({
+      next: (res) => {
+        this.generatedCoverLetter.set(res.result.coverLetter);
+        this.isGeneratingCoverLetter.set(false);
+      },
+      error: () => {
+        this.toastr.error('Erro ao gerar carta. O limite gratuito pode ter sido atingido.', 'Erro IA');
+        this.isGeneratingCoverLetter.set(false);
+      }
+    });
+  }
+
+  roastResume() {
+    const current = this.draft();
+    if (!current.id) return;
+
+    this.isRoasting.set(true);
+    this.showRoastModal.set(true);
+    
+    const lang = this.translate.currentLang || 'pt';
+    this.aiService.roastResume(current.id, lang).subscribe({
+      next: (res) => {
+        this.roastResult.set(res);
+        this.isRoasting.set(false);
+      },
+      error: () => {
+        this.toastr.error('O recrutador foi tomar um café, tente novamente.', 'Erro IA');
+        this.isRoasting.set(false);
+        this.showRoastModal.set(false);
+      }
+    });
+  }
+
+  closeRoastModal() {
+    this.showRoastModal.set(false);
+  }
+
+  copyCoverLetter() {
+    navigator.clipboard.writeText(this.generatedCoverLetter());
+    this.toastr.success('Carta copiada para a área de transferência!', 'Sucesso');
+  }
+
+  closeCoverLetterModal() {
+    this.showCoverLetterModal.set(false);
   }
 }

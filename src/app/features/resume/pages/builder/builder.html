@@ -29,17 +29,18 @@
       <!-- 3-State Save Indicator -->
       <span class="save-indicator" [class.saving]="saveState() === 'saving'" [class.saved]="saveState() === 'saved'">
         @if (saveState() === 'saving') {
-          <div class="save-spinner"></div>
-          <span>{{ 'BUILDER.SAVING' | translate }}</span>
+        <div class="save-spinner"></div>
+        <span>{{ 'BUILDER.SAVING' | translate }}</span>
         } @else if (saveState() === 'saved') {
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5">
-            <polyline points="20 6 9 17 4 12" />
-          </svg>
-          <span>{{ 'BUILDER.SAVED' | translate }}</span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5">
+          <polyline points="20 6 9 17 4 12" />
+        </svg>
+        <span>{{ 'BUILDER.SAVED' | translate }}</span>
         }
       </span>
 
-      <button class="btn btn-secondary btn-sm btn-export-pdf" (click)="exportPdf()" [disabled]="exporting()">
+      <button class="btn btn-secondary btn-sm btn-export-pdf" (click)="exportPdf()"
+        [disabled]="exporting() || (currentStep() !== 'skills' && currentStep() !== 'languages')">
         @if (exporting()) {
         <div class="spinner" style="width:14px;height:14px"></div>
         } @else {
@@ -59,7 +60,7 @@
       <div class="steps-nav">
         @for (s of steps; track s.id; let i = $index) {
         <button class="step-btn" [class.active]="currentStep() === s.id" [class.done]="isStepDone(s.id)"
-          (click)="goToStep(s.id)">
+          [class.disabled]="!isStepDone(s.id) && currentStep() !== s.id">
           <div class="step-num">
             @if (isStepDone(s.id)) {
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
@@ -99,10 +100,9 @@
                 {{ 'BUILDER.PERSONAL.FULL_NAME' | translate }} <span class="required-star">*</span>
               </label>
               <input class="form-control" [class.invalid]="showValidation() && !draft().personalInfo.name.trim()"
-                [(ngModel)]="draft().personalInfo.name" (ngModelChange)="onFieldChange()"
-                placeholder="João da Silva" />
+                [(ngModel)]="draft().personalInfo.name" (ngModelChange)="onFieldChange()" placeholder="João da Silva" />
               @if (showValidation() && !draft().personalInfo.name.trim()) {
-                <span class="field-error animate-shake">Campo obrigatório</span>
+              <span class="field-error animate-shake">Campo obrigatório</span>
               }
             </div>
             <div class="form-group col-2">
@@ -114,11 +114,12 @@
               <label class="form-label">
                 {{ 'BUILDER.PERSONAL.EMAIL' | translate }} <span class="required-star">*</span>
               </label>
-              <input class="form-control" type="email" [class.invalid]="showValidation() && !draft().personalInfo.email.trim()"
-                [(ngModel)]="draft().personalInfo.email"
-                (ngModelChange)="onFieldChange()" placeholder="joao@email.com" />
+              <input class="form-control" type="email"
+                [class.invalid]="showValidation() && !draft().personalInfo.email.trim()"
+                [(ngModel)]="draft().personalInfo.email" (ngModelChange)="onFieldChange()"
+                placeholder="joao@email.com" />
               @if (showValidation() && !draft().personalInfo.email.trim()) {
-                <span class="field-error animate-shake">Campo obrigatório</span>
+              <span class="field-error animate-shake">Campo obrigatório</span>
               }
             </div>
             <div class="form-group">
@@ -133,22 +134,22 @@
               @if (showLocationDropdown) {
               <div class="autocomplete-dropdown">
                 @if (isLocationLoading) {
-                  <div class="autocomplete-loading">
-                    <div class="spinner" style="width: 14px; height: 14px; border-width: 2px;"></div>
-                    Buscando...
-                  </div>
+                <div class="autocomplete-loading">
+                  <div class="spinner" style="width: 14px; height: 14px; border-width: 2px;"></div>
+                  Buscando...
+                </div>
                 } @else if (locationSuggestions.length === 0) {
-                  <div class="autocomplete-empty">Nenhum local encontrado</div>
+                <div class="autocomplete-empty">Nenhum local encontrado</div>
                 } @else {
-                  @for (loc of locationSuggestions; track loc.place_id) {
-                    <div class="autocomplete-item" (click)="selectLocation(loc)">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-                        <circle cx="12" cy="10" r="3" />
-                      </svg>
-                      {{ loc.display_name }}
-                    </div>
-                  }
+                @for (loc of locationSuggestions; track loc.place_id) {
+                <div class="autocomplete-item" (click)="selectLocation(loc)">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                    <circle cx="12" cy="10" r="3" />
+                  </svg>
+                  {{ loc.display_name }}
+                </div>
+                }
                 }
               </div>
               }
@@ -157,6 +158,16 @@
               <label class="form-label">{{ 'BUILDER.PERSONAL.LINKEDIN' | translate }}</label>
               <input class="form-control" [(ngModel)]="draft().personalInfo.linkedin" (ngModelChange)="onFieldChange()"
                 placeholder="linkedin.com/in/joaosilva" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">{{ 'BUILDER.PERSONAL.GITHUB' | translate }}</label>
+              <input class="form-control" [(ngModel)]="draft().personalInfo.github" (ngModelChange)="onFieldChange()"
+                placeholder="github.com/joaosilva" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">{{ 'BUILDER.PERSONAL.PORTFOLIO' | translate }}</label>
+              <input class="form-control" [(ngModel)]="draft().personalInfo.website" (ngModelChange)="onFieldChange()"
+                placeholder="joaosilva.dev" />
             </div>
             <div class="form-group col-2">
               <div class="label-with-action">
@@ -172,7 +183,7 @@
               </div>
               <textarea class="form-control" [(ngModel)]="draft().personalInfo.bio" (ngModelChange)="onFieldChange()"
                 [placeholder]="'BUILDER.PERSONAL.BIO_PLACEHOLDER' | translate" rows="4"></textarea>
-          </div>
+            </div>
           </div>
         </div>
         }
@@ -232,8 +243,8 @@
                   </div>
                   <div class="form-group">
                     <label class="form-label">{{ 'BUILDER.EXPERIENCE.START' | translate }}</label>
-                    <input class="form-control" type="month" [(ngModel)]="exp.startDate" (ngModelChange)="onFieldChange()"
-                      placeholder="Jan 2021" />
+                    <input class="form-control" type="month" [(ngModel)]="exp.startDate"
+                      (ngModelChange)="onFieldChange()" placeholder="Jan 2021" />
                   </div>
                   <div class="form-group">
                     <label class="form-label">{{ 'BUILDER.EXPERIENCE.END' | translate }}</label>
@@ -305,7 +316,8 @@
                   </svg>
                 </div>
                 <div class="list-item-info">
-                  <span class="list-item-title">{{ edu.degree || ('BUILDER.EDUCATION.EMPTY_DEGREE' | translate) }}</span>
+                  <span class="list-item-title">{{ edu.degree || ('BUILDER.EDUCATION.EMPTY_DEGREE' | translate)
+                    }}</span>
                   <span class="list-item-sub">{{ edu.institution }}</span>
                 </div>
                 <div class="list-item-actions">
@@ -342,8 +354,8 @@
                   </div>
                   <div class="form-group">
                     <label class="form-label">{{ 'BUILDER.EDUCATION.START' | translate }}</label>
-                    <input class="form-control" type="month" [(ngModel)]="edu.startDate" (ngModelChange)="onFieldChange()"
-                      placeholder="2018" />
+                    <input class="form-control" type="month" [(ngModel)]="edu.startDate"
+                      (ngModelChange)="onFieldChange()" placeholder="2018" />
                   </div>
                   <div class="form-group">
                     <label class="form-label">{{ 'BUILDER.EDUCATION.END' | translate }}</label>
@@ -383,9 +395,24 @@
             <p class="step-desc">{{ 'BUILDER.SKILLS.DESC' | translate }}</p>
           </div>
 
+          <!-- Nome do Currículo -->
+          <div class="form-group"
+            style="margin-bottom: 24px; background: var(--color-surface); padding: 16px; border-radius: 8px; border: 1px dashed rgba(99, 102, 241, 0.2)">
+            <label class="form-label" style="font-weight: 600; display: flex; align-items: center; gap: 6px;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)"
+                stroke-width="2">
+                <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h12a2 2 0 002-2v-7" />
+                <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
+              </svg>
+              {{ 'BUILDER.SKILLS.RESUME_NAME_LABEL' | translate }}
+            </label>
+            <input class="form-control" [(ngModel)]="resumeTitle" (blur)="saveTitle()" (ngModelChange)="onFieldChange()"
+              [placeholder]="'BUILDER.SKILLS.RESUME_NAME_PLACEHOLDER' | translate" />
+          </div>
+
           <div class="quick-add">
-            <input class="form-control" [(ngModel)]="newSkillName" [placeholder]="'BUILDER.SKILLS.ADD_PLACEHOLDER' | translate"
-              (keydown.enter)="addSkill()" />
+            <input class="form-control" [(ngModel)]="newSkillName"
+              [placeholder]="'BUILDER.SKILLS.ADD_PLACEHOLDER' | translate" (keydown.enter)="addSkill()" />
             <div class="quick-level">
               <span class="level-label">{{ 'BUILDER.SKILLS.LEVEL' | translate }}</span>
               @for (l of [1,2,3,4,5]; track l) {
@@ -393,7 +420,8 @@
                 }}</button>
               }
             </div>
-            <button class="btn btn-primary" (click)="addSkill()" [disabled]="!newSkillName.trim()">{{ 'BUILDER.SKILLS.ADD_BTN' | translate }}</button>
+            <button class="btn btn-primary" (click)="addSkill()" [disabled]="!newSkillName.trim()">{{
+              'BUILDER.SKILLS.ADD_BTN' | translate }}</button>
           </div>
 
           <div class="skills-tags">
@@ -427,236 +455,379 @@
             </div>
           </div>
 
-          <div class="finish-section" style="margin-top: 24px;">
-            <div class="finish-info">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2">
-                <polyline points="20 6 9 17 4 12" />
-              </svg>
-              <span>{{ 'BUILDER.FINISH_INFO' | translate }}</span>
-            </div>
-            <button class="btn btn-primary btn-lg" (click)="exportPdf()" [disabled]="exporting()">
-              @if (exporting()) {
-              <div class="spinner"></div>
-              {{ 'BUILDER.GENERATING_PDF' | translate }}
-              } @else {
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
-                <polyline points="7 10 12 15 17 10" />
-                <line x1="12" y1="15" x2="12" y2="3" />
-              </svg>
-              {{ 'BUILDER.DOWNLOAD_PDF' | translate }}
-              }
-            </button>
-          </div>
         </div>
         }
 
-        @if (currentStep() === 'template') {
+        @if (currentStep() === 'languages') {
         <div class="step-section animate-fade-in-up">
           <div class="step-header">
-            <h2 class="step-title">{{ 'BUILDER.TEMPLATE.TITLE' | translate }}</h2>
-            <p class="step-desc">{{ 'BUILDER.TEMPLATE.DESC' | translate }}</p>
+            <h2 class="step-title">{{ 'BUILDER.LANGUAGES.TITLE' | translate }}</h2>
+            <p class="step-desc">{{ 'BUILDER.LANGUAGES.DESC' | translate }}</p>
           </div>
 
-          <div class="template-options">
-            @for (t of templateOptions; track t.id) {
-            <div class="template-option" [class.selected]="draft().template === t.id && (!t.customColor || (draft().colorTheme || '#1e293b') === t.customColor)" (click)="selectTemplate(t)">
-              <div class="template-preview-mini" [style.background]="t.previewBg">
-                <div class="template-preview-content">
-                  @if (t.id === 'elegance') {
-                    <div class="preview-doc doc-elegance">
-                      <div class="doc-top-bar" [style.background]="t.customColor"></div>
-                      <div class="doc-lines">
-                        <div class="doc-l text-long"></div>
-                        <div class="doc-l text-mid"></div>
-                        <div class="doc-l text-short"></div>
-                      </div>
-                    </div>
-                  } @else if (t.id === 'modern') {
-                    <div class="preview-doc doc-modern">
-                      <div class="doc-sidebar" [style.background]="t.customColor"></div>
-                      <div class="doc-body">
-                        <div class="doc-l text-long"></div>
-                        <div class="doc-l text-mid"></div>
-                      </div>
-                    </div>
-                  } @else if (t.id === 'minimal') {
-                    <div class="preview-doc doc-minimal">
-                      <div class="doc-l header-rule" [style.background]="t.customColor"></div>
-                      <div class="doc-l text-long"></div>
-                      <div class="doc-l text-mid"></div>
-                    </div>
-                  } @else if (t.id === 'creative') {
-                    <div class="preview-doc doc-creative">
-                      <div class="doc-body">
-                        <div class="doc-l header-rule" [style.background]="t.customColor"></div>
-                        <div class="doc-l text-long"></div>
-                      </div>
-                      <div class="doc-avatar"></div>
-                    </div>
-                  } @else if (t.id === 'compact') {
-                    <div class="preview-doc doc-compact">
-                      <div class="doc-header-row">
-                        <div class="header-bullet" [style.background]="t.customColor"></div>
-                        <div class="header-line"></div>
-                      </div>
-                      <div class="doc-body-flex">
-                        <div class="doc-box"></div>
-                        <div class="doc-box"></div>
-                      </div>
-                    </div>
-                  }
+        <div class="quick-add">
+          <div style="position: relative; flex: 1;">
+            <input class="form-control" [value]="newLanguageName" (input)="onLanguageInput($event)" (blur)="hideLanguageDropdown()" [placeholder]="'BUILDER.LANGUAGES.ADD_PLACEHOLDER' | translate" autocomplete="off"
+              (keydown.enter)="addLanguage()" />
+            @if (showLanguageDropdown) {
+              <div class="autocomplete-dropdown" style="top: calc(100% + 4px); left: 0; width: 100%;">
+                @if (isLanguageLoading) {
+                <div class="autocomplete-loading">
+                  <div class="spinner" style="width: 14px; height: 14px; border-width: 2px;"></div>
+                  Buscando...
                 </div>
+                } @else if (languageSuggestions.length === 0) {
+                <div class="autocomplete-empty">Nenhum idioma encontrado</div>
+                } @else {
+                  @for (lang of languageSuggestions; track lang) {
+                  <div class="autocomplete-item" (click)="selectLanguage(lang)">
+                    {{ lang }}
+                  </div>
+                  }
+                }
               </div>
-              <div class="template-option-info">
-                <span class="template-option-name">{{ t.name }}</span>
-                <span class="template-option-desc">{{ t.desc }}</span>
+            }
+          </div>
+          <div class="quick-level">
+            <span class="level-label">{{ 'BUILDER.LANGUAGES.LEVEL' | translate }}</span>
+            <select class="form-control" [(ngModel)]="newLanguageLevel" style="padding: 8px 12px; height: auto;">
+              <option value="Básico">Básico</option>
+              <option value="Intermediário">Intermediário</option>
+              <option value="Avançado">Avançado</option>
+              <option value="Fluente">Fluente</option>
+              <option value="Nativo">Nativo</option>
+            </select>
+          </div>
+          <button class="btn btn-primary" (click)="addLanguage()"
+            [disabled]="!newLanguageName.trim()">{{ 'BUILDER.LANGUAGES.ADD_BTN' | translate }}</button>
+        </div>
+
+        <div class="skills-tags">
+          @if (!draft().languages || draft().languages.length === 0) {
+          <p class="empty-skills">{{ 'BUILDER.LANGUAGES.EMPTY' | translate }}</p>
+          }
+          @for (lang of draft().languages; track lang.id; let i = $index) {
+          <div class="skill-tag-item">
+            <span class="skill-tag-name">{{ lang.name }}</span>
+            <span class="skill-tag-name"
+              style="color: var(--color-text-muted); font-size: 12px; margin-left: auto; margin-right: 12px;">{{
+              lang.level }}</span>
+            <button class="remove-skill" (click)="removeLanguage(i)">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            </button>
+          </div>
+          }
+        </div>
+
+        <div class="finish-section" style="margin-top: 24px;">
+          <div class="finish-info">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2">
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+            <span>{{ 'BUILDER.FINISH_INFO' | translate }}</span>
+          </div>
+          <button class="btn btn-primary btn-lg" (click)="exportPdf()" [disabled]="exporting()">
+            @if (exporting()) {
+            <div class="spinner"></div>
+            {{ 'BUILDER.GENERATING_PDF' | translate }}
+            } @else {
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+              <polyline points="7 10 12 15 17 10" />
+              <line x1="12" y1="15" x2="12" y2="3" />
+            </svg>
+            {{ 'BUILDER.DOWNLOAD_PDF' | translate }}
+            }
+          </button>
+        </div>
+      </div>
+      }
+
+      @if (currentStep() === 'template') {
+      <div class="step-section animate-fade-in-up">
+        <div class="step-header">
+          <h2 class="step-title">{{ 'BUILDER.TEMPLATE.TITLE' | translate }}</h2>
+          <p class="step-desc">{{ 'BUILDER.TEMPLATE.DESC' | translate }}</p>
+        </div>
+
+        <div class="template-options">
+          @for (t of templateOptions; track t.id) {
+          <div class="template-option"
+            [class.selected]="draft().template === t.id && (!t.customColor || (draft().colorTheme || '#1e293b') === t.customColor)"
+            (click)="selectTemplate(t)">
+            <div class="template-preview-mini" [style.background]="t.previewBg">
+              <div class="template-preview-content">
+                @if (t.id === 'elegance') {
+                <div class="preview-doc doc-elegance">
+                  <div class="doc-top-bar" [style.background]="t.customColor"></div>
+                  <div class="doc-lines">
+                    <div class="doc-l text-long"></div>
+                    <div class="doc-l text-mid"></div>
+                    <div class="doc-l text-short"></div>
+                  </div>
+                </div>
+                } @else if (t.id === 'modern') {
+                <div class="preview-doc doc-modern">
+                  <div class="doc-sidebar" [style.background]="t.customColor"></div>
+                  <div class="doc-body">
+                    <div class="doc-l text-long"></div>
+                    <div class="doc-l text-mid"></div>
+                  </div>
+                </div>
+                } @else if (t.id === 'minimal') {
+                <div class="preview-doc doc-minimal">
+                  <div class="doc-l header-rule" [style.background]="t.customColor"></div>
+                  <div class="doc-l text-long"></div>
+                  <div class="doc-l text-mid"></div>
+                </div>
+                } @else if (t.id === 'creative') {
+                <div class="preview-doc doc-creative">
+                  <div class="doc-body">
+                    <div class="doc-l header-rule" [style.background]="t.customColor"></div>
+                    <div class="doc-l text-long"></div>
+                  </div>
+                  <div class="doc-avatar"></div>
+                </div>
+                } @else if (t.id === 'compact') {
+                <div class="preview-doc doc-compact">
+                  <div class="doc-header-row">
+                    <div class="header-bullet" [style.background]="t.customColor"></div>
+                    <div class="header-line"></div>
+                  </div>
+                  <div class="doc-body-flex">
+                    <div class="doc-box"></div>
+                    <div class="doc-box"></div>
+                  </div>
+                </div>
+                }
               </div>
-              @if (draft().template === t.id && (!t.customColor || (draft().colorTheme || '#1e293b') === t.customColor)) {
-              <div class="template-check">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3">
-                  <polyline points="20 6 9 17 4 12" />
-                </svg>
-              </div>
-              }
+            </div>
+            <div class="template-option-info">
+              <span class="template-option-name">{{ t.name }}</span>
+              <span class="template-option-desc">{{ t.desc }}</span>
+            </div>
+            @if (draft().template === t.id && (!t.customColor || (draft().colorTheme || '#1e293b') === t.customColor)) {
+            <div class="template-check">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3">
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
             </div>
             }
           </div>
+          }
+        </div>
 
-          <div class="customizer-section">
-            <div class="customizer-header">
-              <h3 class="customizer-title">{{ 'BUILDER.TEMPLATE.COLOR' | translate }}</h3>
-              <p class="customizer-desc">{{ 'BUILDER.TEMPLATE.COLOR_DESC' | translate }}</p>
-            </div>
-            <div class="color-picker-grid">
-              @for (c of colorThemes; track c.value) {
-              <button class="color-picker-btn" [style.background]="c.value"
-                [class.active]="(draft().colorTheme || '#1e293b') === c.value" (click)="selectColorTheme(c.value)"
-                [title]="c.name">
-                @if ((draft().colorTheme || '#1e293b') === c.value) {
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3">
-                  <polyline points="20 6 9 17 4 12" />
-                </svg>
-                }
-              </button>
-              }
-            </div>
+        <div class="customizer-section">
+          <div class="customizer-header">
+            <h3 class="customizer-title">{{ 'BUILDER.TEMPLATE.COLOR' | translate }}</h3>
+            <p class="customizer-desc">{{ 'BUILDER.TEMPLATE.COLOR_DESC' | translate }}</p>
           </div>
-
-          <div class="customizer-section">
-            <div class="customizer-header">
-              <h3 class="customizer-title">{{ 'BUILDER.TEMPLATE.FONT' | translate }}</h3>
-              <p class="customizer-desc">{{ 'BUILDER.TEMPLATE.FONT_DESC' | translate }}</p>
-            </div>
-            <div class="font-picker-grid">
-              @for (f of fontFamilies; track f.value) {
-              <button class="font-picker-btn" [style.font-family]="f.value"
-                [class.active]="(draft().fontFamily || fontFamilies[0].value) === f.value"
-                (click)="selectFontFamily(f.value)">
-                <span class="font-btn-label">{{ f.name }}</span>
-                @if ((draft().fontFamily || fontFamilies[0].value) === f.value) {
-                <svg class="check-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                  stroke-width="3">
-                  <polyline points="20 6 9 17 4 12" />
-                </svg>
-                }
-              </button>
+          <div class="color-picker-grid">
+            @for (c of colorThemes; track c.value) {
+            <button class="color-picker-btn" [style.background]="c.value"
+              [class.active]="(draft().colorTheme || '#1e293b') === c.value" (click)="selectColorTheme(c.value)"
+              [title]="c.name">
+              @if ((draft().colorTheme || '#1e293b') === c.value) {
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3">
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
               }
-            </div>
-          </div>
-
-          <div class="customizer-section">
-            <div class="customizer-header">
-              <h3 class="customizer-title">{{ 'BUILDER.TEMPLATE.DENSITY' | translate }}</h3>
-              <p class="customizer-desc">{{ 'BUILDER.TEMPLATE.DENSITY_DESC' | translate }}</p>
-            </div>
-            <div class="density-picker-row">
-              <button class="density-btn" [class.active]="(draft().spacingMode || 'normal') === 'compact'"
-                (click)="selectSpacingMode('compact')">
-                <span class="density-icon">🗜️</span>
-                <span class="density-label">{{ 'BUILDER.TEMPLATE.COMPACT' | translate }}</span>
-              </button>
-              <button class="density-btn" [class.active]="(draft().spacingMode || 'normal') === 'normal'"
-                (click)="selectSpacingMode('normal')">
-                <span class="density-icon">⚖️</span>
-                <span class="density-label">{{ 'BUILDER.TEMPLATE.NORMAL' | translate }}</span>
-              </button>
-              <button class="density-btn" [class.active]="(draft().spacingMode || 'normal') === 'spacious'"
-                (click)="selectSpacingMode('spacious')">
-                <span class="density-icon">↔️</span>
-                <span class="density-label">{{ 'BUILDER.TEMPLATE.SPACIOUS' | translate }}</span>
-              </button>
-            </div>
+            </button>
+            }
           </div>
         </div>
+
+        <div class="customizer-section">
+          <div class="customizer-header">
+            <h3 class="customizer-title">{{ 'BUILDER.TEMPLATE.FONT' | translate }}</h3>
+            <p class="customizer-desc">{{ 'BUILDER.TEMPLATE.FONT_DESC' | translate }}</p>
+          </div>
+          <div class="font-picker-grid">
+            @for (f of fontFamilies; track f.value) {
+            <button class="font-picker-btn" [style.font-family]="f.value"
+              [class.active]="(draft().fontFamily || fontFamilies[0].value) === f.value"
+              (click)="selectFontFamily(f.value)">
+              <span class="font-btn-label">{{ f.name }}</span>
+              @if ((draft().fontFamily || fontFamilies[0].value) === f.value) {
+              <svg class="check-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="3">
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+              }
+            </button>
+            }
+          </div>
+        </div>
+
+        <div class="customizer-section">
+          <div class="customizer-header">
+            <h3 class="customizer-title">{{ 'BUILDER.TEMPLATE.DENSITY' | translate }}</h3>
+            <p class="customizer-desc">{{ 'BUILDER.TEMPLATE.DENSITY_DESC' | translate }}</p>
+          </div>
+          <div class="density-picker-row">
+            <button class="density-btn" [class.active]="(draft().spacingMode || 'normal') === 'compact'"
+              (click)="selectSpacingMode('compact')">
+              <span class="density-icon">🗜️</span>
+              <span class="density-label">{{ 'BUILDER.TEMPLATE.COMPACT' | translate }}</span>
+            </button>
+            <button class="density-btn" [class.active]="(draft().spacingMode || 'normal') === 'normal'"
+              (click)="selectSpacingMode('normal')">
+              <span class="density-icon">⚖️</span>
+              <span class="density-label">{{ 'BUILDER.TEMPLATE.NORMAL' | translate }}</span>
+            </button>
+            <button class="density-btn" [class.active]="(draft().spacingMode || 'normal') === 'spacious'"
+              (click)="selectSpacingMode('spacious')">
+              <span class="density-icon">↔️</span>
+              <span class="density-label">{{ 'BUILDER.TEMPLATE.SPACIOUS' | translate }}</span>
+            </button>
+          </div>
+        </div>
+      </div>
+      }
+
+      <div class="step-nav">
+        @if (currentStep() !== 'template') {
+        <button class="btn btn-secondary" (click)="prevStep()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="15 18 9 12 15 6" />
+          </svg>
+          {{ 'BUILDER.PREV' | translate }}
+        </button>
+        } @else {
+        <div></div>
         }
-
-        <div class="step-nav">
-          @if (currentStep() !== 'template') {
-          <button class="btn btn-secondary" (click)="prevStep()">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="15 18 9 12 15 6" />
-            </svg>
-            {{ 'BUILDER.PREV' | translate }}
-          </button>
-          } @else {
-          <div></div>
-          }
-          @if (currentStep() !== 'skills') {
-          <button class="btn btn-primary" (click)="nextStep()">
-            {{ 'BUILDER.NEXT' | translate }}
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="9 18 15 12 9 6" />
-            </svg>
-          </button>
-          }
-        </div>
-      </div>
-    </div>
-
-    <div class="preview-panel">
-      <div class="preview-topbar">
-        <span class="preview-label">{{ 'BUILDER.PREVIEW_LABEL' | translate }}</span>
-        <div class="preview-scale-btns">
-          <button class="scale-btn" [class.active]="previewScale() === 0.4" (click)="previewScale.set(0.4)">40%</button>
-          <button class="scale-btn" [class.active]="previewScale() === 0.6" (click)="previewScale.set(0.6)">60%</button>
-          <button class="scale-btn" [class.active]="previewScale() === 0.8" (click)="previewScale.set(0.8)">80%</button>
-          <button class="scale-btn" [class.active]="previewScale() === 1" (click)="previewScale.set(1)">100%</button>
-        </div>
-      </div>
-      <div class="preview-container">
-        <div class="preview-sheet" [style.transform]="'scale(' + previewScale() + ')'"
-          [style.transformOrigin]="'top center'">
-          @if (draft().template === 'elegance') {
-          <app-elegance-template [resume]="draft()" />
-          } @else if (draft().template === 'modern') {
-          <app-modern-template [resume]="draft()" />
-          } @else if (draft().template === 'minimal') {
-          <app-minimal-template [resume]="draft()" />
-          } @else if (draft().template === 'creative') {
-          <app-creative-template [resume]="draft()" />
-          } @else if (draft().template === 'compact') {
-          <app-compact-template [resume]="draft()" />
-          }
-        </div>
+        @if (currentStep() !== 'skills') {
+        <button class="btn btn-primary" (click)="nextStep()">
+          {{ 'BUILDER.NEXT' | translate }}
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="9 18 15 12 9 6" />
+          </svg>
+        </button>
+        }
       </div>
     </div>
   </div>
 
-  <!-- Floating mobile view switcher -->
-  <button class="mobile-view-toggle" (click)="toggleMobileView()">
-    @if (activeTab() === 'edit') {
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-        <circle cx="12" cy="12" r="3" />
-      </svg>
-      <span>{{ 'BUILDER.MOBILE_PREVIEW' | translate }}</span>
-    } @else {
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M12 20h9" />
-        <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" />
-      </svg>
-      <span>{{ 'BUILDER.MOBILE_EDIT' | translate }}</span>
-    }
-  </button>
+  <div class="preview-panel">
+    <div class="preview-topbar">
+      <span class="preview-label">{{ 'BUILDER.PREVIEW_LABEL' | translate }}</span>
+      <div class="preview-scale-btns">
+        <button class="scale-btn" [class.active]="previewScale() === 0.4" (click)="previewScale.set(0.4)">40%</button>
+        <button class="scale-btn" [class.active]="previewScale() === 0.6" (click)="previewScale.set(0.6)">60%</button>
+        <button class="scale-btn" [class.active]="previewScale() === 0.8" (click)="previewScale.set(0.8)">80%</button>
+        <button class="scale-btn" [class.active]="previewScale() === 1" (click)="previewScale.set(1)">100%</button>
+      </div>
+    </div>
+    <div class="preview-container">
+      <div class="preview-sheet" [style.transform]="'scale(' + previewScale() + ')'"
+        [style.transformOrigin]="'top center'">
+        @if (draft().template === 'elegance') {
+        <app-elegance-template [resume]="draft()" />
+        } @else if (draft().template === 'modern') {
+        <app-modern-template [resume]="draft()" />
+        } @else if (draft().template === 'minimal') {
+        <app-minimal-template [resume]="draft()" />
+        } @else if (draft().template === 'creative') {
+        <app-creative-template [resume]="draft()" />
+        } @else if (draft().template === 'compact') {
+        <app-compact-template [resume]="draft()" />
+        }
+      </div>
+    </div>
+  </div>
 </div>
+
+<!-- Floating mobile view switcher -->
+<button class="mobile-view-toggle" (click)="toggleMobileView()">
+  @if (activeTab() === 'edit') {
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+    <circle cx="12" cy="12" r="3" />
+  </svg>
+  <span>{{ 'BUILDER.MOBILE_PREVIEW' | translate }}</span>
+  } @else {
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <path d="M12 20h9" />
+    <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" />
+  </svg>
+  <span>{{ 'BUILDER.MOBILE_EDIT' | translate }}</span>
+  }
+</button>
+</div>
+
+@if (showRoastModal()) {
+<div class="modal-overlay" (click)="closeRoastModal()">
+  <div class="modal-content cover-letter-modal" (click)="$event.stopPropagation()">
+    <button class="modal-close" (click)="closeRoastModal()">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="18" y1="6" x2="6" y2="18" />
+        <line x1="6" y1="6" x2="18" y2="18" />
+      </svg>
+    </button>
+
+    <div class="modal-header">
+      <h2 class="modal-title" style="color: #ef4444; display: flex; align-items: center; gap: 8px;">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path
+            d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z" />
+        </svg>
+        {{ 'BUILDER.ROAST.TITLE' | translate }}
+      </h2>
+      <p class="modal-desc">{{ 'BUILDER.ROAST.DESC' | translate }}</p>
+    </div>
+
+    <div class="modal-body">
+      @if (isRoasting()) {
+      <div
+        style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 0; gap: 16px;">
+        <div class="spinner"
+          style="width: 32px; height: 32px; border-color: rgba(239, 68, 68, 0.3); border-top-color: #ef4444;"></div>
+        <p style="color: var(--color-text-muted); font-weight: 500;">{{ 'BUILDER.ROAST.LOADING' | translate }}</p>
+      </div>
+      } @else if (roastResult()) {
+      <div class="roast-results animate-fade-in-up">
+
+        <div
+          style="display: flex; align-items: center; justify-content: space-between; background: var(--color-surface-2); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--color-border); margin-bottom: 20px;">
+          <span style="font-weight: 600; font-size: 16px;">{{ 'BUILDER.ROAST.SCORE' | translate }}</span>
+          <div
+            style="display: flex; align-items: center; justify-content: center; width: 48px; height: 48px; border-radius: 50%; border: 3px solid #ef4444; color: #ef4444; font-weight: 700; font-size: 18px;">
+            {{ roastResult().score }}
+          </div>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 16px;">
+          <div class="roast-section strengths">
+            <h4 style="color: #10b981; font-weight: 600; margin-bottom: 8px; font-size: 14px;">{{
+              'BUILDER.ROAST.STRENGTHS' | translate }}</h4>
+            <ul style="margin: 0; padding-left: 20px; color: var(--color-text); font-size: 14px; line-height: 1.6;">
+              @for (s of roastResult().strengths; track s) { <li>{{ s }}</li> }
+            </ul>
+          </div>
+
+          <div class="roast-section weaknesses">
+            <h4 style="color: #ef4444; font-weight: 600; margin-bottom: 8px; font-size: 14px;">{{
+              'BUILDER.ROAST.WEAKNESSES' | translate }}</h4>
+            <ul style="margin: 0; padding-left: 20px; color: var(--color-text); font-size: 14px; line-height: 1.6;">
+              @for (w of roastResult().weaknesses; track w) { <li>{{ w }}</li> }
+            </ul>
+          </div>
+
+          <div class="roast-section actionable">
+            <h4 style="color: #f59e0b; font-weight: 600; margin-bottom: 8px; font-size: 14px;">{{
+              'BUILDER.ROAST.ACTIONABLE' | translate }}</h4>
+            <ul style="margin: 0; padding-left: 20px; color: var(--color-text); font-size: 14px; line-height: 1.6;">
+              @for (a of roastResult().actionableFeedback; track a) { <li>{{ a }}</li> }
+            </ul>
+          </div>
+        </div>
+
+      </div>
+      }
+    </div>
+  </div>
+</div>
+}

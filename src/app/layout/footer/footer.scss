@@ -1,7 +1,7 @@
 .footer {
   background: var(--color-surface);
   border-top: 1px solid var(--color-border);
-  padding: 24px;
+  padding: 10px 24px;
 }
 .footer-inner {
   max-width: 1200px;
@@ -12,14 +12,13 @@
   gap: 16px;
   flex-wrap: wrap;
 }
-.footer-brand { display: flex; flex-direction: column; gap: 6px; }
+.footer-brand { display: flex; align-items: center; gap: 8px; }
 .footer-logo { display: flex; align-items: center; gap: 8px; }
 .logo-icon-sm {
-  width: 28px; height: 28px;
+  width: 22px; height: 22px;
   background: var(--gradient-primary);
-  border-radius: 8px;
+  border-radius: 6px;
   display: flex; align-items: center; justify-content: center;
 }
-.logo-text-sm { font-size: 16px; font-weight: 800; color: white; }
-.footer-tagline { font-size: 13px; color: var(--color-text-subtle); }
-.footer-copy { font-size: 13px; color: var(--color-text-subtle); }
+.logo-text-sm { font-size: 14px; font-weight: 800; color: white; }
+.footer-copy { font-size: 11px; color: var(--color-text-subtle); }

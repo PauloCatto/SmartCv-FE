@@ -1,4 +1,6 @@
 export type TemplateType = 'elegance' | 'modern' | 'minimal' | 'creative' | 'compact';
+export type Step = 'personal' | 'experience' | 'education' | 'skills' | 'languages' | 'template';
+export type SaveState = 'idle' | 'saving' | 'saved';
 
 export interface PersonalInfo {
   name: string;

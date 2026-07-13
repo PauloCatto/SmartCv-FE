@@ -149,6 +149,12 @@
   &.done {
     color: var(--color-success);
   }
+
+  &.disabled {
+    opacity: 0.4;
+    cursor: default;
+    pointer-events: none;
+  }
 }
 
 .step-num {
@@ -324,7 +330,7 @@
   background: var(--color-surface-2);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
-  overflow: hidden;
+  overflow: visible;
 }
 
 .list-item-header {
@@ -915,6 +921,8 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 6px;
+  gap: 8px;
+  flex-wrap: wrap;
 
   .form-label {
     margin-bottom: 0;
@@ -1223,4 +1231,153 @@
   .preview-container {
     padding: 10px;
   }
+}
+
+/* =============================================
+   FORM PANEL INNER RESPONSIVENESS
+   The form panel is only ~420px wide, so inner
+   grids must always stack to 1 column.
+   ============================================= */
+.list-item-form .form-grid {
+  grid-template-columns: 1fr;
+
+  .col-2 {
+    grid-column: span 1;
+  }
+}
+
+/* Fix card header overflow */
+.list-item-header {
+  gap: 8px;
+  min-width: 0;
+}
+
+.list-item-info {
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
+}
+
+.list-item-title {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.list-item-sub {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Fix form inputs overflow */
+.list-item-form .form-control {
+  min-width: 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Step header responsive */
+.step-header {
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+/* =============================================
+   COVER LETTER MODAL
+   ============================================= */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+}
+
+.modal-content.cover-letter-modal {
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  width: 90%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: var(--radius-sm);
+  transition: all var(--transition-fast);
+
+  &:hover {
+    background: var(--color-surface-2);
+    color: var(--color-text);
+  }
+}
+
+.modal-header {
+  padding: 24px 24px 16px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.modal-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: 8px;
+}
+
+.modal-desc {
+  font-size: 14px;
+  color: var(--color-text-muted);
+}
+
+.modal-body {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.generated-content-box {
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.box-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: var(--color-surface-3);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.box-title {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.box-body {
+  padding: 16px;
+  color: var(--color-text);
 }
