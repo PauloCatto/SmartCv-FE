@@ -175,3 +175,67 @@
     display: none;
   }
 }
+
+.toggle-sidebar-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+  cursor: pointer;
+  align-self: flex-end;
+  margin-bottom: 12px;
+  transition: all var(--transition-base);
+
+  &:hover {
+    color: var(--color-text);
+    background: var(--color-surface-3);
+    border-color: var(--color-primary-light);
+  }
+  
+  svg {
+    transition: transform var(--transition-base);
+  }
+}
+
+.sidebar.collapsed {
+  width: 68px;
+  padding: 24px 8px;
+  align-items: center;
+
+  .toggle-sidebar-btn {
+    align-self: center;
+    
+    svg {
+      transform: rotate(180deg);
+    }
+  }
+
+  .sidebar-link {
+    padding: 12px;
+    justify-content: center;
+    gap: 0;
+
+    span { display: none; }
+    &:hover { transform: none; }
+  }
+
+  .user-info-card {
+    padding: 8px;
+    justify-content: center;
+    gap: 0;
+  }
+
+  .user-details { display: none; }
+
+  .logout-btn {
+    padding: 10px;
+    justify-content: center;
+    span { display: none; }
+  }
+}
+

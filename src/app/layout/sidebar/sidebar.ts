@@ -1,6 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive, Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth';
+import { SidebarService } from '../../core/services/sidebar.service';
 import { AsyncPipe } from '@angular/common';
 import { TranslateModule } from '@ngx-translate/core';
 
@@ -12,6 +13,7 @@ import { TranslateModule } from '@ngx-translate/core';
 })
 export class SidebarComponent {
   auth = inject(AuthService);
+  sidebarService = inject(SidebarService);
   private router = inject(Router);
 
   getUserInitials(name: string | undefined): string {
