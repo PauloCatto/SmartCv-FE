@@ -175,7 +175,7 @@
       } @else {
       <div class="resumes-grid">
         @for (resume of vm.resumes; track resume.id) {
-        <div class="resume-card clickable" [class.animate-fade-in-up]="true" (click)="editResume(resume.id)">
+        <div class="resume-card clickable" [class.animate-fade-in-up]="true" (click)="editResume(resume)">
           <div class="resume-preview" [class]="'preview-' + resume.template">
             <div class="preview-content">
               <div class="preview-header">

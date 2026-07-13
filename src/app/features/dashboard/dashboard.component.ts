@@ -6,7 +6,6 @@ import { ResumeService } from '../../core/services/resume';
 import { AuthService } from '../../core/services/auth';
 import { Resume, DashboardStats, TEMPLATE_OPTIONS } from '../../core/models/resume.model';
 import { JobMatcherModalComponent } from './components/job-matcher-modal/job-matcher-modal';
-import { SkeletonLoaderComponent } from '../../shared/components/skeleton-loader/skeleton-loader';
 import { ConfirmModalComponent } from '../../shared/components/confirm-modal/confirm-modal';
 import { TranslateModule } from '@ngx-translate/core';
 import { ToastrService } from 'ngx-toastr';
@@ -66,6 +65,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
   private subs: Subscription[] = [];
 
   ngOnInit() {
+    this.resumeService.loadResumes(true).subscribe(resumes => {
+      this.loadingSubject.next(false);
+    });
     const sub = this.resumeService.getDashboardStats().subscribe(stats => {
       this.stats = stats;
     });
@@ -127,6 +129,19 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.deleteTargetId = null;
   }
 
+  slugify(text: string): string {
+    return text
+      .toString()
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^\w\s-]/g, '')
+      .replace(/[\s_]+/g, '-')
+      .replace(/--+/g, '-')
+      .trim()
+      .replace(/^-+|-+$/g, '');
+  }
+
   createWithTemplate(tmpl: any) {
     const now = new Date();
     const mes = now.toLocaleString('pt-BR', { month: 'short' }).replace('.', '');
@@ -140,7 +155,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       title: titulo
     }).subscribe({
       next: (created) => {
-        this.router.navigate(['/resume', created.id, 'edit']);
+        this.router.navigate(['/resume', this.slugify(created.title), 'edit']);
       }
     });
   }
@@ -153,8 +168,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.selectedResumeId = null;
   }
 
-  editResume(id: string) {
-    this.router.navigate(['/resume', id, 'edit']);
+  editResume(resume: any) {
+    this.router.navigate(['/resume', this.slugify(resume.title), 'edit']);
   }
 
   scrollCarousel(offset: number) {

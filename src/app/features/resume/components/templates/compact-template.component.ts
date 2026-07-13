@@ -1,8 +1,10 @@
-import { Component, input, computed } from '@angular/core';
+import { Component, input, computed, inject } from '@angular/core';
 import { Resume } from '../../../../core/models/resume.model';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-compact-template',
+  imports: [TranslateModule],
   template: `
     <div [class]="'cv-compact cv-spacing-' + (resolvedResume().spacingMode || 'normal')" id="cv-compact" [style.--cv-primary]="resolvedResume().colorTheme || '#0284c7'" [style.font-family]="resolvedResume().fontFamily || 'Inter, sans-serif'">
       <!-- Top Header -->
@@ -30,6 +32,12 @@ import { Resume } from '../../../../core/models/resume.model';
           @if (resolvedResume().personalInfo.linkedin) {
             <div class="contact-item">in {{ resolvedResume().personalInfo.linkedin }}</div>
           }
+          @if (resolvedResume().personalInfo.github) {
+            <div class="contact-item">gh {{ resolvedResume().personalInfo.github }}</div>
+          }
+          @if (resolvedResume().personalInfo.website) {
+            <div class="contact-item">www {{ resolvedResume().personalInfo.website }}</div>
+          }
         </div>
       </div>
 
@@ -48,12 +56,12 @@ import { Resume } from '../../../../core/models/resume.model';
         <!-- Experience -->
         @if (resolvedResume().experience.length > 0) {
           <div class="cv-section">
-            <h2 class="section-title">Experiência Profissional</h2>
+            <h2 class="section-title">{{ 'BUILDER.CV.EXPERIENCE_FULL' | translate }}</h2>
             <div class="horizontal-list">
               @for (exp of resolvedResume().experience; track exp.id) {
                 <div class="exp-item">
                   <div class="item-meta">
-                    <span class="item-period">{{ exp.startDate }} – {{ exp.current ? 'Atual' : exp.endDate }}</span>
+                    <span class="item-period">{{ exp.startDate }} – {{ exp.current ? ('BUILDER.CV.CURRENT' | translate) : exp.endDate }}</span>
                     <span class="item-dot"></span>
                     <span class="item-company">{{ exp.company }}</span>
                   </div>
@@ -71,16 +79,16 @@ import { Resume } from '../../../../core/models/resume.model';
         <!-- Education -->
         @if (resolvedResume().education.length > 0) {
           <div class="cv-section">
-            <h2 class="section-title">Educação e Certificações</h2>
+            <h2 class="section-title">{{ 'BUILDER.CV.EDUCATION_CERTS' | translate }}</h2>
             <div class="horizontal-list">
               @for (edu of resolvedResume().education; track edu.id) {
                 <div class="edu-item">
                   <div class="item-meta">
-                    <span class="item-period">{{ edu.startDate }} – {{ edu.current ? 'Atual' : edu.endDate }}</span>
+                    <span class="item-period">{{ edu.startDate }} – {{ edu.current ? ('BUILDER.CV.CURRENT' | translate) : edu.endDate }}</span>
                     <span class="item-dot"></span>
                     <span class="item-company">{{ edu.institution }}</span>
                   </div>
-                  <h3 class="item-role">{{ edu.degree }} em {{ edu.field }}</h3>
+                  <h3 class="item-role">{{ edu.degree }} {{ 'BUILDER.CV.IN' | translate }} {{ edu.field }}</h3>
                 </div>
               }
             </div>
@@ -91,12 +99,27 @@ import { Resume } from '../../../../core/models/resume.model';
         <!-- Skills -->
         @if (resolvedResume().skills.length > 0) {
           <div class="cv-section">
-            <h2 class="section-title">Habilidades & Conhecimento</h2>
+            <h2 class="section-title">{{ 'BUILDER.CV.SKILLS_KNOWLEDGE' | translate }}</h2>
             <div class="skills-tags-wrap">
               @for (skill of resolvedResume().skills; track skill.id) {
                 <div class="skill-tag-card">
                   <span class="skill-tag-name">{{ skill.name }}</span>
                   <span class="skill-tag-level">{{ getLevelLabel(skill.level) }}</span>
+                </div>
+              }
+            </div>
+          </div>
+        }
+
+        <!-- Languages -->
+        @if (resolvedResume().languages && resolvedResume().languages.length > 0) {
+          <div class="cv-section">
+            <h2 class="section-title">{{ 'BUILDER.CV.LANGUAGES' | translate }}</h2>
+            <div class="skills-tags-wrap">
+              @for (lang of resolvedResume().languages; track lang.id) {
+                <div class="skill-tag-card">
+                  <span class="skill-tag-name">{{ lang.name }}</span>
+                  <span class="skill-tag-level">{{ lang.level }}</span>
                 </div>
               }
             </div>
@@ -315,6 +338,7 @@ import { Resume } from '../../../../core/models/resume.model';
 })
 export class CompactTemplateComponent {
   resume = input.required<Resume>();
+  private translate = inject(TranslateService);
 
   resolvedResume = computed(() => {
     const res = this.resume();
@@ -327,7 +351,7 @@ export class CompactTemplateComponent {
         email: res.personalInfo.email || 'joao@email.com',
         phone: res.personalInfo.phone || '(11) 99999-0000',
         location: res.personalInfo.location || 'São Paulo, SP',
-        bio: res.personalInfo.bio || 'Profissional experiente em desenvolvimento de software com foco em Angular, Node.js e arquiteturas de sistemas escaláveis. Apaixonado por solucionar problemas complexos e criar soluções eficientes que geram valor de negócio.',
+        bio: res.personalInfo.bio || this.translate.instant('BUILDER.CV.MOCK_BIO'),
       },
       experience: (res.experience && res.experience.length > 0) ? res.experience : [
         {
@@ -335,9 +359,9 @@ export class CompactTemplateComponent {
           company: 'Google Brasil',
           role: 'Desenvolvedor Full Stack Senior',
           startDate: 'Jan 2022',
-          endDate: 'Atual',
+          endDate: '',
           current: true,
-          description: 'Responsável pela liderança técnica de projetos em Angular e Node.js. Otimizei o tempo de carregamento de aplicações críticas em 40% e guiei uma equipe de 4 desenvolvedores no design de APIs resilientes.'
+          description: this.translate.instant('BUILDER.CV.MOCK_EXP1_DESC')
         },
         {
           id: 'mock-exp-2',
@@ -346,7 +370,7 @@ export class CompactTemplateComponent {
           startDate: 'Mar 2020',
           endDate: 'Dez 2021',
           current: false,
-          description: 'Desenvolvimento e manutenção de interfaces ricas com foco em performance e acessibilidade. Integração contínua com serviços de nuvem e cobertura abrangente de testes unitários.'
+          description: this.translate.instant('BUILDER.CV.MOCK_EXP2_DESC')
         }
       ],
       education: (res.education && res.education.length > 0) ? res.education : [
@@ -371,6 +395,7 @@ export class CompactTemplateComponent {
   });
 
   getLevelLabel(level: number): string {
-    return ['', 'Básico', 'Iniciante', 'Intermediário', 'Avançado', 'Expert'][level];
+    const keys = ['', 'BUILDER.CV.LEVEL_1', 'BUILDER.CV.LEVEL_2', 'BUILDER.CV.LEVEL_3', 'BUILDER.CV.LEVEL_4', 'BUILDER.CV.LEVEL_5'];
+    return this.translate.instant(keys[level] || '');
   }
 }

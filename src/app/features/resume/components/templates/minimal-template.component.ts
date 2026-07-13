@@ -1,8 +1,11 @@
-import { Component, input, computed } from '@angular/core';
+import { Component, input, computed, inject } from '@angular/core';
 import { Resume } from '../../../../core/models/resume.model';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { UpperCasePipe } from '@angular/common';
 
 @Component({
   selector: 'app-minimal-template',
+  imports: [TranslateModule, UpperCasePipe],
   template: `
     <div [class]="'cv-minimal cv-spacing-' + (resolvedResume().spacingMode || 'normal')" id="cv-minimal" [style.--cv-primary]="resolvedResume().colorTheme || '#111827'" [style.font-family]="resolvedResume().fontFamily || 'Inter, sans-serif'">
       <!-- Header -->
@@ -27,6 +30,12 @@ import { Resume } from '../../../../core/models/resume.model';
           @if (resolvedResume().personalInfo.linkedin) {
             <span>{{ resolvedResume().personalInfo.linkedin }}</span>
           }
+          @if (resolvedResume().personalInfo.github) {
+            <span>{{ resolvedResume().personalInfo.github }}</span>
+          }
+          @if (resolvedResume().personalInfo.website) {
+            <span>{{ resolvedResume().personalInfo.website }}</span>
+          }
         </div>
       </div>
 
@@ -44,7 +53,7 @@ import { Resume } from '../../../../core/models/resume.model';
       @if (resolvedResume().experience.length > 0) {
         <div class="cv-section two-col">
           <div class="col-label">
-            <h2 class="section-title">EXPERIÊNCIA</h2>
+            <h2 class="section-title">{{ 'BUILDER.CV.EXPERIENCE' | translate | uppercase }}</h2>
           </div>
           <div class="col-content">
             @for (exp of resolvedResume().experience; track exp.id; let last = $last) {
@@ -54,7 +63,7 @@ import { Resume } from '../../../../core/models/resume.model';
                     <div class="item-role">{{ exp.role }}</div>
                     <div class="item-company">{{ exp.company }}</div>
                   </div>
-                  <div class="item-period">{{ exp.startDate }} – {{ exp.current ? 'Atual' : exp.endDate }}</div>
+                  <div class="item-period">{{ exp.startDate }} – {{ exp.current ? ('BUILDER.CV.CURRENT' | translate) : exp.endDate }}</div>
                 </div>
                 @if (exp.description) {
                   <p class="item-desc">{{ exp.description }}</p>
@@ -70,17 +79,17 @@ import { Resume } from '../../../../core/models/resume.model';
       @if (resolvedResume().education.length > 0) {
         <div class="cv-section two-col">
           <div class="col-label">
-            <h2 class="section-title">EDUCAÇÃO</h2>
+            <h2 class="section-title">{{ 'BUILDER.CV.EDUCATION' | translate | uppercase }}</h2>
           </div>
           <div class="col-content">
             @for (edu of resolvedResume().education; track edu.id; let last = $last) {
               <div class="cv-item" [class.last]="last">
                 <div class="item-top">
                   <div>
-                    <div class="item-role">{{ edu.degree }} em {{ edu.field }}</div>
+                    <div class="item-role">{{ edu.degree }} {{ 'BUILDER.CV.IN' | translate }} {{ edu.field }}</div>
                     <div class="item-company">{{ edu.institution }}</div>
                   </div>
-                  <div class="item-period">{{ edu.startDate }} – {{ edu.current ? 'Atual' : edu.endDate }}</div>
+                  <div class="item-period">{{ edu.startDate }} – {{ edu.current ? ('BUILDER.CV.CURRENT' | translate) : edu.endDate }}</div>
                 </div>
               </div>
             }
@@ -99,6 +108,22 @@ import { Resume } from '../../../../core/models/resume.model';
             <div class="skills-wrap">
               @for (skill of resolvedResume().skills; track skill.id) {
                 <span class="skill-tag">{{ skill.name }}</span>
+              }
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- Languages -->
+      @if (resolvedResume().languages && resolvedResume().languages.length > 0) {
+        <div class="cv-section two-col">
+          <div class="col-label">
+            <h2 class="section-title">{{ 'BUILDER.CV.LANGUAGES' | translate }}</h2>
+          </div>
+          <div class="col-content">
+            <div class="skills-wrap">
+              @for (lang of resolvedResume().languages; track lang.id) {
+                <span class="skill-tag lang-tag">{{ lang.name }} <em style="opacity:0.7;font-style:normal;font-size:10px;">{{ lang.level }}</em></span>
               }
             </div>
           </div>
@@ -228,6 +253,7 @@ import { Resume } from '../../../../core/models/resume.model';
 })
 export class MinimalTemplateComponent {
   resume = input.required<Resume>();
+  private translate = inject(TranslateService);
 
   resolvedResume = computed(() => {
     const res = this.resume();
@@ -240,7 +266,7 @@ export class MinimalTemplateComponent {
         email: res.personalInfo.email || 'joao@email.com',
         phone: res.personalInfo.phone || '(11) 99999-0000',
         location: res.personalInfo.location || 'São Paulo, SP',
-        bio: res.personalInfo.bio || 'Profissional experiente em desenvolvimento de software com foco em Angular, Node.js e arquiteturas de sistemas escaláveis. Apaixonado por solucionar problemas complexos e criar soluções eficientes que geram valor de negócio.',
+        bio: res.personalInfo.bio || this.translate.instant('BUILDER.CV.MOCK_BIO'),
       },
       experience: (res.experience && res.experience.length > 0) ? res.experience : [
         {
@@ -248,9 +274,9 @@ export class MinimalTemplateComponent {
           company: 'Google Brasil',
           role: 'Desenvolvedor Full Stack Senior',
           startDate: 'Jan 2022',
-          endDate: 'Atual',
+          endDate: '',
           current: true,
-          description: 'Responsável pela liderança técnica de projetos em Angular e Node.js. Otimizei o tempo de carregamento de aplicações críticas em 40% e guiei uma equipe de 4 desenvolvedores no design de APIs resilientes.'
+          description: this.translate.instant('BUILDER.CV.MOCK_EXP1_DESC')
         },
         {
           id: 'mock-exp-2',
@@ -259,7 +285,7 @@ export class MinimalTemplateComponent {
           startDate: 'Mar 2020',
           endDate: 'Dez 2021',
           current: false,
-          description: 'Desenvolvimento e manutenção de interfaces ricas com foco em performance and acessibilidade. Integração contínua com serviços de nuvem e cobertura abrangente de testes unitários.'
+          description: this.translate.instant('BUILDER.CV.MOCK_EXP2_DESC')
         }
       ],
       education: (res.education && res.education.length > 0) ? res.education : [

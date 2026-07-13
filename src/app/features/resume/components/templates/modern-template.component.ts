@@ -1,8 +1,10 @@
-import { Component, input, computed } from '@angular/core';
+import { Component, input, computed, inject } from '@angular/core';
 import { Resume } from '../../../../core/models/resume.model';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-modern-template',
+  imports: [TranslateModule],
   template: `
     <div [class]="'cv-modern cv-spacing-' + (resolvedResume().spacingMode || 'normal')" id="cv-modern" [style.--cv-primary]="resolvedResume().colorTheme || '#4f46e5'" [style.font-family]="resolvedResume().fontFamily || 'Inter, sans-serif'">
       <!-- Sidebar -->
@@ -22,7 +24,7 @@ import { Resume } from '../../../../core/models/resume.model';
 
         <!-- Contacts -->
         <div class="sidebar-section">
-          <h3 class="sidebar-title">Contato</h3>
+          <h3 class="sidebar-title">{{ 'BUILDER.CV.CONTACT' | translate }}</h3>
           <div class="contact-list">
             @if (resolvedResume().personalInfo.email) {
               <div class="contact-row">
@@ -48,13 +50,25 @@ import { Resume } from '../../../../core/models/resume.model';
                 <span>{{ resolvedResume().personalInfo.linkedin }}</span>
               </div>
             }
+            @if (resolvedResume().personalInfo.github) {
+              <div class="contact-row">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
+                <span>{{ resolvedResume().personalInfo.github }}</span>
+              </div>
+            }
+            @if (resolvedResume().personalInfo.website) {
+              <div class="contact-row">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                <span>{{ resolvedResume().personalInfo.website }}</span>
+              </div>
+            }
           </div>
         </div>
 
         <!-- Skills -->
         @if (resolvedResume().skills.length > 0) {
           <div class="sidebar-section">
-            <h3 class="sidebar-title">Habilidades</h3>
+            <h3 class="sidebar-title">{{ 'BUILDER.CV.SKILLS' | translate }}</h3>
             <div class="skills-list">
               @for (skill of resolvedResume().skills; track skill.id) {
                 <div class="skill-item">
@@ -69,6 +83,21 @@ import { Resume } from '../../../../core/models/resume.model';
             </div>
           </div>
         }
+
+        <!-- Languages -->
+        @if (resolvedResume().languages && resolvedResume().languages.length > 0) {
+          <div class="sidebar-section">
+            <h3 class="sidebar-title">{{ 'BUILDER.CV.LANGUAGES' | translate }}</h3>
+            <div class="skills-list">
+              @for (lang of resolvedResume().languages; track lang.id) {
+                <div class="skill-item">
+                  <div class="skill-name">{{ lang.name }}</div>
+                  <div style="font-size:10px;color:rgba(255,255,255,0.6);margin-top:2px;">{{ lang.level }}</div>
+                </div>
+              }
+            </div>
+          </div>
+        }
       </div>
 
       <!-- Main Content -->
@@ -78,7 +107,7 @@ import { Resume } from '../../../../core/models/resume.model';
           <div class="main-section">
             <h2 class="main-title">
               <span class="title-accent"></span>
-              Sobre mim
+              {{ 'BUILDER.CV.ABOUT' | translate }}
             </h2>
             <p class="bio-text">{{ resolvedResume().personalInfo.bio }}</p>
           </div>
@@ -89,7 +118,7 @@ import { Resume } from '../../../../core/models/resume.model';
           <div class="main-section">
             <h2 class="main-title">
               <span class="title-accent"></span>
-              Experiência
+              {{ 'BUILDER.CV.EXPERIENCE' | translate }}
             </h2>
             <div class="timeline">
               @for (exp of resolvedResume().experience; track exp.id) {
@@ -98,7 +127,7 @@ import { Resume } from '../../../../core/models/resume.model';
                   <div class="timeline-content">
                     <div class="timeline-header">
                       <div class="timeline-role">{{ exp.role }}</div>
-                      <div class="timeline-period">{{ exp.startDate }} – {{ exp.current ? 'Atual' : exp.endDate }}</div>
+                      <div class="timeline-period">{{ exp.startDate }} – {{ exp.current ? ('BUILDER.CV.CURRENT' | translate) : exp.endDate }}</div>
                     </div>
                     <div class="timeline-company">{{ exp.company }}</div>
                     @if (exp.description) {
@@ -116,7 +145,7 @@ import { Resume } from '../../../../core/models/resume.model';
           <div class="main-section">
             <h2 class="main-title">
               <span class="title-accent"></span>
-              Educação
+              {{ 'BUILDER.CV.EDUCATION' | translate }}
             </h2>
             <div class="timeline">
               @for (edu of resolvedResume().education; track edu.id) {
@@ -124,8 +153,8 @@ import { Resume } from '../../../../core/models/resume.model';
                   <div class="timeline-dot"></div>
                   <div class="timeline-content">
                     <div class="timeline-header">
-                      <div class="timeline-role">{{ edu.degree }} em {{ edu.field }}</div>
-                      <div class="timeline-period">{{ edu.startDate }} – {{ edu.current ? 'Atual' : edu.endDate }}</div>
+                      <div class="timeline-role">{{ edu.degree }} {{ 'BUILDER.CV.IN' | translate }} {{ edu.field }}</div>
+                      <div class="timeline-period">{{ edu.startDate }} – {{ edu.current ? ('BUILDER.CV.CURRENT' | translate) : edu.endDate }}</div>
                     </div>
                     <div class="timeline-company">{{ edu.institution }}</div>
                   </div>
@@ -293,6 +322,7 @@ import { Resume } from '../../../../core/models/resume.model';
 })
 export class ModernTemplateComponent {
   resume = input.required<Resume>();
+  private translate = inject(TranslateService);
 
   resolvedResume = computed(() => {
     const res = this.resume();
@@ -305,7 +335,7 @@ export class ModernTemplateComponent {
         email: res.personalInfo.email || 'joao@email.com',
         phone: res.personalInfo.phone || '(11) 99999-0000',
         location: res.personalInfo.location || 'São Paulo, SP',
-        bio: res.personalInfo.bio || 'Profissional experiente em desenvolvimento de software com foco em Angular, Node.js e arquiteturas de sistemas escaláveis. Apaixonado por solucionar problemas complexos e criar soluções eficientes que geram valor de negócio.',
+        bio: res.personalInfo.bio || this.translate.instant('BUILDER.CV.MOCK_BIO'),
       },
       experience: (res.experience && res.experience.length > 0) ? res.experience : [
         {
@@ -313,9 +343,9 @@ export class ModernTemplateComponent {
           company: 'Google Brasil',
           role: 'Desenvolvedor Full Stack Senior',
           startDate: 'Jan 2022',
-          endDate: 'Atual',
+          endDate: '',
           current: true,
-          description: 'Responsável pela liderança técnica de projetos em Angular e Node.js. Otimizei o tempo de carregamento de aplicações críticas em 40% e guiei uma equipe de 4 desenvolvedores no design de APIs resilientes.'
+          description: this.translate.instant('BUILDER.CV.MOCK_EXP1_DESC')
         },
         {
           id: 'mock-exp-2',
@@ -324,7 +354,7 @@ export class ModernTemplateComponent {
           startDate: 'Mar 2020',
           endDate: 'Dez 2021',
           current: false,
-          description: 'Desenvolvimento e manutenção de interfaces ricas com foco em performance e acessibilidade. Integração contínua com serviços de nuvem e cobertura abrangente de testes unitários.'
+          description: this.translate.instant('BUILDER.CV.MOCK_EXP2_DESC')
         }
       ],
       education: (res.education && res.education.length > 0) ? res.education : [

@@ -1,8 +1,10 @@
-import { Component, input, computed } from '@angular/core';
+import { Component, input, computed, inject } from '@angular/core';
 import { Resume } from '../../../../core/models/resume.model';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-creative-template',
+  imports: [TranslateModule],
   template: `
     <div [class]="'cv-creative cv-spacing-' + (resolvedResume().spacingMode || 'normal')" id="cv-creative" [style.--cv-primary]="resolvedResume().colorTheme || '#e11d48'" [style.font-family]="resolvedResume().fontFamily || 'Outfit, sans-serif'">
       <!-- Main Content (Left) -->
@@ -17,7 +19,7 @@ import { Resume } from '../../../../core/models/resume.model';
         <!-- Bio -->
         @if (resolvedResume().personalInfo.bio) {
           <div class="cv-section">
-            <h2 class="section-title">Sobre mim</h2>
+            <h2 class="section-title">{{ 'BUILDER.CV.ABOUT' | translate }}</h2>
             <p class="bio-text">{{ resolvedResume().personalInfo.bio }}</p>
           </div>
         }
@@ -25,13 +27,13 @@ import { Resume } from '../../../../core/models/resume.model';
         <!-- Experience -->
         @if (resolvedResume().experience.length > 0) {
           <div class="cv-section">
-            <h2 class="section-title">Trajetória Profissional</h2>
+            <h2 class="section-title">{{ 'BUILDER.CV.TRAJECTORY' | translate }}</h2>
             <div class="experience-list">
               @for (exp of resolvedResume().experience; track exp.id) {
                 <div class="exp-item">
                   <div class="exp-header">
                     <span class="exp-role">{{ exp.role }}</span>
-                    <span class="exp-period">{{ exp.startDate }} – {{ exp.current ? 'Atual' : exp.endDate }}</span>
+                    <span class="exp-period">{{ exp.startDate }} – {{ exp.current ? ('BUILDER.CV.CURRENT' | translate) : exp.endDate }}</span>
                   </div>
                   <div class="exp-company">{{ exp.company }}</div>
                   @if (exp.description) {
@@ -46,13 +48,13 @@ import { Resume } from '../../../../core/models/resume.model';
         <!-- Education -->
         @if (resolvedResume().education.length > 0) {
           <div class="cv-section">
-            <h2 class="section-title">Educação</h2>
+            <h2 class="section-title">{{ 'BUILDER.CV.EDUCATION' | translate }}</h2>
             <div class="education-list">
               @for (edu of resolvedResume().education; track edu.id) {
                 <div class="edu-item">
                   <div class="edu-header">
-                    <span class="edu-degree">{{ edu.degree }} em {{ edu.field }}</span>
-                    <span class="edu-period">{{ edu.startDate }} – {{ edu.current ? 'Atual' : edu.endDate }}</span>
+                    <span class="edu-degree">{{ edu.degree }} {{ 'BUILDER.CV.IN' | translate }} {{ edu.field }}</span>
+                    <span class="edu-period">{{ edu.startDate }} – {{ edu.current ? ('BUILDER.CV.CURRENT' | translate) : edu.endDate }}</span>
                   </div>
                   <div class="edu-institution">{{ edu.institution }}</div>
                 </div>
@@ -77,7 +79,7 @@ import { Resume } from '../../../../core/models/resume.model';
 
         <!-- Contact Info -->
         <div class="sidebar-section">
-          <h3 class="sidebar-title">Contato</h3>
+          <h3 class="sidebar-title">{{ 'BUILDER.CV.CONTACT' | translate }}</h3>
           <div class="contact-list">
             @if (resolvedResume().personalInfo.email) {
               <div class="contact-item">
@@ -103,13 +105,25 @@ import { Resume } from '../../../../core/models/resume.model';
                 <span class="contact-text">{{ resolvedResume().personalInfo.linkedin }}</span>
               </div>
             }
+            @if (resolvedResume().personalInfo.github) {
+              <div class="contact-item">
+                <span class="contact-icon">gh</span>
+                <span class="contact-text">{{ resolvedResume().personalInfo.github }}</span>
+              </div>
+            }
+            @if (resolvedResume().personalInfo.website) {
+              <div class="contact-item">
+                <span class="contact-icon">www</span>
+                <span class="contact-text">{{ resolvedResume().personalInfo.website }}</span>
+              </div>
+            }
           </div>
         </div>
 
         <!-- Skills -->
         @if (resolvedResume().skills.length > 0) {
           <div class="sidebar-section">
-            <h3 class="sidebar-title">Competências</h3>
+            <h3 class="sidebar-title">{{ 'BUILDER.CV.COMPETENCIES' | translate }}</h3>
             <div class="skills-list">
               @for (skill of resolvedResume().skills; track skill.id) {
                 <div class="skill-item">
@@ -119,6 +133,23 @@ import { Resume } from '../../../../core/models/resume.model';
                   </div>
                   <div class="skill-progress-bar">
                     <div class="skill-progress-fill" [style.width.%]="skill.level * 20"></div>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        }
+
+        <!-- Languages -->
+        @if (resolvedResume().languages && resolvedResume().languages.length > 0) {
+          <div class="sidebar-section">
+            <h3 class="sidebar-title">{{ 'BUILDER.CV.LANGUAGES' | translate }}</h3>
+            <div class="skills-list">
+              @for (lang of resolvedResume().languages; track lang.id) {
+                <div class="skill-item">
+                  <div class="skill-info">
+                    <span class="skill-name">{{ lang.name }}</span>
+                    <span class="skill-percent">{{ lang.level }}</span>
                   </div>
                 </div>
               }
@@ -429,6 +460,7 @@ import { Resume } from '../../../../core/models/resume.model';
 })
 export class CreativeTemplateComponent {
   resume = input.required<Resume>();
+  private translate = inject(TranslateService);
 
   resolvedResume = computed(() => {
     const res = this.resume();
@@ -441,7 +473,7 @@ export class CreativeTemplateComponent {
         email: res.personalInfo.email || 'joao@email.com',
         phone: res.personalInfo.phone || '(11) 99999-0000',
         location: res.personalInfo.location || 'São Paulo, SP',
-        bio: res.personalInfo.bio || 'Profissional experiente em desenvolvimento de software com foco em Angular, Node.js e arquiteturas de sistemas escaláveis. Apaixonado por solucionar problemas complexos e criar soluções eficientes que geram valor de negócio.',
+        bio: res.personalInfo.bio || this.translate.instant('BUILDER.CV.MOCK_BIO'),
       },
       experience: (res.experience && res.experience.length > 0) ? res.experience : [
         {
@@ -449,9 +481,9 @@ export class CreativeTemplateComponent {
           company: 'Google Brasil',
           role: 'Desenvolvedor Full Stack Senior',
           startDate: 'Jan 2022',
-          endDate: 'Atual',
+          endDate: '',
           current: true,
-          description: 'Responsável pela liderança técnica de projetos em Angular e Node.js. Otimizei o tempo de carregamento de aplicações críticas em 40% e guiei uma equipe de 4 desenvolvedores no design de APIs resilientes.'
+          description: this.translate.instant('BUILDER.CV.MOCK_EXP1_DESC')
         },
         {
           id: 'mock-exp-2',
@@ -460,7 +492,7 @@ export class CreativeTemplateComponent {
           startDate: 'Mar 2020',
           endDate: 'Dez 2021',
           current: false,
-          description: 'Desenvolvimento e manutenção de interfaces ricas com foco em performance e acessibilidade. Integração contínua com serviços de nuvem e cobertura abrangente de testes unitários.'
+          description: this.translate.instant('BUILDER.CV.MOCK_EXP2_DESC')
         }
       ],
       education: (res.education && res.education.length > 0) ? res.education : [
