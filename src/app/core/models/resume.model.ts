@@ -8,6 +8,7 @@ export interface PersonalInfo {
   location: string;
   website?: string;
   linkedin?: string;
+  github?: string;
   bio: string;
   photo?: string;
 }
@@ -39,6 +40,12 @@ export interface Skill {
   category?: string;
 }
 
+export interface Language {
+  id: string;
+  name: string;
+  level: 'Básico' | 'Intermediário' | 'Avançado' | 'Fluente' | 'Nativo';
+}
+
 export interface Resume {
   id: string;
   title: string;
@@ -50,6 +57,7 @@ export interface Resume {
   experience: Experience[];
   education: Education[];
   skills: Skill[];
+  languages: Language[];
   createdAt: string;
   updatedAt: string;
 }
@@ -175,10 +183,12 @@ export const EMPTY_RESUME: Omit<Resume, 'id' | 'createdAt' | 'updatedAt'> = {
     location: '',
     website: '',
     linkedin: '',
+    github: '',
     bio: '',
     photo: '',
   },
   experience: [],
   education: [],
   skills: [],
+  languages: [],
 };

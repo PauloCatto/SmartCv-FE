@@ -19,12 +19,20 @@ export class ResumeService {
     this.loadResumes().subscribe();
   }
 
-  loadResumes(): Observable<Resume[]> {
-    return this.http.get<Resume[]>(`${environment.apiUrl}/resumes`).pipe(
+  loadResumes(completedOnly = false): Observable<Resume[]> {
+    const url = completedOnly
+      ? `${environment.apiUrl}/resumes?completed=true`
+      : `${environment.apiUrl}/resumes`;
+    return this.http.get<Resume[]>(url).pipe(
       tap(resumesList => {
         this.resumesSubject.next(resumesList);
       })
     );
+  }
+
+  getLanguages(query = ''): Observable<string[]> {
+    const q = query ? `?q=${encodeURIComponent(query)}` : '';
+    return this.http.get<string[]>(`${environment.apiUrl}/resumes/languages${q}`);
   }
 
   getAll(): Resume[] {

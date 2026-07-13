@@ -4,6 +4,11 @@ import { authGuard, guestGuard } from './core/guards/auth.guard';
 export const routes: Routes = [
   {
     path: '',
+    pathMatch: 'full',
+    redirectTo: 'home',
+  },
+  {
+    path: 'home',
     loadComponent: () => import('./pages/home/home.component').then(m => m.HomeComponent),
   },
   {
@@ -43,6 +48,21 @@ export const routes: Routes = [
       {
         path: ':id/edit',
         loadComponent: () => import('./features/resume/pages/builder/builder').then(m => m.BuilderComponent),
+      },
+    ],
+  },
+  {
+    path: 'ai',
+    canActivate: [authGuard],
+    loadComponent: () => import('./layout/layout.component').then(m => m.LayoutComponent),
+    children: [
+      {
+        path: 'cover-letter',
+        loadComponent: () => import('./features/ai/pages/cover-letter/cover-letter.component').then(m => m.CoverLetterPageComponent),
+      },
+      {
+        path: 'roast',
+        loadComponent: () => import('./features/ai/pages/roast-resume/roast-resume.component').then(m => m.RoastResumePageComponent),
       },
     ],
   },
