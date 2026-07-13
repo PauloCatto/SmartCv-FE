@@ -1,15 +1,17 @@
 {
   "HEADER": {
     "FEATURES": "Funcionalidades",
-    "TEMPLATES": "Templates",
+    "TEMPLATES": "Modelos",
     "PRICING": "Planos",
     "LOGIN": "Entrar",
     "REGISTER": "Começar grátis",
-    "DASHBOARD": "Dashboard",
+    "DASHBOARD": "Painel",
     "LOGOUT": "Sair"
   },
   "SIDEBAR": {
-    "DASHBOARD": "Dashboard",
+    "DASHBOARD": "Painel",
+    "COVER_LETTER": "Carta de Apresentação",
+    "ROAST": "Análise Crítica",
     "PLAN_FREE": "Plano Free",
     "PLAN_PREMIUM": "Plano Premium",
     "LOGOUT": "Sair"
@@ -22,11 +24,12 @@
     "EXPORT_PDF": "Exportar PDF",
     "GENERATING_PDF": "Gerando PDF...",
     "STEPS": {
-      "TEMPLATE": "Template",
+      "TEMPLATE": "Modelo",
       "PERSONAL": "Pessoal",
       "EXPERIENCE": "Experiência",
       "EDUCATION": "Educação",
-      "SKILLS": "Skills"
+      "SKILLS": "Habilidades",
+      "LANGUAGES": "Idiomas"
     },
     "PERSONAL": {
       "TITLE": "Informações Pessoais",
@@ -37,10 +40,20 @@
       "EMAIL": "Email",
       "PHONE": "Telefone",
       "LOCATION": "Localização",
-      "LINKEDIN": "LinkedIn",
+      "LINKEDIN": "LinkedIn (opcional)",
+      "GITHUB": "GitHub (opcional)",
+      "PORTFOLIO": "Portfólio/Site (opcional)",
       "BIO": "Resumo profissional",
       "BIO_PLACEHOLDER": "Breve descrição sobre você, seus valores e objetivos profissionais...",
       "IMPROVE_AI": "✨ Melhorar com IA"
+    },
+    "LANGUAGES": {
+      "TITLE": "Idiomas",
+      "DESC": "Adicione os idiomas que você domina e seu nível de proficiência.",
+      "ADD_PLACEHOLDER": "Ex: Inglês, Espanhol...",
+      "LEVEL": "Nível",
+      "ADD_BTN": "Adicionar",
+      "EMPTY": "Nenhum idioma adicionado ainda."
     },
     "EXPERIENCE": {
       "TITLE": "Experiência Profissional",
@@ -74,7 +87,9 @@
       "LEVEL": "Nível:",
       "ADD_BTN": "Adicionar",
       "EMPTY": "Nenhuma skill adicionada ainda. Use o campo acima!",
-      "SUGGESTIONS": "Sugestões populares:"
+      "SUGGESTIONS": "Sugestões populares:",
+      "RESUME_NAME_LABEL": "Nome do Currículo (usado nas rotas e busca)",
+      "RESUME_NAME_PLACEHOLDER": "Ex: Desenvolvedor Frontend Angular"
     },
     "TEMPLATE": {
       "TITLE": "Escolha o Template",
@@ -95,11 +110,72 @@
     "PREV": "Anterior",
     "NEXT": "Próximo",
     "FINISH_INFO": "Seu currículo está sendo salvo automaticamente",
-    "DOWNLOAD_PDF": "Baixar PDF"
+    "DOWNLOAD_PDF": "Baixar PDF",
+    "COVER_LETTER": {
+      "TITLE": "Gerar Carta de Apresentação",
+      "DESC": "Use nossa IA para criar uma carta persuasiva baseada no seu currículo e na vaga.",
+      "SELECT_RESUME": "Selecione o Currículo Base",
+      "CHOOSE_RESUME": "Escolha um currículo...",
+      "NO_RESUME": "Nenhum currículo encontrado",
+      "NO_RESUME_DESC": "Você precisa criar um currículo primeiro para poder gerar uma carta de apresentação.",
+      "CREATE_RESUME": "Criar Currículo",
+      "JOB_TITLE_LABEL": "Título da Vaga (Opcional)",
+      "JOB_TITLE_PLACEHOLDER": "Ex: Desenvolvedor Frontend Angular",
+      "JOB_DESC_LABEL": "Cole a descrição da vaga aqui",
+      "JOB_DESC_PLACEHOLDER": "Ex: Buscamos um desenvolvedor frontend com experiência em Angular...",
+      "GENERATE_BTN": "Gerar Carta",
+      "GENERATING": "Escrevendo carta...",
+      "COPY_BTN": "Copiar Texto",
+      "COPIED": "Copiado!",
+      "MODAL_TITLE": "Sua Carta de Apresentação",
+      "LOADING_RESUMES": "Carregando currículos...",
+      "WORKSPACE_DESC": "Preencha as informações da vaga ao lado para gerar sua carta de apresentação personalizada com nossa inteligência artificial."
+    },
+    "ROAST": {
+      "BTN": "🔥 Analisar meu Currículo",
+      "TITLE": "Análise Sincera de Currículo (Modo Sincero)",
+      "DESC": "Nossa IA vai atuar como um recrutador exigente e apontar as falhas do seu currículo. Você aguenta?",
+      "SELECT_RESUME": "Selecione o Currículo para Avaliação",
+      "CHOOSE_RESUME": "Escolha um currículo...",
+      "NO_RESUME": "Nenhum currículo encontrado",
+      "NO_RESUME_DESC": "Você precisa criar um currículo primeiro para poder gerar uma avaliação.",
+      "CREATE_RESUME": "Criar Currículo",
+      "SCORE": "Nota do Currículo:",
+      "STRENGTHS": "Pontos Fortes (Milagre!)",
+      "WEAKNESSES": "Problemas Encontrados",
+      "ACTIONABLE": "O que você PRECISA mudar agora",
+      "LOADING": "Analisando seu currículo friamente...",
+      "ERROR": "O recrutador foi tomar um café, tente de novo.",
+      "LOADING_RESUMES": "Carregando currículos...",
+      "WORKSPACE_DESC": "Selecione um currículo ao lado para que nossa IA de recrutamento possa fazer uma avaliação sincera e apontar as falhas."
+    },
+    "CV": {
+      "ABOUT": "Sobre mim",
+      "EXPERIENCE": "Experiência",
+      "EXPERIENCE_FULL": "Experiência Profissional",
+      "TRAJECTORY": "Trajetória Profissional",
+      "EDUCATION": "Educação",
+      "EDUCATION_CERTS": "Educação e Certificações",
+      "SKILLS": "Habilidades",
+      "SKILLS_KNOWLEDGE": "Habilidades & Conhecimento",
+      "COMPETENCIES": "Competências",
+      "CONTACT": "Contato",
+      "CURRENT": "Atual",
+      "IN": "em",
+      "LEVEL_1": "Básico",
+      "LEVEL_2": "Básico-Int.",
+      "LEVEL_3": "Intermediário",
+      "LEVEL_4": "Avançado",
+      "LEVEL_5": "Expert",
+      "MOCK_BIO": "Profissional experiente em desenvolvimento de software com foco em Angular, Node.js e arquiteturas de sistemas escaláveis. Apaixonado por solucionar problemas complexos e criar soluções eficientes que geram valor de negócio.",
+      "MOCK_EXP1_DESC": "Responsável pela liderança técnica de projetos em Angular e Node.js. Otimizei o tempo de carregamento de aplicações críticas em 40% e guiei uma equipe de 4 desenvolvedores no design de APIs resilientes.",
+      "MOCK_EXP2_DESC": "Desenvolvimento e manutenção de interfaces ricas com foco em performance e acessibilidade. Integração contínua com serviços de nuvem e cobertura abrangente de testes unitários.",
+      "LANGUAGES": "Idiomas"
+    }
   },
   "FOOTER": {
     "TAGLINE": "Crie currículos incríveis com IA",
-    "COPYRIGHT": "© 2026 SmartCV. Todos os direitos reservados."
+    "COPYRIGHT": "© 2026 Prime Resume. Todos os direitos reservados."
   },
   "DASHBOARD": {
     "GREETING": "Olá,",
@@ -130,71 +206,141 @@
     "MINUTES_AGO": "há {{count}} min",
     "HOURS_AGO": "há {{count}}h"
   },
-  "BUILDER": {
-    "BACK": "Voltar",
-    "EXPORT_PDF": "Exportar PDF",
-    "SAVED": "Salvo",
-    "SAVING": "Salvando...",
-    "STEP_TEMPLATE": "Template",
-    "STEP_PERSONAL": "Pessoal",
-    "STEP_EXPERIENCE": "Experiência",
-    "STEP_EDUCATION": "Educação",
-    "STEP_SKILLS": "Skills",
-    "NEXT": "Próximo",
-    "PREVIOUS": "Anterior",
-    "PERSONAL_TITLE": "Informações Pessoais",
-    "PERSONAL_DESC": "Dados básicos que aparecerão no topo do seu currículo",
-    "AUTO_FILL": "Auto-preencher",
-    "FULL_NAME": "Nome completo",
-    "JOB_TITLE": "Cargo / Título profissional",
-    "EMAIL": "Email",
-    "PHONE": "Telefone",
-    "LOCATION": "Localização",
-    "LINKEDIN": "LinkedIn",
-    "BIO": "Resumo profissional",
-    "IMPROVE_AI": "✨ Melhorar com IA",
-    "EXP_TITLE": "Experiência Profissional",
-    "EXP_DESC": "Adicione suas experiências mais recentes primeiro",
-    "ADD_EXP": "Adicionar experiência",
-    "ROLE": "Cargo",
-    "COMPANY": "Empresa",
-    "START_DATE": "Início",
-    "END_DATE": "Fim",
-    "CURRENT_JOB": "Emprego atual",
-    "DESCRIPTION": "Descrição das atividades",
-    "EDU_TITLE": "Educação",
-    "EDU_DESC": "Formação acadêmica e cursos relevantes",
-    "ADD_EDU": "Adicionar formação",
-    "DEGREE": "Grau / Tipo",
-    "FIELD": "Área / Curso",
-    "INSTITUTION": "Instituição",
-    "CURRENT_EDU": "Em andamento",
-    "SKILLS_TITLE": "Habilidades",
-    "SKILLS_DESC": "Adicione suas skills técnicas e comportamentais",
-    "SKILL_LEVEL": "Nível:",
-    "ADD_SKILL": "Adicionar",
-    "EMPTY_SKILLS": "Nenhuma skill adicionada ainda. Use o campo acima!",
-    "SUGGESTIONS": "Sugestões populares:",
-    "AUTO_SAVE_MSG": "Seu currículo está sendo salvo automaticamente",
-    "DOWNLOAD_PDF": "Baixar PDF",
-    "GENERATING_PDF": "Gerando PDF...",
-    "TEMPLATE_TITLE": "Escolha o Template",
-    "TEMPLATE_DESC": "Selecione o design que melhor representa você",
-    "COLOR_TITLE": "Cor de Destaque",
-    "COLOR_DESC": "Selecione uma paleta profissional para os realces e títulos",
-    "FONT_TITLE": "Tipografia (Fontes ATS)",
-    "FONT_DESC": "Selecione uma fonte legível recomendada pelo mercado de contratações",
-    "DENSITY_TITLE": "Densidade do Layout (Espaçamento)",
-    "DENSITY_DESC": "Ajuste o espaçamento para preencher a folha perfeitamente",
-    "DENSITY_COMPACT": "Compacto",
-    "DENSITY_NORMAL": "Padrão",
-    "DENSITY_SPACIOUS": "Amplo",
-    "PREVIEW_LABEL": "Preview ao vivo",
-    "MOBILE_PREVIEW": "Ver Prévia",
-    "MOBILE_EDIT": "Editar Conteúdo",
-    "REQUIRED_FIELD": "Campo obrigatório",
-    "AI_ERROR": "Erro ao processar com IA. Tente novamente."
+
+  "HOME": {
+    "HERO": {
+      "TITLE_1": "Crie currículos",
+      "TITLE_GRADIENT": "profissionais",
+      "TITLE_2": "em minutos",
+      "DESC": "Plataforma inteligente que usa IA para otimizar seu currículo, aumentar suas chances em sistemas ATS e te ajudar a conseguir a vaga dos sonhos.",
+      "CTA_PRIMARY": "Criar meu currículo grátis",
+      "CTA_SECONDARY": "Ver modelos",
+      "STATS": {
+        "TEMPLATES": "Modelos profissionais",
+        "GEMINI": "Gemini integrada",
+        "EXPORT": "Exportação profissional"
+      },
+      "FLOAT": {
+        "ATS": "ATS Otimizado",
+        "PDF": "PDF exportado"
+      }
+    },
+    "FEATURES": {
+      "EYEBROW": "Funcionalidades",
+      "TITLE_1": "Tudo que você precisa para ",
+      "TITLE_GRADIENT": "se destacar",
+      "ITEMS": {
+        "PREVIEW": {
+          "TITLE": "Visualização em tempo real",
+          "DESC": "Veja seu currículo atualizar conforme você digita. Sem surpresas na hora de exportar."
+        },
+        "COVER_LETTER": {
+          "TITLE": "Carta de Apresentação",
+          "DESC": "Gere cartas de apresentação personalizadas em segundos com base na vaga e no seu currículo."
+        },
+        "EXPORT": {
+          "TITLE": "Exportação PDF",
+          "DESC": "Exporte seu currículo em PDF com alta qualidade e formatação profissional perfeita."
+        },
+        "ATS": {
+          "TITLE": "Compatível com ATS",
+          "DESC": "Templates otimizados para passar pelos filtros de sistemas de rastreio de candidatos."
+        },
+        "PREMIUM": {
+          "TITLE": "8 modelos premium",
+          "DESC": "Templates profissionais com designs sob medida para todas as carreiras."
+        },
+        "ROAST": {
+          "TITLE": "Análise Sincera de Currículo",
+          "DESC": "Nossa IA recrutadora avalia seu currículo friamente e aponta as falhas críticas sem rodeios."
+        }
+      }
+    },
+    "TEMPLATES": {
+      "EYEBROW": "Modelos",
+      "TITLE_1": "8 modelos ",
+      "TITLE_GRADIENT": "prontos para usar",
+      "DESC": "Escolha o que melhor combina com seu perfil e ajuste o espaçamento. Todos são otimizados para ATS e exportáveis em PDF.",
+      "POPULAR": "Popular",
+      "USE_TEMPLATE": "Usar este modelo",
+      "ITEMS": {
+        "ELEGANCE": {
+          "NAME": "Elegante Clássico",
+          "DESC": "Clássico e profissional. Perfeito para áreas tradicionais como direito, finanças e RH."
+        },
+        "EXECUTIVE": {
+          "NAME": "Executivo Dourado",
+          "DESC": "Corporativo e refinado com detalhes em dourado."
+        },
+        "MODERN_BLUE": {
+          "NAME": "Moderno Azul",
+          "DESC": "Criativo e moderno com coluna lateral azul. Ideal para tecnologia e inovação."
+        },
+        "MODERN_TEAL": {
+          "NAME": "Moderno Verde",
+          "DESC": "Visual moderno, limpo e dinâmico na cor verde azulada."
+        },
+        "MINIMAL": {
+          "NAME": "Minimalista",
+          "DESC": "Ultra limpo, refinado e focado no conteúdo."
+        },
+        "TECH_MONO": {
+          "NAME": "Técnico Mono",
+          "DESC": "Estilo clássico de engenharia com fonte monoespaçada."
+        },
+        "CREATIVE": {
+          "NAME": "Criativo Rosa",
+          "DESC": "Arrojado e moderno com barra lateral direita em tons de rosa. Perfeito para marketing."
+        },
+        "COMPACT": {
+          "NAME": "Compacto",
+          "DESC": "Otimizado horizontalmente para preencher a folha de forma equilibrada com menos dados."
+        }
+      }
+    },
+    "PRICING": {
+      "EYEBROW": "Planos",
+      "TITLE_1": "Simples e ",
+      "TITLE_GRADIENT": "transparente",
+      "FREE": {
+        "PLAN": "Gratuito",
+        "PRICE": "R$ 0",
+        "PERIOD": "/mês",
+        "FEATURES": {
+          "F1": "1 currículo",
+          "F2": "Modelo básico",
+          "F3": "Exportação PDF",
+          "F4": "IA ilimitada",
+          "F5": "Análise ATS"
+        },
+        "BTN": "Começar grátis"
+      },
+      "PREMIUM": {
+        "RECOMMENDED": "Recomendado",
+        "PLAN": "Premium",
+        "PRICE": "R$ 29",
+        "PERIOD": "/mês",
+        "FEATURES": {
+          "F1": "Currículos ilimitados",
+          "F2": "Todos os modelos",
+          "F3": "IA ilimitada (Gemini)",
+          "F4": "Análise ATS avançada",
+          "F5": "Exportações premium"
+        },
+        "BTN": "Começar Premium",
+        "COMING_SOON": "Em breve",
+        "BTN_DISABLED": "Indisponível"
+      }
+    },
+    "CTA": {
+      "TITLE_1": "Pronto para sua próxima ",
+      "TITLE_GRADIENT": "oportunidade",
+      "TITLE_2": "?",
+      "DESC": "Junte-se a profissionais que usam Prime Resume para conseguir empregos incríveis.",
+      "BTN": "Criar currículo agora — é grátis"
+    }
   },
+
   "LANG": {
     "PT": "Português",
     "EN": "English"

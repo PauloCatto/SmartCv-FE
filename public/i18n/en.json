@@ -10,6 +10,8 @@
   },
   "SIDEBAR": {
     "DASHBOARD": "Dashboard",
+    "COVER_LETTER": "Cover Letter",
+    "ROAST": "Roast my CV",
     "PLAN_FREE": "Free Plan",
     "PLAN_PREMIUM": "Premium Plan",
     "LOGOUT": "Logout"
@@ -26,7 +28,8 @@
       "PERSONAL": "Personal",
       "EXPERIENCE": "Experience",
       "EDUCATION": "Education",
-      "SKILLS": "Skills"
+      "SKILLS": "Skills",
+      "LANGUAGES": "Languages"
     },
     "PERSONAL": {
       "TITLE": "Personal Information",
@@ -37,10 +40,20 @@
       "EMAIL": "Email",
       "PHONE": "Phone",
       "LOCATION": "Location",
-      "LINKEDIN": "LinkedIn",
+      "LINKEDIN": "LinkedIn (optional)",
+      "GITHUB": "GitHub (optional)",
+      "PORTFOLIO": "Portfolio/Website (optional)",
       "BIO": "Professional Summary",
       "BIO_PLACEHOLDER": "Brief description about you, your values and professional goals...",
       "IMPROVE_AI": "✨ Improve with AI"
+    },
+    "LANGUAGES": {
+      "TITLE": "Languages",
+      "DESC": "Add the languages you speak and your proficiency level.",
+      "ADD_PLACEHOLDER": "Ex: English, Spanish...",
+      "LEVEL": "Level",
+      "ADD_BTN": "Add",
+      "EMPTY": "No languages added yet."
     },
     "EXPERIENCE": {
       "TITLE": "Professional Experience",
@@ -74,7 +87,9 @@
       "LEVEL": "Level:",
       "ADD_BTN": "Add",
       "EMPTY": "No skills added yet. Use the field above!",
-      "SUGGESTIONS": "Popular suggestions:"
+      "SUGGESTIONS": "Popular suggestions:",
+      "RESUME_NAME_LABEL": "Resume Name (used in routes and search)",
+      "RESUME_NAME_PLACEHOLDER": "E.g.: Senior Frontend Developer"
     },
     "TEMPLATE": {
       "TITLE": "Choose Template",
@@ -95,11 +110,72 @@
     "PREV": "Previous",
     "NEXT": "Next",
     "FINISH_INFO": "Your resume is automatically saved",
-    "DOWNLOAD_PDF": "Download PDF"
+    "DOWNLOAD_PDF": "Download PDF",
+    "COVER_LETTER": {
+      "TITLE": "Generate Cover Letter",
+      "DESC": "Use our AI to create a persuasive cover letter tailored to your resume and the job.",
+      "SELECT_RESUME": "Select Base Resume",
+      "CHOOSE_RESUME": "Choose a resume...",
+      "NO_RESUME": "No resume found",
+      "NO_RESUME_DESC": "You need to create a resume first to generate a cover letter.",
+      "CREATE_RESUME": "Create Resume",
+      "JOB_TITLE_LABEL": "Job Title (Optional)",
+      "JOB_TITLE_PLACEHOLDER": "Ex: Senior Frontend Developer",
+      "JOB_DESC_LABEL": "Paste the job description here",
+      "JOB_DESC_PLACEHOLDER": "Ex: We are looking for a frontend developer with Angular experience...",
+      "GENERATE_BTN": "Generate Letter",
+      "GENERATING": "Writing letter...",
+      "COPY_BTN": "Copy Text",
+      "COPIED": "Copied!",
+      "MODAL_TITLE": "Your Cover Letter",
+      "LOADING_RESUMES": "Loading resumes...",
+      "WORKSPACE_DESC": "Fill in the job details on the left to generate your custom cover letter using our artificial intelligence."
+    },
+    "ROAST": {
+      "BTN": "🔥 Roast my CV",
+      "TITLE": "Roast my CV (Harsh Mode)",
+      "DESC": "Our AI will act as a strict recruiter and point out the flaws in your resume. Can you handle it?",
+      "SELECT_RESUME": "Select Resume for Roast",
+      "CHOOSE_RESUME": "Choose a resume...",
+      "NO_RESUME": "No resume found",
+      "NO_RESUME_DESC": "You need to create a resume first to generate a roast.",
+      "CREATE_RESUME": "Create Resume",
+      "SCORE": "Resume Score:",
+      "STRENGTHS": "Strengths (Miracle!)",
+      "WEAKNESSES": "Issues Found",
+      "ACTIONABLE": "What you MUST change now",
+      "LOADING": "Analyzing your resume coldly...",
+      "ERROR": "The recruiter went for coffee, try again.",
+      "LOADING_RESUMES": "Loading resumes...",
+      "WORKSPACE_DESC": "Select a resume on the left so our AI recruiter can analyze it and point out the flaws."
+    },
+    "CV": {
+      "ABOUT": "About Me",
+      "EXPERIENCE": "Experience",
+      "EXPERIENCE_FULL": "Professional Experience",
+      "TRAJECTORY": "Professional Journey",
+      "EDUCATION": "Education",
+      "EDUCATION_CERTS": "Education & Certifications",
+      "SKILLS": "Skills",
+      "SKILLS_KNOWLEDGE": "Skills & Knowledge",
+      "COMPETENCIES": "Competencies",
+      "CONTACT": "Contact",
+      "CURRENT": "Current",
+      "IN": "in",
+      "LEVEL_1": "Basic",
+      "LEVEL_2": "Basic-Int.",
+      "LEVEL_3": "Intermediate",
+      "LEVEL_4": "Advanced",
+      "LEVEL_5": "Expert",
+      "MOCK_BIO": "Experienced professional in software development focused on Angular, Node.js, and scalable system architectures. Passionate about solving complex problems and creating efficient solutions that drive business value.",
+      "MOCK_EXP1_DESC": "Responsible for technical leadership of projects in Angular and Node.js. Optimized critical application load times by 40% and guided a team of 4 developers in designing resilient APIs.",
+      "MOCK_EXP2_DESC": "Development and maintenance of rich interfaces focused on performance and accessibility. Continuous integration with cloud services and comprehensive unit test coverage.",
+      "LANGUAGES": "Languages"
+    }
   },
   "FOOTER": {
     "TAGLINE": "Create amazing resumes with AI",
-    "COPYRIGHT": "© 2026 SmartCV. All rights reserved."
+    "COPYRIGHT": "© 2026 Prime Resume. All rights reserved."
   },
   "DASHBOARD": {
     "GREETING": "Hello,",
@@ -130,71 +206,141 @@
     "MINUTES_AGO": "{{count}} min ago",
     "HOURS_AGO": "{{count}}h ago"
   },
-  "BUILDER": {
-    "BACK": "Back",
-    "EXPORT_PDF": "Export PDF",
-    "SAVED": "Saved",
-    "SAVING": "Saving...",
-    "STEP_TEMPLATE": "Template",
-    "STEP_PERSONAL": "Personal",
-    "STEP_EXPERIENCE": "Experience",
-    "STEP_EDUCATION": "Education",
-    "STEP_SKILLS": "Skills",
-    "NEXT": "Next",
-    "PREVIOUS": "Previous",
-    "PERSONAL_TITLE": "Personal Information",
-    "PERSONAL_DESC": "Basic information that will appear at the top of your resume",
-    "AUTO_FILL": "Auto-fill",
-    "FULL_NAME": "Full name",
-    "JOB_TITLE": "Job title",
-    "EMAIL": "Email",
-    "PHONE": "Phone",
-    "LOCATION": "Location",
-    "LINKEDIN": "LinkedIn",
-    "BIO": "Professional summary",
-    "IMPROVE_AI": "✨ Improve with AI",
-    "EXP_TITLE": "Professional Experience",
-    "EXP_DESC": "Add your most recent experiences first",
-    "ADD_EXP": "Add experience",
-    "ROLE": "Role",
-    "COMPANY": "Company",
-    "START_DATE": "Start date",
-    "END_DATE": "End date",
-    "CURRENT_JOB": "Current job",
-    "DESCRIPTION": "Activity description",
-    "EDU_TITLE": "Education",
-    "EDU_DESC": "Academic background and relevant courses",
-    "ADD_EDU": "Add education",
-    "DEGREE": "Degree / Type",
-    "FIELD": "Field / Course",
-    "INSTITUTION": "Institution",
-    "CURRENT_EDU": "In progress",
-    "SKILLS_TITLE": "Skills",
-    "SKILLS_DESC": "Add your technical and soft skills",
-    "SKILL_LEVEL": "Level:",
-    "ADD_SKILL": "Add",
-    "EMPTY_SKILLS": "No skills added yet. Use the field above!",
-    "SUGGESTIONS": "Popular suggestions:",
-    "AUTO_SAVE_MSG": "Your resume is being saved automatically",
-    "DOWNLOAD_PDF": "Download PDF",
-    "GENERATING_PDF": "Generating PDF...",
-    "TEMPLATE_TITLE": "Choose a Template",
-    "TEMPLATE_DESC": "Select the design that best represents you",
-    "COLOR_TITLE": "Accent Color",
-    "COLOR_DESC": "Select a professional palette for highlights and titles",
-    "FONT_TITLE": "Typography (ATS Fonts)",
-    "FONT_DESC": "Select a legible font recommended by the hiring market",
-    "DENSITY_TITLE": "Layout Density (Spacing)",
-    "DENSITY_DESC": "Adjust spacing to perfectly fill the page",
-    "DENSITY_COMPACT": "Compact",
-    "DENSITY_NORMAL": "Standard",
-    "DENSITY_SPACIOUS": "Spacious",
-    "PREVIEW_LABEL": "Live preview",
-    "MOBILE_PREVIEW": "See Preview",
-    "MOBILE_EDIT": "Edit Content",
-    "REQUIRED_FIELD": "Required field",
-    "AI_ERROR": "Error processing with AI. Please try again."
+
+  "HOME": {
+    "HERO": {
+      "TITLE_1": "Create",
+      "TITLE_GRADIENT": "professional",
+      "TITLE_2": "resumes in minutes",
+      "DESC": "Smart platform that uses AI to optimize your resume, increase your chances in ATS systems and help you land your dream job.",
+      "CTA_PRIMARY": "Create my resume for free",
+      "CTA_SECONDARY": "View templates",
+      "STATS": {
+        "TEMPLATES": "Professional templates",
+        "GEMINI": "Integrated Gemini",
+        "EXPORT": "Professional export"
+      },
+      "FLOAT": {
+        "ATS": "ATS Optimized",
+        "PDF": "PDF exported"
+      }
+    },
+    "FEATURES": {
+      "EYEBROW": "Features",
+      "TITLE_1": "Everything you need to ",
+      "TITLE_GRADIENT": "stand out",
+      "ITEMS": {
+        "PREVIEW": {
+          "TITLE": "Real-time preview",
+          "DESC": "See your resume update as you type. No surprises when exporting."
+        },
+        "COVER_LETTER": {
+          "TITLE": "Cover Letter Writer",
+          "DESC": "Generate tailored cover letters in seconds based on your resume and the job description."
+        },
+        "EXPORT": {
+          "TITLE": "PDF Export",
+          "DESC": "Export your resume in high-quality PDF with perfect professional formatting."
+        },
+        "ATS": {
+          "TITLE": "ATS Friendly",
+          "DESC": "Templates optimized to pass through Applicant Tracking System filters."
+        },
+        "PREMIUM": {
+          "TITLE": "8 premium templates",
+          "DESC": "Professional templates with tailored designs for all careers."
+        },
+        "ROAST": {
+          "TITLE": "Harsh CV Evaluation (Roast)",
+          "DESC": "Our AI recruiter analyzes your resume coldly and highlights critical flaws directly."
+        }
+      }
+    },
+    "TEMPLATES": {
+      "EYEBROW": "Templates",
+      "TITLE_1": "8 models ",
+      "TITLE_GRADIENT": "ready to use",
+      "DESC": "Choose the one that best fits your profile and adjust the spacing. All are ATS-friendly and exportable in PDF.",
+      "POPULAR": "Popular",
+      "USE_TEMPLATE": "Use this template",
+      "ITEMS": {
+        "ELEGANCE": {
+          "NAME": "Elegance Classic",
+          "DESC": "Classic and professional. Perfect for traditional fields like law, finance, and HR."
+        },
+        "EXECUTIVE": {
+          "NAME": "Executive Gold",
+          "DESC": "Refined and corporate design with gold accents."
+        },
+        "MODERN_BLUE": {
+          "NAME": "Modern Blue",
+          "DESC": "Creative and modern with a blue sidebar. Ideal for technology and innovation."
+        },
+        "MODERN_TEAL": {
+          "NAME": "Modern Teal",
+          "DESC": "Modern, clean, and dynamic layout in teal green."
+        },
+        "MINIMAL": {
+          "NAME": "Minimalist",
+          "DESC": "Ultra clean and refined. Focuses entirely on the content."
+        },
+        "TECH_MONO": {
+          "NAME": "Tech Mono",
+          "DESC": "Classic engineering style with mono-spaced font."
+        },
+        "CREATIVE": {
+          "NAME": "Creative Rose",
+          "DESC": "Bold and modern with a right sidebar in pink tones. Perfect for marketing."
+        },
+        "COMPACT": {
+          "NAME": "Compact",
+          "DESC": "Horizontally optimized. Ideal for balancing pages with less data."
+        }
+      }
+    },
+    "PRICING": {
+      "EYEBROW": "Plans",
+      "TITLE_1": "Simple and ",
+      "TITLE_GRADIENT": "transparent",
+      "FREE": {
+        "PLAN": "Free",
+        "PRICE": "$ 0",
+        "PERIOD": "/month",
+        "FEATURES": {
+          "F1": "1 resume",
+          "F2": "Basic template",
+          "F3": "PDF export",
+          "F4": "Unlimited AI",
+          "F5": "ATS analysis"
+        },
+        "BTN": "Start free"
+      },
+      "PREMIUM": {
+        "RECOMMENDED": "Recommended",
+        "PLAN": "Premium",
+        "PRICE": "$ 9.99",
+        "PERIOD": "/month",
+        "FEATURES": {
+          "F1": "Unlimited resumes",
+          "F2": "All templates",
+          "F3": "Unlimited AI (Gemini)",
+          "F4": "Advanced ATS analysis",
+          "F5": "Premium exports"
+        },
+        "BTN": "Start Premium",
+        "COMING_SOON": "Coming soon",
+        "BTN_DISABLED": "Unavailable"
+      }
+    },
+    "CTA": {
+      "TITLE_1": "Ready for your next ",
+      "TITLE_GRADIENT": "opportunity",
+      "TITLE_2": "?",
+      "DESC": "Join professionals who use Prime Resume to land amazing jobs.",
+      "BTN": "Create resume now — it's free"
+    }
   },
+
   "LANG": {
     "PT": "Português",
     "EN": "English"
