@@ -8,6 +8,68 @@
     "DASHBOARD": "Dashboard",
     "LOGOUT": "Sign out"
   },
+  "AUTH": {
+    "BACK": "Back",
+    "LOGIN": {
+      "TITLE": "Welcome back",
+      "SUBTITLE": "Sign in to your account to continue",
+      "EMAIL": "Email",
+      "EMAIL_PLACEHOLDER": "you@email.com",
+      "PASSWORD": "Password",
+      "PASSWORD_PLACEHOLDER": "Your password",
+      "SUBMIT": "Sign In",
+      "SUBMITTING": "Signing in...",
+      "FORGOT_PASSWORD": "Forgot your password?",
+      "OR_CONTINUE": "or continue with",
+      "NO_ACCOUNT": "Don't have an account?",
+      "REGISTER": "Create now"
+    },
+    "REGISTER": {
+      "TITLE": "Create your free account",
+      "SUBTITLE": "Start creating professional resumes now",
+      "NAME": "Full Name",
+      "NAME_PLACEHOLDER": "John Doe",
+      "EMAIL": "Email",
+      "EMAIL_PLACEHOLDER": "you@email.com",
+      "PASSWORD": "Password",
+      "PASSWORD_PLACEHOLDER": "Minimum 6 characters",
+      "SUBMIT": "Create free account",
+      "SUBMITTING": "Creating account...",
+      "OR_CREATE": "or create with",
+      "HAS_ACCOUNT": "Already have an account?",
+      "LOGIN": "Sign in now",
+      "TERMS": "By creating an account, you agree to the <a href='#' class='terms-link'>Terms of Service</a> and <a href='#' class='terms-link'>Privacy Policy</a>.",
+      "BENEFITS": {
+        "0": "3 free resumes",
+        "1": "Professional templates",
+        "2": "Real-time preview",
+        "3": "PDF export",
+        "4": "Basic AI analysis"
+      }
+    },
+    "FORGOT_PASSWORD": {
+      "TITLE": "Forgot password?",
+      "SUBTITLE": "Enter your email and we will send you instructions",
+      "EMAIL": "Email",
+      "EMAIL_PLACEHOLDER": "you@email.com",
+      "SUBMIT": "Send recovery link",
+      "SUBMITTING": "Sending...",
+      "REMEMBERED": "Remembered your password?",
+      "BACK_LOGIN": "Back to login"
+    },
+    "RESET_PASSWORD": {
+      "TITLE": "Reset password",
+      "SUBTITLE": "Create a new password for your account",
+      "PASSWORD": "New Password",
+      "PASSWORD_PLACEHOLDER": "Minimum 6 characters",
+      "CONFIRM_PASSWORD": "Confirm New Password",
+      "CONFIRM_PASSWORD_PLACEHOLDER": "Repeat password",
+      "SUBMIT": "Reset Password",
+      "SUBMITTING": "Resetting...",
+      "SUCCESS": "Password reset successfully. You will be redirected to login.",
+      "BACK_TO_LOGIN": "Back to login"
+    }
+  },
   "SIDEBAR": {
     "DASHBOARD": "Dashboard",
     "COVER_LETTER": "Cover Letter",
@@ -307,11 +369,11 @@
         "PRICE": "$ 0",
         "PERIOD": "/month",
         "FEATURES": {
-          "F1": "1 resume",
-          "F2": "Basic template",
+          "F1": "3 resumes",
+          "F2": "Professional templates",
           "F3": "PDF export",
-          "F4": "Unlimited AI",
-          "F5": "ATS analysis"
+          "F4": "Cover letter generator",
+          "F5": "ATS resume analysis"
         },
         "BTN": "Start free"
       },

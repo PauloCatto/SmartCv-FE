@@ -8,6 +8,68 @@
     "DASHBOARD": "Painel",
     "LOGOUT": "Sair"
   },
+  "AUTH": {
+    "BACK": "Voltar",
+    "LOGIN": {
+      "TITLE": "Bem-vindo de volta",
+      "SUBTITLE": "Entre na sua conta para continuar",
+      "EMAIL": "Email",
+      "EMAIL_PLACEHOLDER": "seu@email.com",
+      "PASSWORD": "Senha",
+      "PASSWORD_PLACEHOLDER": "Sua senha",
+      "SUBMIT": "Entrar",
+      "SUBMITTING": "Entrando...",
+      "FORGOT_PASSWORD": "Esqueceu a senha?",
+      "OR_CONTINUE": "ou continue com",
+      "NO_ACCOUNT": "Não tem uma conta?",
+      "REGISTER": "Crie agora"
+    },
+    "REGISTER": {
+      "TITLE": "Crie sua conta grátis",
+      "SUBTITLE": "Comece a criar currículos profissionais agora",
+      "NAME": "Nome completo",
+      "NAME_PLACEHOLDER": "João Silva",
+      "EMAIL": "Email",
+      "EMAIL_PLACEHOLDER": "seu@email.com",
+      "PASSWORD": "Senha",
+      "PASSWORD_PLACEHOLDER": "Mínimo 6 caracteres",
+      "SUBMIT": "Criar conta grátis",
+      "SUBMITTING": "Criando conta...",
+      "OR_CREATE": "ou crie com",
+      "HAS_ACCOUNT": "Já tem conta?",
+      "LOGIN": "Entrar agora",
+      "TERMS": "Ao criar uma conta, você concorda com os <a href='#' class='terms-link'>Termos de Uso</a> e a <a href='#' class='terms-link'>Política de Privacidade</a>.",
+      "BENEFITS": {
+        "0": "3 currículos gratuitos",
+        "1": "Modelos profissionais",
+        "2": "Preview em tempo real",
+        "3": "Exportação em PDF",
+        "4": "Análise básica com IA"
+      }
+    },
+    "FORGOT_PASSWORD": {
+      "TITLE": "Esqueceu a senha?",
+      "SUBTITLE": "Digite seu e-mail e enviaremos instruções",
+      "EMAIL": "Email",
+      "EMAIL_PLACEHOLDER": "seu@email.com",
+      "SUBMIT": "Enviar link de recuperação",
+      "SUBMITTING": "Enviando...",
+      "REMEMBERED": "Lembrou a senha?",
+      "BACK_LOGIN": "Voltar ao login"
+    },
+    "RESET_PASSWORD": {
+      "TITLE": "Redefinir senha",
+      "SUBTITLE": "Crie uma nova senha para sua conta",
+      "PASSWORD": "Nova Senha",
+      "PASSWORD_PLACEHOLDER": "Mínimo 6 caracteres",
+      "CONFIRM_PASSWORD": "Confirmar Nova Senha",
+      "CONFIRM_PASSWORD_PLACEHOLDER": "Repita a senha",
+      "SUBMIT": "Redefinir Senha",
+      "SUBMITTING": "Redefinindo...",
+      "SUCCESS": "Senha redefinida com sucesso. Você será redirecionado para o login.",
+      "BACK_TO_LOGIN": "Voltar ao login"
+    }
+  },
   "SIDEBAR": {
     "DASHBOARD": "Painel",
     "COVER_LETTER": "Carta de Apresentação",
@@ -307,11 +369,11 @@
         "PRICE": "R$ 0",
         "PERIOD": "/mês",
         "FEATURES": {
-          "F1": "1 currículo",
-          "F2": "Modelo básico",
+          "F1": "3 currículos",
+          "F2": "Modelos profissionais",
           "F3": "Exportação PDF",
-          "F4": "IA ilimitada",
-          "F5": "Análise ATS"
+          "F4": "Carta de apresentação",
+          "F5": "Análise de currículo (ATS)"
         },
         "BTN": "Começar grátis"
       },
