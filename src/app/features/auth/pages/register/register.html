@@ -6,26 +6,31 @@
   </div>
 
   <div class="auth-card animate-fade-in-up">
-    <a routerLink="/" class="auth-logo">
-      <div class="logo-icon">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-          <path d="M9 12h6M9 16h6M9 8h6M5 4h14a2 2 0 012 2v12a2 2 0 01-2 2H5a2 2 0 01-2-2V6a2 2 0 012-2z"
-            stroke="white" stroke-width="2" stroke-linecap="round"/>
-        </svg>
-      </div>
-      <span class="logo-text">Prime <span class="gradient-text">Resume</span></span>
-    </a>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+      <a routerLink="/" class="auth-logo" style="margin-bottom: 0;">
+        <div class="logo-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <path d="M9 12h6M9 16h6M9 8h6M5 4h14a2 2 0 012 2v12a2 2 0 01-2 2H5a2 2 0 01-2-2V6a2 2 0 012-2z" stroke="white" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <span class="logo-text">Prime <span class="gradient-text">Resume</span></span>
+      </a>
+      <a routerLink="/" class="auth-link" style="display: flex; align-items: center; gap: 0.25rem; font-size: 0.875rem;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        {{ 'AUTH.BACK' | translate }}
+      </a>
+    </div>
 
     <div class="auth-header">
-      <h1 class="auth-title">Crie sua conta grátis</h1>
-      <p class="auth-subtitle">Comece a criar currículos profissionais agora</p>
+      <h1 class="auth-title">{{ 'AUTH.REGISTER.TITLE' | translate }}</h1>
+      <p class="auth-subtitle">{{ 'AUTH.REGISTER.SUBTITLE' | translate }}</p>
     </div>
 
     <div class="benefits">
       @for (b of benefits; track b) {
         <div class="benefit-item">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-          <span>{{ b }}</span>
+          <span>{{ b | translate }}</span>
         </div>
       }
     </div>
@@ -39,25 +44,25 @@
 
     <form class="auth-form" (ngSubmit)="onSubmit()" #form="ngForm">
       <div class="form-group">
-        <label class="form-label" for="name">Nome completo</label>
+        <label class="form-label" for="name">{{ 'AUTH.REGISTER.NAME' | translate }}</label>
         <input id="name" type="text" class="form-control"
-          placeholder="João Silva"
+          [placeholder]="'AUTH.REGISTER.NAME_PLACEHOLDER' | translate"
           [(ngModel)]="name" name="name" required />
       </div>
 
       <div class="form-group">
-        <label class="form-label" for="email">Email</label>
+        <label class="form-label" for="email">{{ 'AUTH.REGISTER.EMAIL' | translate }}</label>
         <input id="email" type="email" class="form-control"
-          placeholder="seu@email.com"
+          [placeholder]="'AUTH.REGISTER.EMAIL_PLACEHOLDER' | translate"
           [(ngModel)]="email" name="email" required />
       </div>
 
       <div class="form-group">
-        <label class="form-label" for="password">Senha</label>
+        <label class="form-label" for="password">{{ 'AUTH.REGISTER.PASSWORD' | translate }}</label>
         <div class="input-wrapper">
           <input id="password" [type]="showPassword() ? 'text' : 'password'"
             class="form-control"
-            placeholder="Mínimo 6 caracteres"
+            [placeholder]="'AUTH.REGISTER.PASSWORD_PLACEHOLDER' | translate"
             [(ngModel)]="password" name="password" required minlength="6" />
           <button type="button" class="input-toggle" (click)="showPassword.update(v => !v)">
             @if (showPassword()) {
@@ -82,19 +87,25 @@
       <button type="submit" class="btn btn-primary" style="width:100%;" [disabled]="(auth.loading$ | async)">
         @if (auth.loading$ | async) {
           <div class="spinner"></div>
-          Criando conta...
+          {{ 'AUTH.REGISTER.SUBMITTING' | translate }}
         } @else {
-          Criar conta grátis
+          {{ 'AUTH.REGISTER.SUBMIT' | translate }}
         }
       </button>
     </form>
 
+    <div class="auth-divider">
+      <span>{{ 'AUTH.REGISTER.OR_CREATE' | translate }}</span>
+    </div>
+    
+    <div style="display: flex; justify-content: center; margin-bottom: 1rem;">
+      <asl-google-signin-button type="standard" size="large" theme="outline" text="continue_with" [width]="320"></asl-google-signin-button>
+    </div>
+
     <p class="auth-footer-text">
-      Já tem conta? <a routerLink="/auth/login" class="auth-link">Entrar agora</a>
+      {{ 'AUTH.REGISTER.HAS_ACCOUNT' | translate }} <a routerLink="/auth/login" class="auth-link">{{ 'AUTH.REGISTER.LOGIN' | translate }}</a>
     </p>
 
-    <p class="terms-text">
-      Ao criar uma conta, você concorda com os <a href="#" class="terms-link">Termos de Uso</a> e a <a href="#" class="terms-link">Política de Privacidade</a>.
-    </p>
+    <p class="terms-text" [innerHTML]="'AUTH.REGISTER.TERMS' | translate"></p>
   </div>
 </div>
