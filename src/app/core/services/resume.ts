@@ -103,6 +103,16 @@ export class ResumeService {
     );
   }
 
+  publish(id: string): Observable<Resume> {
+    return this.http.post<Resume>(`${environment.apiUrl}/resumes/${id}/publish`, {}).pipe(
+      tap(published => {
+        const currentList = this.resumesSubject.value;
+        this.resumesSubject.next(currentList.map(r => r.id === id ? published : r));
+        this.currentResumeSubject.next(published);
+      })
+    );
+  }
+
   getDashboardStats(): Observable<DashboardStats> {
     return this.http.get<DashboardStats>(`${environment.apiUrl}/resumes/dashboard/stats`);
   }

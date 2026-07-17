@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { authGuard, guestGuard } from './core/guards/auth.guard';
+import { canDeactivateGuard } from './core/guards/can-deactivate.guard';
 
 export const routes: Routes = [
   {
@@ -52,10 +53,12 @@ export const routes: Routes = [
       {
         path: 'new',
         loadComponent: () => import('./features/resume/pages/builder/builder').then(m => m.BuilderComponent),
+        canDeactivate: [canDeactivateGuard],
       },
       {
         path: ':id/edit',
         loadComponent: () => import('./features/resume/pages/builder/builder').then(m => m.BuilderComponent),
+        canDeactivate: [canDeactivateGuard],
       },
     ],
   },

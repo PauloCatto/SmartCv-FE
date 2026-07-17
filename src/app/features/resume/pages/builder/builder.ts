@@ -2,8 +2,9 @@ import { Component, inject, signal, computed, OnInit, OnDestroy } from '@angular
 import { Router, ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CdkDragDrop, moveItemInArray, CdkDropList, CdkDrag, CdkDragHandle } from '@angular/cdk/drag-drop';
-import { Subject, Subscription, of } from 'rxjs';
+import { Subject, Subscription, Observable, of } from 'rxjs';
 import { debounceTime, switchMap, finalize, tap, distinctUntilChanged, catchError } from 'rxjs/operators';
+import { CanComponentDeactivate } from '../../../../core/guards/can-deactivate.guard';
 import { HttpClient } from '@angular/common/http';
 import { UpperCasePipe } from '@angular/common';
 import { ResumeService } from '../../../../core/services/resume';
@@ -16,8 +17,6 @@ import { CreativeTemplateComponent } from '../../components/templates/creative-t
 import { CompactTemplateComponent } from '../../components/templates/compact-template.component';
 import { ToastrService } from 'ngx-toastr';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-
-
 
 @Component({
   selector: 'app-builder',
@@ -35,7 +34,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
   templateUrl: './builder.html',
   styleUrl: './builder.scss',
 })
-export class BuilderComponent implements OnInit, OnDestroy {
+export class BuilderComponent implements OnInit, OnDestroy, CanComponentDeactivate {
   private resumeService = inject(ResumeService);
   private aiService = inject(AiService);
   private router = inject(Router);
@@ -64,10 +63,16 @@ export class BuilderComponent implements OnInit, OnDestroy {
   newLanguageLevel: 'Básico' | 'Intermediário' | 'Avançado' | 'Fluente' | 'Nativo' = 'Básico';
   isAILoading = signal<string | null>(null);
   showValidation = signal(false);
+  isSaving = signal(false);
 
-  // Cover Letter states
+  // Leave-without-saving modal
+  showLeaveModal = signal(false);
+  private leaveSubject = new Subject<boolean>();
+  isPublishedLocally = false;
+  isNavigatingInternally = false;
+
   showCoverLetterModal = signal(false);
-  jobDescription = '';
+  jobDescription: string = '';
   generatedCoverLetter = signal('');
   isGeneratingCoverLetter = signal(false);
 
@@ -77,14 +82,14 @@ export class BuilderComponent implements OnInit, OnDestroy {
 
   locationSearch$ = new Subject<string>();
   locationSuggestions: any[] = [];
-  isLocationLoading = false;
-  showLocationDropdown = false;
+  isLocationLoading: boolean = false;
+  showLocationDropdown: boolean = false;
   private locationSub!: Subscription;
 
   languageSearch$ = new Subject<string>();
   languageSuggestions: string[] = [];
-  isLanguageLoading = false;
-  showLanguageDropdown = false;
+  isLanguageLoading: boolean = false;
+  showLanguageDropdown: boolean = false;
   private languageSub!: Subscription;
 
   atsScore = computed(() => {
@@ -122,6 +127,7 @@ export class BuilderComponent implements OnInit, OnDestroy {
     { id: 'education', label: 'Educação' },
     { id: 'skills', label: 'Skills' },
     { id: 'languages', label: 'Idiomas' },
+    { id: 'finish', label: 'Finalizar' },
   ];
 
   skillSuggestions = [
@@ -357,7 +363,10 @@ export class BuilderComponent implements OnInit, OnDestroy {
           this.saveState.set('saved');
           clearTimeout(this.savedIndicatorTimeout);
           this.savedIndicatorTimeout = setTimeout(() => this.saveState.set('idle'), 2500);
-          this.router.navigate(['/resume', this.slugify(this.resumeTitle), 'edit'], { replaceUrl: true });
+          this.isNavigatingInternally = true;
+          this.router.navigate(['/resume', this.slugify(this.resumeTitle), 'edit'], { replaceUrl: true }).then(() => {
+            this.isNavigatingInternally = false;
+          });
         },
         error: () => {
           this.saveState.set('idle');
@@ -410,7 +419,7 @@ export class BuilderComponent implements OnInit, OnDestroy {
   }
 
   isStepDone(step: Step): boolean {
-    const order: Step[] = ['template', 'personal', 'experience', 'education', 'skills', 'languages'];
+    const order: Step[] = ['template', 'personal', 'experience', 'education', 'skills', 'languages', 'finish'];
     return order.indexOf(step) < order.indexOf(this.currentStep());
   }
 
@@ -692,6 +701,46 @@ export class BuilderComponent implements OnInit, OnDestroy {
     this.router.navigate(['/dashboard']);
   }
 
+  finishAndSave() {
+    const current = this.draft();
+    if (!current.id) return;
+
+    this.isSaving.set(true);
+    this.resumeService.update(current.id, { ...current, title: this.resumeTitle }).pipe(
+      switchMap(() => this.resumeService.publish(current.id))
+    ).subscribe({
+      next: () => {
+        this.isSaving.set(false);
+        this.isPublishedLocally = true;
+        this.toastr.success(
+          this.translate.instant('BUILDER.FINISH.SAVE_SUCCESS_MSG'),
+          this.translate.instant('BUILDER.FINISH.SAVE_SUCCESS_TITLE')
+        );
+        this.router.navigate(['/dashboard']);
+      },
+      error: () => {
+        this.isSaving.set(false);
+        this.toastr.error('Erro ao salvar currículo. Tente novamente.', 'Erro');
+      }
+    });
+  }
+
+  canDeactivate(): Observable<boolean> {
+    if (this.isPublishedLocally || this.isNavigatingInternally) return of(true);
+    this.showLeaveModal.set(true);
+    return this.leaveSubject.asObservable();
+  }
+
+  confirmLeave() {
+    this.showLeaveModal.set(false);
+    this.leaveSubject.next(true);
+  }
+
+  cancelLeave() {
+    this.showLeaveModal.set(false);
+    this.leaveSubject.next(false);
+  }
+
   toggleMobileView() {
     this.activeTab.update(t => {
       const next = t === 'edit' ? 'preview' : 'edit';
@@ -730,7 +779,7 @@ export class BuilderComponent implements OnInit, OnDestroy {
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pageHeight = pdf.internal.pageSize.getHeight();
       const imgHeight = (canvas.height * pdfWidth) / canvas.width;
-      
+
       let heightLeft = imgHeight;
       let position = 0;
 
@@ -746,6 +795,14 @@ export class BuilderComponent implements OnInit, OnDestroy {
 
       pdf.save(`${this.slugify(this.resumeTitle || 'curriculo')}.pdf`);
       this.toastr.success('PDF exportado com sucesso!', 'Download');
+
+      // Mark as published after successful PDF download
+      const current = this.draft();
+      if (current.id && !this.isPublishedLocally) {
+        this.resumeService.publish(current.id).subscribe({
+          next: () => { this.isPublishedLocally = true; }
+        });
+      }
     } catch (e) {
       console.error('PDF export error:', e);
       this.toastr.error('Erro ao exportar PDF. Tente novamente.', 'Erro');
@@ -786,7 +843,7 @@ export class BuilderComponent implements OnInit, OnDestroy {
 
     this.isRoasting.set(true);
     this.showRoastModal.set(true);
-    
+
     const lang = this.translate.currentLang || 'pt';
     this.aiService.roastResume(current.id, lang).subscribe({
       next: (res) => {

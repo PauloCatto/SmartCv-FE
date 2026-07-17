@@ -91,7 +91,8 @@
       "EXPERIENCE": "Experience",
       "EDUCATION": "Education",
       "SKILLS": "Skills",
-      "LANGUAGES": "Languages"
+      "LANGUAGES": "Languages",
+      "FINISH": "Finish"
     },
     "PERSONAL": {
       "TITLE": "Personal Information",
@@ -173,6 +174,26 @@
     "NEXT": "Next",
     "FINISH_INFO": "Your resume is automatically saved",
     "DOWNLOAD_PDF": "Download PDF",
+    "FINISH": {
+      "TITLE": "Resume Ready! 🎉",
+      "SUBTITLE": "Review the summary below and save your resume to access it in the dashboard.",
+      "SUMMARY_NAME": "Resume name",
+      "SUMMARY_TEMPLATE": "Template",
+      "SUMMARY_EXPERIENCE": "Experiences",
+      "SUMMARY_SKILLS": "Skills",
+      "ITEMS": "items",
+      "SAVE_BTN": "Save Resume",
+      "SAVING": "Saving...",
+      "SAVE_SUCCESS_TITLE": "Saved!",
+      "SAVE_SUCCESS_MSG": "Resume saved successfully!",
+      "AUTO_SAVE_NOTE": "Your changes are automatically saved in real time"
+    },
+    "LEAVE_MODAL": {
+      "TITLE": "Leave without saving?",
+      "DESC": "Your resume hasn't been published yet. If you leave, it won't appear in the dashboard. Do you want to continue?",
+      "STAY": "Keep editing",
+      "LEAVE": "Leave anyway"
+    },
     "COVER_LETTER": {
       "TITLE": "Generate Cover Letter",
       "DESC": "Use our AI to create a persuasive cover letter tailored to your resume and the job.",

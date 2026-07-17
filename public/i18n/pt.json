@@ -91,7 +91,8 @@
       "EXPERIENCE": "Experiência",
       "EDUCATION": "Educação",
       "SKILLS": "Habilidades",
-      "LANGUAGES": "Idiomas"
+      "LANGUAGES": "Idiomas",
+      "FINISH": "Finalizar"
     },
     "PERSONAL": {
       "TITLE": "Informações Pessoais",
@@ -173,6 +174,26 @@
     "NEXT": "Próximo",
     "FINISH_INFO": "Seu currículo está sendo salvo automaticamente",
     "DOWNLOAD_PDF": "Baixar PDF",
+    "FINISH": {
+      "TITLE": "Currículo Pronto! 🎉",
+      "SUBTITLE": "Revise o resumo abaixo e salve seu currículo para acessar no painel.",
+      "SUMMARY_NAME": "Nome do currículo",
+      "SUMMARY_TEMPLATE": "Modelo",
+      "SUMMARY_EXPERIENCE": "Experiências",
+      "SUMMARY_SKILLS": "Habilidades",
+      "ITEMS": "itens",
+      "SAVE_BTN": "Salvar Currículo",
+      "SAVING": "Salvando...",
+      "SAVE_SUCCESS_TITLE": "Salvo!",
+      "SAVE_SUCCESS_MSG": "Currículo salvo com sucesso!",
+      "AUTO_SAVE_NOTE": "Suas alterações são salvas automaticamente em tempo real"
+    },
+    "LEAVE_MODAL": {
+      "TITLE": "Sair sem salvar?",
+      "DESC": "Seu currículo ainda não foi publicado. Se você sair, ele não aparecerá no painel. Deseja continuar?",
+      "STAY": "Continuar editando",
+      "LEAVE": "Sair mesmo assim"
+    },
     "COVER_LETTER": {
       "TITLE": "Gerar Carta de Apresentação",
       "DESC": "Use nossa IA para criar uma carta persuasiva baseada no seu currículo e na vaga.",
