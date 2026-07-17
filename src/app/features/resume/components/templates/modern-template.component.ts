@@ -265,7 +265,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
     .title-accent { display: block; width: 4px; height: 16px; background: var(--cv-primary); border-radius: 2px; }
 
-    .bio-text { font-size: 12px; color: #475569; line-height: 1.7; }
+    .bio-text { font-size: 13px; color: #475569; line-height: 1.7; white-space: pre-wrap; word-break: break-word; }
 
     /* TIMELINE */
     .timeline { display: flex; flex-direction: column; gap: 16px; }
@@ -286,7 +286,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
     .timeline-role { font-size: 13px; font-weight: 700; color: #1e293b; }
     .timeline-period { font-size: 10px; color: #94a3b8; white-space: nowrap; }
     .timeline-company { font-size: 12px; color: var(--cv-primary); font-weight: 600; }
-    .timeline-desc { font-size: 11px; color: #64748b; line-height: 1.5; margin-top: 4px; }
+    .timeline-desc { font-size: 11px; color: #64748b; line-height: 1.5; margin-top: 4px; white-space: pre-wrap; word-break: break-word; }
 
     /* =======================================
        DENSITY MODIFIERS (SPACING CONTROLS)

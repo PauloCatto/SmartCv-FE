@@ -203,7 +203,7 @@ import { UpperCasePipe } from '@angular/common';
       margin-top: 2px;
     }
 
-    .bio-text { font-size: 13px; color: #374151; line-height: 1.7; }
+    .bio-text { font-size: 12px; color: #4b5563; line-height: 1.7; white-space: pre-wrap; word-break: break-word; }
 
     /* ITEMS */
     .cv-item { padding-bottom: 14px; margin-bottom: 14px; border-bottom: 1px solid #f9fafb; }
@@ -220,7 +220,7 @@ import { UpperCasePipe } from '@angular/common';
     .item-role { font-size: 13px; font-weight: 700; color: #111827; }
     .item-company { font-size: 12px; color: #6b7280; margin-top: 2px; }
     .item-period { font-size: 11px; color: #9ca3af; white-space: nowrap; flex-shrink: 0; }
-    .item-desc { font-size: 12px; color: #4b5563; line-height: 1.6; }
+    .item-desc { font-size: 12px; color: #4b5563; line-height: 1.6; white-space: pre-wrap; word-break: break-word; }
 
     /* SKILLS */
     .skills-wrap { display: flex; flex-wrap: wrap; gap: 6px; }

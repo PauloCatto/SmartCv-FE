@@ -212,9 +212,10 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
     }
 
     .bio-text {
-      font-size: 12px;
-      color: #475569;
+      font-size: 11px;
+      color: #334155;
       line-height: 1.6;
+      white-space: pre-wrap; word-break: break-word;
     }
 
     /* HORIZONTAL GRID OR FLOW FOR ITEMS */
@@ -262,6 +263,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
       color: #475569;
       line-height: 1.5;
       margin-top: 2px;
+      white-space: pre-wrap; word-break: break-word;
     }
 
     /* SKILLS HORIZONTAL TAGS */

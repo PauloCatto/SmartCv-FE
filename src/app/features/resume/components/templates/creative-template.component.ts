@@ -228,6 +228,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
       font-size: 13px;
       color: #475569;
       line-height: 1.7;
+      white-space: pre-wrap; word-break: break-word;
     }
 
     /* EXPERIENCE & EDUCATION */
@@ -274,6 +275,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
       color: #475569;
       line-height: 1.6;
       margin-top: 2px;
+      white-space: pre-wrap; word-break: break-word;
     }
 
     /* SIDEBAR RIGHT */

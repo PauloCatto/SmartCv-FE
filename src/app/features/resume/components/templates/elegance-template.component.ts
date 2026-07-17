@@ -235,7 +235,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
     .item-title { font-size: 14px; font-weight: 700; color: #1e293b; font-family: 'Inter', sans-serif; }
     .item-subtitle { font-size: 13px; color: #64748b; font-family: 'Inter', sans-serif; }
     .item-period { font-size: 11px; color: #94a3b8; font-family: 'Inter', sans-serif; white-space: nowrap; flex-shrink: 0; }
-    .item-desc { font-size: 12px; color: #475569; line-height: 1.6; }
+    .item-desc { font-size: 12px; color: #475569; line-height: 1.6; white-space: pre-wrap; word-break: break-word; }
 
     .skills-grid { display: flex; flex-direction: column; gap: 10px; }
     .skill-item { display: flex; flex-direction: column; gap: 4px; }
