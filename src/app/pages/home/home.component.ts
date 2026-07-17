@@ -4,10 +4,11 @@ import { HeaderComponent } from '../../layout/header/header';
 import { FooterComponent } from '../../layout/footer/footer';
 
 import { TranslateModule } from '@ngx-translate/core';
+import { SafeHtmlPipe } from '../../shared/pipes/safe-html.pipe';
 
 @Component({
   selector: 'app-home',
-  imports: [RouterLink, HeaderComponent, FooterComponent, TranslateModule],
+  imports: [RouterLink, HeaderComponent, FooterComponent, TranslateModule, SafeHtmlPipe],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
 })

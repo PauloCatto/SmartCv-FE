@@ -367,3 +367,17 @@
   .templates-grid { grid-template-columns: 1fr; }
   .pricing-grid { grid-template-columns: 1fr; }
 }
+
+@media (max-width: 600px) {
+  .hero { 
+    min-height: auto; 
+    padding-top: 100px; 
+    padding-bottom: 40px; 
+  }
+  .features-grid { grid-template-columns: 1fr; }
+  .hero-title { font-size: 2.2rem; }
+  .hero-actions { flex-direction: column; width: 100%; }
+  .hero-actions .btn { width: 100%; justify-content: center; }
+  .cta-card { padding: 40px 20px; }
+  .pricing-card { padding: 24px !important; }
+}
