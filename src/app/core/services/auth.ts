@@ -63,7 +63,7 @@ export class AuthService {
     );
   }
 
-  login(email: string, password: string): Observable<AuthResponse> {
+  login(email: string, password?: string): Observable<AuthResponse> {
     this.loadingSubject.next(true);
     return this.http.post<AuthResponse>(`${environment.apiUrl}/auth/login`, { email, password }).pipe(
       tap({
@@ -81,7 +81,25 @@ export class AuthService {
     );
   }
 
-  register(name: string, email: string, password: string): Observable<AuthResponse> {
+  googleLogin(idToken: string): Observable<AuthResponse> {
+    this.loadingSubject.next(true);
+    return this.http.post<AuthResponse>(`${environment.apiUrl}/auth/google`, { idToken }).pipe(
+      tap({
+        next: (response) => {
+          const user = this.mapBackendUser(response.user);
+          this.userSubject.next(user);
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
+          localStorage.setItem(STORAGE_TOKEN, response.token);
+          this.loadingSubject.next(false);
+        },
+        error: () => {
+          this.loadingSubject.next(false);
+        }
+      })
+    );
+  }
+
+  register(name: string, email: string, password?: string): Observable<AuthResponse> {
     this.loadingSubject.next(true);
     return this.http.post<AuthResponse>(`${environment.apiUrl}/auth/register`, { name, email, password }).pipe(
       tap({
@@ -95,6 +113,36 @@ export class AuthService {
         error: () => {
           this.loadingSubject.next(false);
         }
+      })
+    );
+  }
+
+  changePassword(newPassword: string, oldPassword?: string): Observable<{message: string}> {
+    this.loadingSubject.next(true);
+    return this.http.post<{message: string}>(`${environment.apiUrl}/auth/change-password`, { oldPassword, newPassword }).pipe(
+      tap({
+        next: () => this.loadingSubject.next(false),
+        error: () => this.loadingSubject.next(false)
+      })
+    );
+  }
+
+  forgotPassword(email: string): Observable<{message: string}> {
+    this.loadingSubject.next(true);
+    return this.http.post<{message: string}>(`${environment.apiUrl}/auth/forgot-password`, { email }).pipe(
+      tap({
+        next: () => this.loadingSubject.next(false),
+        error: () => this.loadingSubject.next(false)
+      })
+    );
+  }
+
+  resetPassword(token: string, newPassword: string): Observable<{message: string}> {
+    this.loadingSubject.next(true);
+    return this.http.post<{message: string}>(`${environment.apiUrl}/auth/reset-password`, { token, newPassword }).pipe(
+      tap({
+        next: () => this.loadingSubject.next(false),
+        error: () => this.loadingSubject.next(false)
       })
     );
   }
