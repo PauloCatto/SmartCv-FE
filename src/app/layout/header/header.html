@@ -12,9 +12,9 @@
 
     @if (!(auth.isAuthenticated$ | async)) {
     <div class="navbar-links">
-      <a href="#features" class="nav-link">{{ 'HEADER.FEATURES' | translate }}</a>
-      <a href="#templates" class="nav-link">{{ 'HEADER.TEMPLATES' | translate }}</a>
-      <a href="#pricing" class="nav-link">{{ 'HEADER.PRICING' | translate }}</a>
+      <a (click)="scrollTo('features')" class="nav-link" style="cursor:pointer">{{ 'HEADER.FEATURES' | translate }}</a>
+      <a (click)="scrollTo('templates')" class="nav-link" style="cursor:pointer">{{ 'HEADER.TEMPLATES' | translate }}</a>
+      <a (click)="scrollTo('pricing')" class="nav-link" style="cursor:pointer">{{ 'HEADER.PRICING' | translate }}</a>
     </div>
     }
 

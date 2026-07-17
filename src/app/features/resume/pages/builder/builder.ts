@@ -349,9 +349,21 @@ export class BuilderComponent implements OnInit, OnDestroy {
 
   saveTitle() {
     this.draft.update(d => ({ ...d, title: this.resumeTitle }));
-    this.onFieldChange();
-    if (this.resumeTitle.trim()) {
-      this.router.navigate(['/resume', this.slugify(this.resumeTitle), 'edit'], { replaceUrl: true });
+    const current = this.draft();
+    if (current.id && this.resumeTitle.trim()) {
+      this.saveState.set('saving');
+      this.resumeService.update(current.id, { ...current, title: this.resumeTitle }).subscribe({
+        next: () => {
+          this.saveState.set('saved');
+          clearTimeout(this.savedIndicatorTimeout);
+          this.savedIndicatorTimeout = setTimeout(() => this.saveState.set('idle'), 2500);
+          this.router.navigate(['/resume', this.slugify(this.resumeTitle), 'edit'], { replaceUrl: true });
+        },
+        error: () => {
+          this.saveState.set('idle');
+          this.toastr.error('Erro ao salvar título', 'Erro');
+        }
+      });
     }
   }
 
@@ -669,7 +681,7 @@ export class BuilderComponent implements OnInit, OnDestroy {
       ]
     });
     this.resumeTitle = 'Currículo Importado';
-    this.onFieldChange();
+    this.saveTitle();
   }
 
   goBack() {
@@ -716,9 +728,23 @@ export class BuilderComponent implements OnInit, OnDestroy {
       const imgData = canvas.toDataURL('image/jpeg', 0.95);
       const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
       const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-      pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
-      pdf.save(`${this.resumeTitle || 'curriculo'}.pdf`);
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      const imgHeight = (canvas.height * pdfWidth) / canvas.width;
+      
+      let heightLeft = imgHeight;
+      let position = 0;
+
+      pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, imgHeight);
+      heightLeft -= pageHeight;
+
+      while (heightLeft > 0) {
+        position -= pageHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, imgHeight);
+        heightLeft -= pageHeight;
+      }
+
+      pdf.save(`${this.slugify(this.resumeTitle || 'curriculo')}.pdf`);
       this.toastr.success('PDF exportado com sucesso!', 'Download');
     } catch (e) {
       console.error('PDF export error:', e);

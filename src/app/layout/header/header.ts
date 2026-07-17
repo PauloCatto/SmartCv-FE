@@ -61,4 +61,18 @@ export class HeaderComponent {
     this.menuOpen.set(false);
     this.router.navigate(['/']);
   }
+
+  scrollTo(id: string) {
+    if (this.router.url !== '/' && !this.router.url.startsWith('/#')) {
+      this.router.navigate(['/']).then(() => {
+        setTimeout(() => {
+          const el = document.getElementById(id);
+          if (el) el.scrollIntoView({ behavior: 'smooth' });
+        }, 100);
+      });
+    } else {
+      const el = document.getElementById(id);
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
+    }
+  }
 }

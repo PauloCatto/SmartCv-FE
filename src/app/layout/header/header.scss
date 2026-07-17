@@ -243,3 +243,33 @@
   color: var(--color-primary-light);
 }
 
+@media (max-width: 768px) {
+  .navbar-links {
+    display: none; /* Hide anchor links on mobile to save space */
+  }
+  .navbar-actions {
+    gap: 6px;
+  }
+  .lang-code {
+    display: none; /* Hide language text, keep icon */
+  }
+  .lang-btn {
+    padding: 6px;
+  }
+  .logo-text {
+    font-size: 16px;
+  }
+  .logo-icon {
+    width: 30px;
+    height: 30px;
+  }
+  .btn-sm {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+  .navbar-inner {
+    padding: 0 4px;
+    gap: 8px;
+  }
+}
+

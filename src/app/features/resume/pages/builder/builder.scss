@@ -698,10 +698,22 @@
   min-height: 1123px;
   background: white;
   box-shadow: 0 10px 60px rgba(0, 0, 0, 0.4);
-  border-radius: 4px;
-  overflow: hidden;
   transition: transform 0.3s ease;
   flex-shrink: 0;
+  position: relative;
+}
+
+.preview-sheet::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  background-image: repeating-linear-gradient(to bottom, transparent, transparent 1121px, #ef4444 1121px, #ef4444 1123px);
+  z-index: 10;
+  opacity: 0.5;
 }
 
 .customizer-section {
