@@ -3,6 +3,7 @@ import { RouterLink, Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth';
 import { AsyncPipe, UpperCasePipe } from '@angular/common';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { SidebarService } from '../../core/services/sidebar.service';
 
 @Component({
   selector: 'app-header',
@@ -13,6 +14,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 export class HeaderComponent {
   auth = inject(AuthService);
   translate = inject(TranslateService);
+  sidebarService = inject(SidebarService);
   private router = inject(Router);
   scrolled = signal(false);
   menuOpen = signal(false);

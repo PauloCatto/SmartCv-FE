@@ -243,7 +243,31 @@
   color: var(--color-primary-light);
 }
 
+.hamburger-menu-btn {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  margin-right: 4px;
+
+  &:hover {
+    color: var(--color-text);
+    background: var(--color-surface-3);
+    border-color: var(--color-primary-light);
+  }
+}
+
 @media (max-width: 768px) {
+  .hamburger-menu-btn {
+    display: flex;
+  }
   .navbar-links {
     display: none; /* Hide anchor links on mobile to save space */
   }
