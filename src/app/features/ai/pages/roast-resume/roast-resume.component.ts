@@ -88,20 +88,20 @@ import { Resume } from '../../../../core/models/resume.model';
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
                       </svg>
-                      Resumo
+                      {{ 'BUILDER.ROAST.TABS.SUMMARY' | translate }}
                     </button>
                     <button class="tab-btn" [class.active]="activeTab() === 'ats'" (click)="activeTab.set('ats')">
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <line x1="18" y1="6" x2="6" y2="18"></line>
                         <line x1="6" y1="6" x2="18" y2="18"></line>
                       </svg>
-                      Problemas ATS
+                      {{ 'BUILDER.ROAST.TABS.ATS' | translate }}
                     </button>
                     <button class="tab-btn" [class.active]="activeTab() === 'actionable'" (click)="activeTab.set('actionable')">
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"></path>
                       </svg>
-                      Próximos Passos
+                      {{ 'BUILDER.ROAST.TABS.ACTIONABLE' | translate }}
                     </button>
                   </div>
                 </div>
@@ -111,7 +111,7 @@ import { Resume } from '../../../../core/models/resume.model';
                     <div class="score-card">
                       <div class="score-info">
                         <span class="score-label">{{ 'BUILDER.ROAST.SCORE' | translate }}</span>
-                        <span class="score-desc">Nota geral baseada no potencial do currículo em processos seletivos.</span>
+                        <span class="score-desc">{{ 'BUILDER.ROAST.SCORE_DESC' | translate }}</span>
                       </div>
                       <div class="score-circle-wrapper">
                         <div class="score-circle">
@@ -166,13 +166,13 @@ import { Resume } from '../../../../core/models/resume.model';
                 </div>
               } @else {
                 <div class="workspace-placeholder-example">
-                  <div class="example-badge">Exemplo de Visualização</div>
+                  <div class="example-badge">{{ 'BUILDER.ROAST.EXAMPLE_BADGE' | translate }}</div>
                   
                   <div class="workspace-header-tabs" style="margin-top: 12px;">
                     <div class="tabs-buttons">
-                      <button class="tab-btn" [class.active]="activeExampleTab() === 'summary'" (click)="activeExampleTab.set('summary')">Resumo</button>
-                      <button class="tab-btn" [class.active]="activeExampleTab() === 'ats'" (click)="activeExampleTab.set('ats')">Problemas ATS</button>
-                      <button class="tab-btn" [class.active]="activeExampleTab() === 'actionable'" (click)="activeExampleTab.set('actionable')">Próximos Passos</button>
+                      <button class="tab-btn" [class.active]="activeExampleTab() === 'summary'" (click)="activeExampleTab.set('summary')">{{ 'BUILDER.ROAST.TABS.SUMMARY' | translate }}</button>
+                      <button class="tab-btn" [class.active]="activeExampleTab() === 'ats'" (click)="activeExampleTab.set('ats')">{{ 'BUILDER.ROAST.TABS.ATS' | translate }}</button>
+                      <button class="tab-btn" [class.active]="activeExampleTab() === 'actionable'" (click)="activeExampleTab.set('actionable')">{{ 'BUILDER.ROAST.TABS.ACTIONABLE' | translate }}</button>
                     </div>
                   </div>
 
@@ -181,7 +181,7 @@ import { Resume } from '../../../../core/models/resume.model';
                       <div class="score-card animate-fade-in" style="opacity: 0.55;">
                         <div class="score-info">
                           <span class="score-label">{{ 'BUILDER.ROAST.SCORE' | translate }}</span>
-                          <span class="score-desc">Nota geral baseada no potencial do currículo em processos seletivos.</span>
+                          <span class="score-desc">{{ 'BUILDER.ROAST.SCORE_DESC' | translate }}</span>
                         </div>
                         <div class="score-circle-wrapper">
                           <div class="score-circle" style="animation: none;">
@@ -198,8 +198,8 @@ import { Resume } from '../../../../core/models/resume.model';
                           {{ 'BUILDER.ROAST.STRENGTHS' | translate }}
                         </h4>
                         <ul>
-                          <li>Foco claro no resumo profissional descrevendo conquistas e tecnologias chave.</li>
-                          <li>Seção de experiências com impactos quantificáveis e resultados alcançados.</li>
+                          <li>{{ 'BUILDER.ROAST.EXAMPLE_STRENGTH_1' | translate }}</li>
+                          <li>{{ 'BUILDER.ROAST.EXAMPLE_STRENGTH_2' | translate }}</li>
                         </ul>
                       </div>
                     }
@@ -214,8 +214,8 @@ import { Resume } from '../../../../core/models/resume.model';
                           {{ 'BUILDER.ROAST.WEAKNESSES' | translate }}
                         </h4>
                         <ul>
-                          <li>Falta de métricas quantificáveis em algumas das experiências profissionais.</li>
-                          <li>Formatação em múltiplas colunas pode dificultar a análise por parsers ATS antigos.</li>
+                          <li>{{ 'BUILDER.ROAST.EXAMPLE_WEAKNESS_1' | translate }}</li>
+                          <li>{{ 'BUILDER.ROAST.EXAMPLE_WEAKNESS_2' | translate }}</li>
                         </ul>
                       </div>
                     }
@@ -231,8 +231,8 @@ import { Resume } from '../../../../core/models/resume.model';
                           {{ 'BUILDER.ROAST.ACTIONABLE' | translate }}
                         </h4>
                         <ul>
-                          <li>Reescreva as conquistas usando a fórmula X-Y-Z (ex: Realizei X, medido por Y, fazendo Z).</li>
-                          <li>Use modelos de currículo ATS-friendly de coluna única, como "Minimal" ou "Elegance".</li>
+                          <li>{{ 'BUILDER.ROAST.EXAMPLE_ACTIONABLE_1' | translate }}</li>
+                          <li>{{ 'BUILDER.ROAST.EXAMPLE_ACTIONABLE_2' | translate }}</li>
                         </ul>
                       </div>
                     }

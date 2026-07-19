@@ -109,21 +109,21 @@ import { Resume } from '../../../../core/models/resume.model';
                         <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h12a2 2 0 002-2v-7" />
                         <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
                       </svg>
-                      Editar Texto
+                      {{ 'BUILDER.COVER_LETTER.TABS.EDIT_TEXT' | translate }}
                     </button>
                     <button class="tab-btn" [class.active]="viewMode() === 'paper'" (click)="viewMode.set('paper')">
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                         <polyline points="14 2 14 8 20 8"></polyline>
                       </svg>
-                      Visualizar Papel
+                      {{ 'BUILDER.COVER_LETTER.TABS.VIEW_PAPER' | translate }}
                     </button>
                   </div>
 
                   @if (matchScore() !== null) {
                     <div class="match-rate-badge" [style.border-color]="selectedResumeColor()">
                       <div class="match-score" [style.color]="selectedResumeColor()">{{ matchScore() }}%</div>
-                      <div class="match-label">Match Vaga</div>
+                      <div class="match-label">{{ 'BUILDER.COVER_LETTER.MATCH_RATE' | translate }}</div>
                     </div>
                   }
                 </div>
@@ -183,7 +183,7 @@ import { Resume } from '../../../../core/models/resume.model';
                           <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h12a2 2 0 002-2v-7" />
                           <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
                         </svg>
-                        Editar Texto
+                        Ver Texto
                       </button>
                       <button class="tab-btn" [class.active]="activeExampleTab() === 'paper'" (click)="activeExampleTab.set('paper')">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -277,8 +277,11 @@ export class CoverLetterPageComponent implements OnInit {
   jobDescription = '';
   
   isGenerating = signal(false);
-  generatedLetter = signal<string | null>(null);
-  generatedLetterEditable = '';
+
+  defaultLetterText = '';
+
+  generatedLetter = signal<string | null>(this.defaultLetterText);
+  generatedLetterEditable = this.defaultLetterText;
   viewMode = signal<'text' | 'paper'>('text');
   matchScore = signal<number | null>(null);
   activeExampleTab = signal<'text' | 'paper'>('paper');
@@ -292,6 +295,14 @@ export class CoverLetterPageComponent implements OnInit {
   selectedResumeLocation = signal<string>('');
 
   ngOnInit() {
+    this.translate.stream('BUILDER.COVER_LETTER.DEFAULT_TEXT').subscribe(text => {
+      if (this.generatedLetterEditable === this.defaultLetterText) {
+        this.generatedLetterEditable = text;
+        this.generatedLetter.set(text);
+      }
+      this.defaultLetterText = text;
+    });
+
     this.resumeService.loadResumes(true).subscribe({
       next: (data) => {
         this.resumes.set(data);
