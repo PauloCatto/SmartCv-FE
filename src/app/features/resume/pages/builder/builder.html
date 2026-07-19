@@ -13,7 +13,7 @@
     </div>
     <div class="topbar-right">
       <div class="ats-score-widget"
-        [class]="'score-' + (atsScore() >= 80 ? 'high' : atsScore() >= 50 ? 'medium' : 'low')" title="ATS Score">
+        [class]="'score-' + (atsScore() >= 80 ? 'high' : atsScore() >= 50 ? 'medium' : 'low')" [title]="'BUILDER.ATS_SCORE' | translate">
         <div class="ats-score-circle">
           <svg viewBox="0 0 36 36" class="circular-chart">
             <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
@@ -22,7 +22,7 @@
           </svg>
           <span class="ats-score-text">{{atsScore()}}</span>
         </div>
-        <span class="ats-score-label">ATS Score</span>
+        <span class="ats-score-label">{{ 'BUILDER.ATS_SCORE' | translate }}</span>
       </div>
       <div class="topbar-divider"></div>
 
@@ -39,9 +39,9 @@
         }
       </span>
 
-      <button class="btn btn-secondary btn-sm btn-export-pdf" (click)="exportPdf()"
-        [disabled]="exporting() || (currentStep() !== 'skills' && currentStep() !== 'languages')">
-        @if (exporting()) {
+      <button class="btn btn-secondary btn-sm btn-export-pdf" (click)="exportToPDF()"
+        [disabled]="isExportingPdf() || currentStep() !== 'finish'">
+        @if (isExportingPdf()) {
         <div class="spinner" style="width:14px;height:14px"></div>
         } @else {
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -92,6 +92,35 @@
               </svg>
               {{ 'BUILDER.PERSONAL.AUTOFILL' | translate }}
             </button>
+          </div>
+
+          <!-- Photo Upload Section -->
+          <div class="photo-upload-section">
+            <div class="photo-preview-wrapper">
+              @if (draft().personalInfo.photo) {
+               <img [src]="((draft().personalInfo.photo || '').startsWith('data:') || (draft().personalInfo.photo || '').startsWith('http')) ? (draft().personalInfo.photo || '') : environment.uploadUrl + (draft().personalInfo.photo || '')" class="photo-preview-img" alt="Foto de perfil" />
+                <button class="remove-photo-btn" (click)="removePhoto()" title="Remover foto">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                  </svg>
+                </button>
+              } @else {
+                <div class="photo-placeholder">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                    <circle cx="12" cy="13" r="4"></circle>
+                  </svg>
+                </div>
+              }
+            </div>
+            <div class="photo-upload-actions">
+              <label class="btn btn-secondary btn-sm photo-upload-label">
+                <input type="file" (change)="onPhotoSelected($event)" accept="image/*" style="display: none;" />
+                {{ (draft().personalInfo.photo ? 'Alterar foto' : 'Adicionar foto') }}
+              </label>
+              <span class="photo-hint">Máx: 2MB (JPG/PNG)</span>
+            </div>
           </div>
 
           <div class="form-grid">
@@ -491,11 +520,11 @@
           <div class="quick-level">
             <span class="level-label">{{ 'BUILDER.LANGUAGES.LEVEL' | translate }}</span>
             <select class="form-control" [(ngModel)]="newLanguageLevel" style="padding: 8px 12px; height: auto;">
-              <option value="Básico">Básico</option>
-              <option value="Intermediário">Intermediário</option>
-              <option value="Avançado">Avançado</option>
-              <option value="Fluente">Fluente</option>
-              <option value="Nativo">Nativo</option>
+              <option value="Básico">{{ 'BUILDER.LANGUAGES.LEVELS.BASIC' | translate }}</option>
+              <option value="Intermediário">{{ 'BUILDER.LANGUAGES.LEVELS.INTERMEDIATE' | translate }}</option>
+              <option value="Avançado">{{ 'BUILDER.LANGUAGES.LEVELS.ADVANCED' | translate }}</option>
+              <option value="Fluente">{{ 'BUILDER.LANGUAGES.LEVELS.FLUENT' | translate }}</option>
+              <option value="Nativo">{{ 'BUILDER.LANGUAGES.LEVELS.NATIVE' | translate }}</option>
             </select>
           </div>
           <button class="btn btn-primary" (click)="addLanguage()"
@@ -511,7 +540,7 @@
             <span class="skill-tag-name">{{ lang.name }}</span>
             <span class="skill-tag-name"
               style="color: var(--color-text-muted); font-size: 12px; margin-left: auto; margin-right: 12px;">{{
-              lang.level }}</span>
+              getTranslatedLanguageLevel(lang.level) }}</span>
             <button class="remove-skill" (click)="removeLanguage(i)">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                 <line x1="18" y1="6" x2="6" y2="18" />
@@ -585,7 +614,7 @@
 
             <!-- ATS Score row -->
             <div class="finish-ats-row">
-              <span class="finish-summary-label">ATS Score</span>
+              <span class="finish-summary-label">{{ 'BUILDER.ATS_SCORE' | translate }}</span>
               <div class="finish-ats-bar-wrapper">
                 <div class="finish-ats-bar">
                   <div class="finish-ats-fill"
@@ -646,7 +675,7 @@
           </div>
 
         <div class="template-options">
-          @for (t of templateOptions; track t.id) {
+          @for (t of templateOptions; track t.name) {
           <div class="template-option"
             [class.selected]="draft().template === t.id && (!t.customColor || (draft().colorTheme || '#1e293b') === t.customColor)"
             (click)="selectTemplate(t)">
@@ -698,8 +727,8 @@
               </div>
             </div>
             <div class="template-option-info">
-              <span class="template-option-name">{{ t.name }}</span>
-              <span class="template-option-desc">{{ t.desc }}</span>
+              <span class="template-option-name">{{ currentLang === 'en' ? t.name : t.ptName }}</span>
+              <span class="template-option-desc">{{ currentLang === 'en' ? t.enDesc : t.desc }}</span>
             </div>
             @if (draft().template === t.id && (!t.customColor || (draft().colorTheme || '#1e293b') === t.customColor)) {
             <div class="template-check">
@@ -780,6 +809,42 @@
         </div>
         }
 
+        @if (currentStep() === 'finish') {
+        <div class="step-section animate-fade-in-up">
+          <div class="step-header" style="justify-content: center; text-align: center;">
+            <div class="step-header-title" style="align-items: center;">
+              <h2 class="step-title">Currículo Concluído! 🎉</h2>
+              <p class="step-desc">Tudo pronto! Seu currículo está finalizado e pronto para impressionar.</p>
+            </div>
+          </div>
+          <div style="display: flex; flex-direction: column; align-items: center; gap: 24px; padding: 40px 20px; text-align: center;">
+            <div style="width: 80px; height: 80px; background: #ecfdf5; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 8px;">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="3">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+            </div>
+            <div>
+              <p style="color: #64748b; max-width: 380px; margin: 0 auto; line-height: 1.6;">
+                Revise os detalhes na janela ao lado. Se tudo estiver correto, exporte seu currículo em alta qualidade usando o botão abaixo ou no topo da página.
+              </p>
+            </div>
+            <button class="btn btn-primary btn-lg" style="margin-top: 16px;" (click)="exportToPDF()" [disabled]="isExportingPdf()">
+              @if (isExportingPdf()) {
+                <div class="spinner" style="width: 18px; height: 18px; border-width: 2px;"></div>
+                <span>{{ 'BUILDER.GENERATING_PDF' | translate }}</span>
+              } @else {
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="7 10 12 15 17 10"></polyline>
+                  <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                <span>{{ 'BUILDER.DOWNLOAD_PDF' | translate }}</span>
+              }
+            </button>
+          </div>
+        </div>
+        }
+
       <div class="step-nav">
         @if (currentStep() !== 'template') {
         <button class="btn btn-secondary" (click)="prevStep()">
@@ -806,16 +871,18 @@
   <div class="preview-panel">
     <div class="preview-topbar">
       <span class="preview-label">{{ 'BUILDER.PREVIEW_LABEL' | translate }}</span>
-      <div class="preview-scale-btns">
-        <button class="scale-btn" [class.active]="previewScale() === 0.4" (click)="previewScale.set(0.4)">40%</button>
-        <button class="scale-btn" [class.active]="previewScale() === 0.6" (click)="previewScale.set(0.6)">60%</button>
-        <button class="scale-btn" [class.active]="previewScale() === 0.8" (click)="previewScale.set(0.8)">80%</button>
-        <button class="scale-btn" [class.active]="previewScale() === 1" (click)="previewScale.set(1)">100%</button>
+      <div style="display: flex; align-items: center; gap: 16px;">
+        <div class="preview-scale-btns">
+          <button class="scale-btn" [class.active]="previewScale() === 0.4" (click)="previewScale.set(0.4)">40%</button>
+          <button class="scale-btn" [class.active]="previewScale() === 0.6" (click)="previewScale.set(0.6)">60%</button>
+          <button class="scale-btn" [class.active]="previewScale() === 0.8" (click)="previewScale.set(0.8)">80%</button>
+          <button class="scale-btn" [class.active]="previewScale() === 1" (click)="previewScale.set(1)">100%</button>
+        </div>
       </div>
     </div>
     <div class="preview-container">
       <div class="preview-sheet" [style.transform]="'scale(' + previewScale() + ')'"
-        [style.transformOrigin]="'top center'">
+        [style.transformOrigin]="'top center'" spellcheck="false">
         @if (draft().template === 'elegance') {
         <app-elegance-template [resume]="draft()" />
         } @else if (draft().template === 'modern') {
@@ -826,6 +893,10 @@
         <app-creative-template [resume]="draft()" />
         } @else if (draft().template === 'compact') {
         <app-compact-template [resume]="draft()" />
+        } @else if (draft().template === 'elegance-photo') {
+        <app-elegance-photo-template [resume]="draft()" />
+        } @else if (draft().template === 'creative-photo') {
+        <app-creative-photo-template [resume]="draft()" />
         }
       </div>
     </div>
@@ -833,7 +904,7 @@
 </div>
 
 <!-- Floating mobile view switcher -->
-<button class="mobile-view-toggle" (click)="toggleMobileView()">
+<button class="mobile-view-toggle" [class.in-edit]="activeTab() === 'edit'" (click)="toggleMobileView()">
   @if (activeTab() === 'edit') {
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
     <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />

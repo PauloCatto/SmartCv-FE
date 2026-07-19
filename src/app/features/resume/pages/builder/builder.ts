@@ -1,5 +1,7 @@
 import { Component, inject, signal, computed, OnInit, OnDestroy } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
+import html2canvas from 'html2canvas';
+import { jsPDF } from 'jspdf';
 import { FormsModule } from '@angular/forms';
 import { CdkDragDrop, moveItemInArray, CdkDropList, CdkDrag, CdkDragHandle } from '@angular/cdk/drag-drop';
 import { Subject, Subscription, Observable, of } from 'rxjs';
@@ -15,6 +17,9 @@ import { MinimalTemplateComponent } from '../../components/templates/minimal-tem
 import { ModernTemplateComponent } from '../../components/templates/modern-template.component';
 import { CreativeTemplateComponent } from '../../components/templates/creative-template.component';
 import { CompactTemplateComponent } from '../../components/templates/compact-template.component';
+import { ElegancePhotoTemplateComponent } from '../../components/templates/elegance-photo-template.component';
+import { CreativePhotoTemplateComponent } from '../../components/templates/creative-photo-template.component';
+import { environment } from '../../../../../environments/environment';
 import { ToastrService } from 'ngx-toastr';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
@@ -28,6 +33,8 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
     MinimalTemplateComponent,
     CreativeTemplateComponent,
     CompactTemplateComponent,
+    ElegancePhotoTemplateComponent,
+    CreativePhotoTemplateComponent,
     TranslateModule,
     UpperCasePipe
   ],
@@ -64,12 +71,17 @@ export class BuilderComponent implements OnInit, OnDestroy, CanComponentDeactiva
   isAILoading = signal<string | null>(null);
   showValidation = signal(false);
   isSaving = signal(false);
+  environment = environment;
 
   // Leave-without-saving modal
   showLeaveModal = signal(false);
   private leaveSubject = new Subject<boolean>();
   isPublishedLocally = false;
   isNavigatingInternally = false;
+
+  get currentLang(): string {
+    return this.translate.currentLang || 'pt';
+  }
 
   showCoverLetterModal = signal(false);
   jobDescription: string = '';
@@ -273,7 +285,10 @@ export class BuilderComponent implements OnInit, OnDestroy, CanComponentDeactiva
 
             const slug = this.slugify(existing.title);
             if (id !== slug) {
-              this.router.navigate(['/resume', slug, 'edit'], { replaceUrl: true });
+              this.isNavigatingInternally = true;
+              this.router.navigate(['/resume', slug, 'edit'], { replaceUrl: true }).then(() => {
+                this.isNavigatingInternally = false;
+              });
             }
           }
         }
@@ -281,11 +296,23 @@ export class BuilderComponent implements OnInit, OnDestroy, CanComponentDeactiva
       return;
     }
 
+    const tplParam = this.route.snapshot.queryParamMap.get('template') as TemplateType;
+
     this.resumeService.create().subscribe({
       next: (created) => {
+        if (tplParam && ['elegance', 'modern', 'minimal', 'creative', 'compact'].includes(tplParam)) {
+          created.template = tplParam;
+        }
         this.draft.set({ ...created });
+        if (tplParam) {
+          // Salva imediatamente com o template escolhido
+          this.onFieldChange();
+        }
         this.resumeTitle = created.title;
-        this.router.navigate(['/resume', this.slugify(created.title), 'edit'], { replaceUrl: true });
+        this.isNavigatingInternally = true;
+        this.router.navigate(['/resume', this.slugify(created.title), 'edit'], { replaceUrl: true }).then(() => {
+          this.isNavigatingInternally = false;
+        });
       }
     });
   }
@@ -477,11 +504,15 @@ export class BuilderComponent implements OnInit, OnDestroy, CanComponentDeactiva
   }
 
   addLanguage() {
-    if (!this.newLanguageName.trim()) return;
-    if (this.languageExists(this.newLanguageName)) return;
+    const name = this.newLanguageName.trim();
+    if (!name) return;
+    if (this.languageExists(name)) {
+      this.toastr.warning('Este idioma já foi adicionado.', 'Aviso');
+      return;
+    }
     const lang = {
       id: crypto.randomUUID(),
-      name: this.newLanguageName.trim(),
+      name: name,
       level: this.newLanguageLevel,
     };
     this.draft.update(d => ({ ...d, languages: [...(d.languages || []), lang] }));
@@ -504,8 +535,21 @@ export class BuilderComponent implements OnInit, OnDestroy, CanComponentDeactiva
   }
 
   languageExists(name: string): boolean {
+    const normalize = (s: string) => s.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    const normalizedTarget = normalize(name);
     const langs = this.draft().languages || [];
-    return langs.some(l => l.name.toLowerCase() === name.toLowerCase());
+    return langs.some(l => normalize(l.name) === normalizedTarget);
+  }
+
+  getTranslatedLanguageLevel(level: string): string {
+    const map: Record<string, string> = {
+      'Básico': 'BUILDER.LANGUAGES.LEVELS.BASIC',
+      'Intermediário': 'BUILDER.LANGUAGES.LEVELS.INTERMEDIATE',
+      'Avançado': 'BUILDER.LANGUAGES.LEVELS.ADVANCED',
+      'Fluente': 'BUILDER.LANGUAGES.LEVELS.FLUENT',
+      'Nativo': 'BUILDER.LANGUAGES.LEVELS.NATIVE'
+    };
+    return this.translate.instant(map[level] || map['Básico']);
   }
 
   setSkillLevel(index: number, level: number) {
@@ -526,6 +570,28 @@ export class BuilderComponent implements OnInit, OnDestroy, CanComponentDeactiva
     return this.draft().skills.some(s => s.name.toLowerCase() === name.toLowerCase());
   }
 
+  isDefaultTitle(title: string): boolean {
+    if (!title || !title.trim()) return true;
+
+    const defaults = [
+      'Meu Currículo', 'My Resume',
+      'Currículo Importado', 'Imported Resume',
+    ];
+
+    // Check if it starts with LinkedIn default prefixes (PT/EN)
+    if (title.startsWith('Currículo LinkedIn') || title.startsWith('Resume LinkedIn')) {
+      return true;
+    }
+
+    // Check if it matches any template's name or ptName
+    for (const opt of this.templateOptions) {
+      defaults.push(opt.name);
+      defaults.push(opt.ptName);
+    }
+
+    return defaults.some(d => title.toLowerCase().trim() === d.toLowerCase().trim());
+  }
+
   selectTemplate(tmpl: any) {
     this.draft.update(d => ({
       ...d,
@@ -533,7 +599,17 @@ export class BuilderComponent implements OnInit, OnDestroy, CanComponentDeactiva
       colorTheme: tmpl.customColor || d.colorTheme,
       fontFamily: tmpl.customFont || d.fontFamily
     }));
-    this.onFieldChange();
+
+    const isEn = this.translate.currentLang === 'en';
+    const newTitle = isEn ? tmpl.name : tmpl.ptName;
+
+    if (this.isDefaultTitle(this.resumeTitle)) {
+      this.resumeTitle = newTitle;
+      this.draft.update(d => ({ ...d, title: newTitle }));
+      this.saveTitle(); // Trigger title save in DB and update the route slug
+    } else {
+      this.onFieldChange();
+    }
   }
 
   dropExperience(event: CdkDragDrop<Experience[]>) {
@@ -580,7 +656,7 @@ export class BuilderComponent implements OnInit, OnDestroy, CanComponentDeactiva
 
     if (type === 'bio') {
       const bioText = d.personalInfo.bio;
-      this.aiService.improveBio(bioText).subscribe({
+      this.aiService.improveBio(bioText, this.translate.currentLang).subscribe({
         next: (improved) => {
           this.draft.update(current => ({
             ...current,
@@ -598,7 +674,7 @@ export class BuilderComponent implements OnInit, OnDestroy, CanComponentDeactiva
     } else if (type === 'experience' && index !== null) {
       const expItem = d.experience[index];
       const descText = expItem.description;
-      this.aiService.improveExperience(descText, expItem.role).subscribe({
+      this.aiService.improveExperience(descText, expItem.role, this.translate.currentLang).subscribe({
         next: (improved) => {
           this.draft.update(current => {
             const exp = [...current.experience];
@@ -618,9 +694,12 @@ export class BuilderComponent implements OnInit, OnDestroy, CanComponentDeactiva
   }
 
   importMockData() {
+    const isEn = this.translate.currentLang === 'en';
+    const title = this.translate.instant('BUILDER.IMPORTED_RESUME_TITLE');
+    
     this.draft.set({
       id: this.draft().id,
-      title: 'Currículo Importado',
+      title: title,
       createdAt: this.draft().createdAt,
       updatedAt: this.draft().updatedAt,
       template: this.draft().template,
@@ -629,48 +708,54 @@ export class BuilderComponent implements OnInit, OnDestroy, CanComponentDeactiva
       spacingMode: this.draft().spacingMode,
       personalInfo: {
         name: 'Alexandre Magno',
-        jobTitle: 'Engenheiro de Software Senior',
+        jobTitle: isEn ? 'Senior Software Engineer' : 'Engenheiro de Software Senior',
         email: 'alex.magno@email.com',
         phone: '+55 11 98765-4321',
-        location: 'São Paulo, SP - Híbrido',
+        location: isEn ? 'São Paulo, SP - Hybrid' : 'São Paulo, SP - Híbrido',
         linkedin: 'linkedin.com/in/alexmagno',
-        bio: 'Engenheiro de software apaixonado por criar arquiteturas escaláveis e produtos com excelente experiência de usuário. Com mais de 8 anos na área de tecnologia, possuo sólida experiência na liderança técnica de esquadrões ágeis e na transição de sistemas monolíticos para microsserviços na nuvem.'
+        bio: isEn 
+          ? 'Software engineer passionate about building scalable architectures and products with excellent user experience. With over 8 years in tech, I have solid experience technically leading agile squads and transitioning monolithic systems to cloud microservices.'
+          : 'Engenheiro de software apaixonado por criar arquiteturas escaláveis e produtos com excelente experiência de usuário. Com mais de 8 anos na área de tecnologia, possuo sólida experiência na liderança técnica de esquadrões ágeis e na transição de sistemas monolíticos para microsserviços na nuvem.'
       },
       experience: [
         {
           id: crypto.randomUUID(),
           role: 'Tech Lead / Staff Engineer',
           company: 'Fintech Solutions S.A.',
-          startDate: 'Jan 2021',
+          startDate: isEn ? 'Jan 2021' : 'Jan 2021',
           endDate: '',
           current: true,
-          description: '• Liderança de uma tribo com 4 squads e mais de 20 desenvolvedores, focada no core bancário.\n• Arquitetura e migração do monolito legado para microsserviços Node.js e Go, melhorando o tempo de resposta em 45%.\n• Implementação de cultura DevOps e CI/CD com GitHub Actions, reduzindo o time-to-market.'
+          description: isEn 
+            ? '• Led a tribe with 4 squads and over 20 developers, focused on core banking.\n• Architected and migrated legacy monolith to Node.js and Go microservices, improving response time by 45%.\n• Implemented DevOps culture and CI/CD with GitHub Actions, reducing time-to-market.'
+            : '• Liderança de uma tribo com 4 squads e mais de 20 desenvolvedores, focada no core bancário.\n• Arquitetura e migração do monolito legado para microsserviços Node.js e Go, melhorando o tempo de resposta em 45%.\n• Implementação de cultura DevOps e CI/CD com GitHub Actions, reduzindo o time-to-market.'
         },
         {
           id: crypto.randomUUID(),
-          role: 'Desenvolvedor Full Stack Sênior',
-          company: 'E-commerce Varejo Global',
-          startDate: 'Fev 2018',
-          endDate: 'Dez 2020',
+          role: isEn ? 'Senior Full Stack Developer' : 'Desenvolvedor Full Stack Sênior',
+          company: isEn ? 'Global Retail E-commerce' : 'E-commerce Varejo Global',
+          startDate: isEn ? 'Feb 2018' : 'Fev 2018',
+          endDate: isEn ? 'Dec 2020' : 'Dez 2020',
           current: false,
-          description: '• Desenvolvimento do novo checkout da plataforma utilizando React e Node.js.\n• Otimização de performance no frontend que aumentou a conversão de vendas em 12%.\n• Mentoria de desenvolvedores juniores e plenos.'
+          description: isEn 
+            ? '• Developed the new platform checkout using React and Node.js.\n• Frontend performance optimization that increased sales conversion by 12%.\n• Mentored junior and mid-level developers.'
+            : '• Desenvolvimento do novo checkout da plataforma utilizando React e Node.js.\n• Otimização de performance no frontend que aumentou a conversão de vendas em 12%.\n• Mentoria de desenvolvedores juniores e plenos.'
         }
       ],
       education: [
         {
           id: crypto.randomUUID(),
-          degree: 'Pós-graduação em Arquitetura de Software',
-          field: 'Tecnologia da Informação',
-          institution: 'Universidade Tecnológica',
+          degree: isEn ? 'Postgraduate in Software Architecture' : 'Pós-graduação em Arquitetura de Software',
+          field: isEn ? 'Information Technology' : 'Tecnologia da Informação',
+          institution: isEn ? 'Technological University' : 'Universidade Tecnológica',
           startDate: '2019',
           endDate: '2020',
           current: false
         },
         {
           id: crypto.randomUUID(),
-          degree: 'Bacharelado em Ciência da Computação',
-          field: 'Computação',
-          institution: 'Universidade Federal',
+          degree: isEn ? 'Bachelor of Computer Science' : 'Bacharelado em Ciência da Computação',
+          field: isEn ? 'Computing' : 'Computação',
+          institution: isEn ? 'Federal University' : 'Universidade Federal',
           startDate: '2013',
           endDate: '2017',
           current: false
@@ -681,15 +766,15 @@ export class BuilderComponent implements OnInit, OnDestroy, CanComponentDeactiva
         { id: crypto.randomUUID(), name: 'Node.js', level: 5 },
         { id: crypto.randomUUID(), name: 'Angular', level: 4 },
         { id: crypto.randomUUID(), name: 'AWS Cloud', level: 4 },
-        { id: crypto.randomUUID(), name: 'Liderança', level: 5 }
+        { id: crypto.randomUUID(), name: isEn ? 'Leadership' : 'Liderança', level: 5 }
       ],
       languages: [
-        { id: crypto.randomUUID(), name: 'Português', level: 'Nativo' },
-        { id: crypto.randomUUID(), name: 'Inglês', level: 'Avançado' },
-        { id: crypto.randomUUID(), name: 'Espanhol', level: 'Intermediário' }
+        { id: crypto.randomUUID(), name: isEn ? 'Portuguese' : 'Português', level: 'Nativo' },
+        { id: crypto.randomUUID(), name: isEn ? 'English' : 'Inglês', level: 'Avançado' },
+        { id: crypto.randomUUID(), name: isEn ? 'Spanish' : 'Espanhol', level: 'Intermediário' }
       ]
     });
-    this.resumeTitle = 'Currículo Importado';
+    this.resumeTitle = title;
     this.saveTitle();
   }
 
@@ -699,6 +784,43 @@ export class BuilderComponent implements OnInit, OnDestroy, CanComponentDeactiva
       this.resumeService.update(current.id, { ...current, title: this.resumeTitle }).subscribe();
     }
     this.router.navigate(['/dashboard']);
+  }
+
+  onPhotoSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files[0]) {
+      const file = input.files[0];
+
+      if (file.size > 2 * 1024 * 1024) {
+        this.toastr.warning('A imagem deve ter no máximo 2MB', 'Aviso');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        const base64 = e.target.result;
+        this.draft.update(d => ({
+          ...d,
+          personalInfo: {
+            ...d.personalInfo,
+            photo: base64
+          }
+        }));
+        this.onFieldChange();
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  removePhoto() {
+    this.draft.update(d => ({
+      ...d,
+      personalInfo: {
+        ...d.personalInfo,
+        photo: ''
+      }
+    }));
+    this.onFieldChange();
   }
 
   finishAndSave() {
@@ -869,5 +991,58 @@ export class BuilderComponent implements OnInit, OnDestroy, CanComponentDeactiva
 
   closeCoverLetterModal() {
     this.showCoverLetterModal.set(false);
+  }
+
+  isExportingPdf = signal(false);
+
+  async exportToPDF() {
+    this.isExportingPdf.set(true);
+    
+    // Create a temporary clone of the preview for high-res rendering
+    const originalElement = document.querySelector('.preview-sheet') as HTMLElement;
+    if (!originalElement) {
+      this.isExportingPdf.set(false);
+      return;
+    }
+
+    const clone = originalElement.cloneNode(true) as HTMLElement;
+    
+    // Temporarily reset transforms and scale to capture in full resolution (A4 size approx)
+    Object.assign(clone.style, {
+      transform: 'none',
+      position: 'fixed',
+      top: '0',
+      left: '0',
+      width: '794px', // Standard A4 width in px at 96 DPI
+      height: '1123px', // Standard A4 height in px
+      zIndex: '-9999',
+      backgroundColor: 'white'
+    });
+    document.body.appendChild(clone);
+
+    try {
+      const canvas = await html2canvas(clone, {
+        scale: 2, // Higher scale for better quality text
+        useCORS: true,
+        logging: false
+      });
+      
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+      
+      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+      pdf.save(`${this.draft().title || 'Curriculo'}.pdf`);
+      
+      this.toastr.success(this.translate.instant('BUILDER.DOWNLOAD_PDF') + ' gerado com sucesso!');
+    } catch (err) {
+      console.error(err);
+      this.toastr.error('Erro ao gerar PDF. Tente novamente.', 'Erro');
+    } finally {
+      document.body.removeChild(clone);
+      this.isExportingPdf.set(false);
+    }
   }
 }
