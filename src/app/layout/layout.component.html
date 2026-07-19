@@ -6,6 +6,10 @@
     <!-- Sidebar Left Panel -->
     <app-sidebar></app-sidebar>
 
+    @if (!sidebarService.isCollapsed()) {
+      <div class="sidebar-backdrop" (click)="sidebarService.collapse()"></div>
+    }
+
     <!-- Main Content Area -->
     <div class="app-layout-main">
       <main class="app-layout-content">
