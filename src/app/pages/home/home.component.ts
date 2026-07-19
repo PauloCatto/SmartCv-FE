@@ -54,6 +54,7 @@ export class HomeComponent {
 
   templates = [
     {
+      id: 'elegance',
       name: 'HOME.TEMPLATES.ITEMS.ELEGANCE.NAME',
       desc: 'HOME.TEMPLATES.ITEMS.ELEGANCE.DESC',
       featured: false,
@@ -76,6 +77,7 @@ export class HomeComponent {
       `,
     },
     {
+      id: 'modern',
       name: 'HOME.TEMPLATES.ITEMS.EXECUTIVE.NAME',
       desc: 'HOME.TEMPLATES.ITEMS.EXECUTIVE.DESC',
       featured: false,
@@ -98,6 +100,7 @@ export class HomeComponent {
       `,
     },
     {
+      id: 'modern',
       name: 'HOME.TEMPLATES.ITEMS.MODERN_BLUE.NAME',
       desc: 'HOME.TEMPLATES.ITEMS.MODERN_BLUE.DESC',
       featured: true,
@@ -122,6 +125,7 @@ export class HomeComponent {
       `,
     },
     {
+      id: 'modern',
       name: 'HOME.TEMPLATES.ITEMS.MODERN_TEAL.NAME',
       desc: 'HOME.TEMPLATES.ITEMS.MODERN_TEAL.DESC',
       featured: false,
@@ -145,6 +149,7 @@ export class HomeComponent {
       `,
     },
     {
+      id: 'minimal',
       name: 'HOME.TEMPLATES.ITEMS.MINIMAL.NAME',
       desc: 'HOME.TEMPLATES.ITEMS.MINIMAL.DESC',
       featured: false,
@@ -165,6 +170,7 @@ export class HomeComponent {
       `,
     },
     {
+      id: 'creative',
       name: 'HOME.TEMPLATES.ITEMS.TECH_MONO.NAME',
       desc: 'HOME.TEMPLATES.ITEMS.TECH_MONO.DESC',
       featured: false,
@@ -184,6 +190,7 @@ export class HomeComponent {
       `,
     },
     {
+      id: 'creative',
       name: 'HOME.TEMPLATES.ITEMS.CREATIVE.NAME',
       desc: 'HOME.TEMPLATES.ITEMS.CREATIVE.DESC',
       featured: false,
@@ -204,6 +211,7 @@ export class HomeComponent {
       `,
     },
     {
+      id: 'compact',
       name: 'HOME.TEMPLATES.ITEMS.COMPACT.NAME',
       desc: 'HOME.TEMPLATES.ITEMS.COMPACT.DESC',
       featured: false,

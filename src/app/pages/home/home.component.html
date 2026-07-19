@@ -153,7 +153,7 @@
             <div class="template-info">
               <h3 class="template-name">{{ t.name | translate }}</h3>
               <p class="template-desc">{{ t.desc | translate }}</p>
-              <a routerLink="/auth/register" class="btn btn-secondary btn-sm" style="width:100%; margin-top:8px;">{{ 'HOME.TEMPLATES.USE_TEMPLATE' | translate }}</a>
+              <a [routerLink]="['/resume/new']" [queryParams]="{template: t.id}" class="btn btn-secondary btn-sm" style="width:100%; margin-top:8px;">{{ 'HOME.TEMPLATES.USE_TEMPLATE' | translate }}</a>
             </div>
           </div>
         }
@@ -161,55 +161,6 @@
     </div>
   </section>
 
-  <!-- PRICING -->
-  <section class="pricing" id="pricing">
-    <div class="section-container">
-      <div class="section-header">
-        <span class="section-eyebrow">{{ 'HOME.PRICING.EYEBROW' | translate }}</span>
-        <h2 class="section-title">
-          {{ 'HOME.PRICING.TITLE_1' | translate }}
-          <span class="gradient-text">{{ 'HOME.PRICING.TITLE_GRADIENT' | translate }}</span>
-        </h2>
-      </div>
-
-      <div class="pricing-grid">
-        <!-- Free -->
-        <div class="pricing-card card" style="padding: 32px;">
-          <div class="pricing-plan">{{ 'HOME.PRICING.FREE.PLAN' | translate }}</div>
-          <div class="pricing-price">
-            <span class="price-value">{{ 'HOME.PRICING.FREE.PRICE' | translate }}</span>
-            <span class="price-period">{{ 'HOME.PRICING.FREE.PERIOD' | translate }}</span>
-          </div>
-          <ul class="pricing-features">
-            <li class="pricing-feature"><span class="check">✓</span> {{ 'HOME.PRICING.FREE.FEATURES.F1' | translate }}</li>
-            <li class="pricing-feature"><span class="check">✓</span> {{ 'HOME.PRICING.FREE.FEATURES.F2' | translate }}</li>
-            <li class="pricing-feature"><span class="check">✓</span> {{ 'HOME.PRICING.FREE.FEATURES.F3' | translate }}</li>
-            <li class="pricing-feature"><span class="check">✓</span> {{ 'HOME.PRICING.FREE.FEATURES.F4' | translate }}</li>
-            <li class="pricing-feature"><span class="check">✓</span> {{ 'HOME.PRICING.FREE.FEATURES.F5' | translate }}</li>
-          </ul>
-          <a routerLink="/auth/register" class="btn btn-secondary" style="width:100%;">{{ 'HOME.PRICING.FREE.BTN' | translate }}</a>
-        </div>
-
-        <!-- Premium -->
-        <div class="pricing-card card featured-plan" style="padding: 32px; opacity: 0.7;">
-          <div class="featured-badge" style="background: var(--color-text-muted); color: var(--color-surface);">{{ 'HOME.PRICING.PREMIUM.COMING_SOON' | translate }}</div>
-          <div class="pricing-plan">{{ 'HOME.PRICING.PREMIUM.PLAN' | translate }}</div>
-          <div class="pricing-price">
-            <span class="price-value gradient-text">{{ 'HOME.PRICING.PREMIUM.PRICE' | translate }}</span>
-            <span class="price-period">{{ 'HOME.PRICING.PREMIUM.PERIOD' | translate }}</span>
-          </div>
-          <ul class="pricing-features">
-            <li class="pricing-feature"><span class="check">✓</span> {{ 'HOME.PRICING.PREMIUM.FEATURES.F1' | translate }}</li>
-            <li class="pricing-feature"><span class="check">✓</span> {{ 'HOME.PRICING.PREMIUM.FEATURES.F2' | translate }}</li>
-            <li class="pricing-feature"><span class="check">✓</span> {{ 'HOME.PRICING.PREMIUM.FEATURES.F3' | translate }}</li>
-            <li class="pricing-feature"><span class="check">✓</span> {{ 'HOME.PRICING.PREMIUM.FEATURES.F4' | translate }}</li>
-            <li class="pricing-feature"><span class="check">✓</span> {{ 'HOME.PRICING.PREMIUM.FEATURES.F5' | translate }}</li>
-          </ul>
-          <button class="btn btn-secondary" style="width:100%; cursor: not-allowed;" disabled>{{ 'HOME.PRICING.PREMIUM.BTN_DISABLED' | translate }}</button>
-        </div>
-      </div>
-    </div>
-  </section>
 
   <!-- CTA -->
   <section class="cta-section">
