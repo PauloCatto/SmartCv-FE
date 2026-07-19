@@ -23,6 +23,31 @@
 .dashboard-title { font-size: 2.2rem; font-weight: 900; margin-bottom: 6px; }
 .dashboard-subtitle { font-size: 15px; color: var(--color-text-muted); }
 
+.btn-import-linkedin {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--color-surface-hover);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  
+  &:hover {
+    background: var(--color-border);
+    color: white;
+  }
+  
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
 /* STATS */
 .stats-row {
   display: flex;
@@ -660,25 +685,6 @@
 
   .resumes-grid {
     grid-template-columns: 1fr;
-  }
-
-  .resume-card {
-    display: flex;
-    flex-direction: row;
-    align-items: stretch;
-
-    .resume-preview {
-      width: 80px;
-      height: auto;
-      flex-shrink: 0;
-      border-bottom: none;
-      border-right: 1px solid var(--color-border);
-    }
-
-    .resume-info {
-      flex: 1;
-      padding: 12px;
-    }
   }
 }
 

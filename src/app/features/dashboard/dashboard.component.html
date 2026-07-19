@@ -10,6 +10,19 @@
           {{ 'DASHBOARD.SUBTITLE' | translate }}
         </p>
       </div>
+      <div class="header-right">
+        <input type="file" #fileInput (change)="onLinkedInFileSelected($event)" accept="application/pdf" style="display: none;">
+        <button class="btn-import-linkedin" (click)="triggerLinkedInImport()" [disabled]="isImportingLinkedIn">
+          @if (isImportingLinkedIn) {
+            <span class="spinner"></span> {{ 'BUILDER.IMPORT_LINKEDIN.LOADING' | translate }}
+          } @else {
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-1.85 0-2.58 1-3 1.66v-1.42h-2.9v9.32h2.9v-5.18c0-.28.05-.55.13-.75.22-.56.73-1.14 1.58-1.14 1.11 0 1.55.85 1.55 2.09v5zM8.34 9.4A1.66 1.66 0 1 0 6.68 7.74 1.66 1.66 0 0 0 8.34 9.4zM9.79 18.5H6.89v-9.32h2.9z"/>
+            </svg>
+            {{ 'BUILDER.IMPORT_LINKEDIN.TITLE' | translate }}
+          }
+        </button>
+      </div>
     </div>
 
     <!-- Seção de Modelos de Currículo (Galeria de Templates) -->
@@ -111,17 +124,6 @@
           <div>
             <div class="stat-value">{{ vm.stats.totalResumes }}</div>
             <div class="stat-name">{{ 'DASHBOARD.RESUMES' | translate }}</div>
-          </div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon" style="background: rgba(16,185,129,0.15)">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2">
-              <polyline points="20 6 9 17 4 12" />
-            </svg>
-          </div>
-          <div>
-            <div class="stat-value">{{ vm.stats.plan === 'PREMIUM' ? ('DASHBOARD.PREMIUM' | translate) : ('DASHBOARD.FREE' | translate) }}</div>
-            <div class="stat-name">{{ 'DASHBOARD.CURRENT_PLAN' | translate }}</div>
           </div>
         </div>
         <div class="stat-card">
