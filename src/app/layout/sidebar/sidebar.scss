@@ -172,7 +172,54 @@
 
 @media (max-width: 768px) {
   .sidebar {
-    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 1000;
+    height: 100vh;
+    background: var(--color-surface);
+    box-shadow: 20px 0 30px rgba(0, 0, 0, 0.3);
+    transform: translateX(-100%);
+    transition: transform var(--transition-base);
+    width: 260px !important;
+    padding: 24px 16px !important;
+    align-items: stretch !important;
+    display: flex !important;
+
+    .sidebar-link {
+      padding: 12px 16px !important;
+      justify-content: flex-start !important;
+      gap: 12px !important;
+
+      span {
+        display: inline !important;
+      }
+    }
+
+    .user-info-card {
+      padding: 10px !important;
+      justify-content: flex-start !important;
+      gap: 12px !important;
+    }
+
+    .user-details {
+      display: flex !important;
+    }
+
+    .logout-btn {
+      padding: 10px 16px !important;
+      justify-content: flex-start !important;
+
+      span {
+        display: inline !important;
+      }
+    }
+  }
+
+  // When sidebar is not collapsed, slide it in on mobile
+  .sidebar:not(.collapsed) {
+    transform: translateX(0);
   }
 }
 

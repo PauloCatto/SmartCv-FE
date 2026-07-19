@@ -5,7 +5,7 @@
         <polyline points="15 18 9 12 15 6" />
       </svg>
     </button>
-    <a routerLink="/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" class="sidebar-link">
+    <a routerLink="/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" class="sidebar-link" (click)="onLinkClick()">
       <svg class="sidebar-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
         stroke-width="2">
         <rect x="3" y="3" width="7" height="7" />
@@ -16,7 +16,7 @@
       <span>{{ 'SIDEBAR.DASHBOARD' | translate }}</span>
     </a>
 
-    <a routerLink="/ai/cover-letter" routerLinkActive="active" class="sidebar-link ai-link">
+    <a routerLink="/ai/cover-letter" routerLinkActive="active" class="sidebar-link ai-link" (click)="onLinkClick()">
       <svg class="sidebar-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
         <polyline points="14 2 14 8 20 8"></polyline>
@@ -27,7 +27,7 @@
       <span>{{ 'SIDEBAR.COVER_LETTER' | translate }}</span>
     </a>
 
-    <a routerLink="/ai/roast" routerLinkActive="active" class="sidebar-link ai-link">
+    <a routerLink="/ai/roast" routerLinkActive="active" class="sidebar-link ai-link" (click)="onLinkClick()">
       <svg class="sidebar-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
         <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/>
       </svg>

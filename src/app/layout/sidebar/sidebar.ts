@@ -22,7 +22,14 @@ export class SidebarComponent {
     return userName.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase();
   }
 
+  onLinkClick() {
+    if (typeof window !== 'undefined' && window.innerWidth <= 768) {
+      this.sidebarService.collapse();
+    }
+  }
+
   logout() {
+    this.onLinkClick();
     this.auth.logout();
     this.router.navigate(['/']);
   }
