@@ -1,4 +1,4 @@
-export type TemplateType = 'elegance' | 'modern' | 'minimal' | 'creative' | 'compact';
+export type TemplateType = 'elegance' | 'modern' | 'minimal' | 'creative' | 'compact' | 'elegance-photo' | 'creative-photo';
 export type Step = 'personal' | 'experience' | 'education' | 'skills' | 'languages' | 'template' | 'finish';
 export type SaveState = 'idle' | 'saving' | 'saved';
 
@@ -82,6 +82,7 @@ export interface TemplateOption {
   name: string;
   ptName: string;
   desc: string;
+  enDesc: string;
   previewBg: string;
   preview: string;
   customColor?: string;
@@ -94,6 +95,7 @@ export const TEMPLATE_OPTIONS: TemplateOption[] = [
     name: 'Elegance',
     ptName: 'Elegante Clássico',
     desc: 'Clássico e profissional',
+    enDesc: 'Classic and professional',
     previewBg: 'linear-gradient(135deg, #1e293b, #0f172a)',
     preview: '',
     customColor: '#1e293b',
@@ -104,6 +106,7 @@ export const TEMPLATE_OPTIONS: TemplateOption[] = [
     name: 'Executive Gold',
     ptName: 'Executivo Dourado',
     desc: 'Corporativo refinado em ouro',
+    enDesc: 'Refined gold corporate style',
     previewBg: 'linear-gradient(135deg, #d97706, #78350f)',
     preview: '',
     customColor: '#b45309',
@@ -114,6 +117,7 @@ export const TEMPLATE_OPTIONS: TemplateOption[] = [
     name: 'Modern Blue',
     ptName: 'Moderno Azul',
     desc: 'Criativo com coluna lateral',
+    enDesc: 'Creative with sidebar column',
     previewBg: 'linear-gradient(135deg, #4c1d95, #1e1b4b)',
     preview: '',
     customColor: '#4f46e5',
@@ -124,6 +128,7 @@ export const TEMPLATE_OPTIONS: TemplateOption[] = [
     name: 'Modern Teal',
     ptName: 'Moderno Verde',
     desc: 'Visual moderno e dinâmico',
+    enDesc: 'Modern and dynamic look',
     previewBg: 'linear-gradient(135deg, #0d9488, #115e59)',
     preview: '',
     customColor: '#0d9488',
@@ -134,6 +139,7 @@ export const TEMPLATE_OPTIONS: TemplateOption[] = [
     name: 'Minimal',
     ptName: 'Minimalista',
     desc: 'Ultra limpo e refinado',
+    enDesc: 'Ultra clean and refined',
     previewBg: 'linear-gradient(135deg, #1f2937, #111827)',
     preview: '',
     customColor: '#1f2937',
@@ -144,6 +150,7 @@ export const TEMPLATE_OPTIONS: TemplateOption[] = [
     name: 'Tech Mono',
     ptName: 'Técnico Mono',
     desc: 'Estilo clássico de engenharia',
+    enDesc: 'Classic engineering style',
     previewBg: 'linear-gradient(135deg, #0f172a, #020617)',
     preview: '',
     customColor: '#0f172a',
@@ -153,7 +160,8 @@ export const TEMPLATE_OPTIONS: TemplateOption[] = [
     id: 'creative',
     name: 'Creative Rose',
     ptName: 'Criativo Rosa',
-    desc: 'Portfólio arroçado',
+    desc: 'Portfólio arrojado',
+    enDesc: 'Bold portfolio design',
     previewBg: 'linear-gradient(135deg, #f43f5e, #be123c)',
     preview: '',
     customColor: '#e11d48',
@@ -164,12 +172,36 @@ export const TEMPLATE_OPTIONS: TemplateOption[] = [
     name: 'Compact',
     ptName: 'Compacto',
     desc: 'Preenchimento horizontal',
+    enDesc: 'Horizontal layout',
     previewBg: 'linear-gradient(135deg, #0ea5e9, #0369a1)',
     preview: '',
     customColor: '#0284c7',
     customFont: "'Inter', sans-serif"
   },
+  {
+    id: 'elegance-photo',
+    name: 'Elegance with Photo',
+    ptName: 'Elegante com Foto',
+    desc: 'Elegante clássico com foto de perfil',
+    enDesc: 'Classic elegance with a profile photo',
+    previewBg: 'linear-gradient(135deg, #0f172a, #1e293b)',
+    preview: '',
+    customColor: '#1e293b',
+    customFont: "'Georgia', serif"
+  },
+  {
+    id: 'creative-photo',
+    name: 'Creative with Photo',
+    ptName: 'Criativo com Foto',
+    desc: 'Layout moderno destacando sua foto',
+    enDesc: 'Modern layout highlighting your photo',
+    previewBg: 'linear-gradient(135deg, #be123c, #f43f5e)',
+    preview: '',
+    customColor: '#e11d48',
+    customFont: "'Inter', sans-serif"
+  },
 ];
+
 
 export const EMPTY_RESUME: Omit<Resume, 'id' | 'createdAt' | 'updatedAt'> = {
   title: 'Meu Currículo',

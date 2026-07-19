@@ -40,11 +40,13 @@
       "LOGIN": "Entrar agora",
       "TERMS": "Ao criar uma conta, você concorda com os <a href='#' class='terms-link'>Termos de Uso</a> e a <a href='#' class='terms-link'>Política de Privacidade</a>.",
       "BENEFITS": {
-        "0": "3 currículos gratuitos",
-        "1": "Modelos profissionais",
-        "2": "Preview em tempo real",
+        "0": "Currículos ilimitados e gratuitos",
+        "1": "Modelos profissionais (com e sem foto)",
+        "2": "Visualização em tempo real",
         "3": "Exportação em PDF",
-        "4": "Análise básica com IA"
+        "4": "Análise crítica com IA",
+        "5": "Gerador de Cartas de Apresentação",
+        "6": "Importação rápida do LinkedIn"
       }
     },
     "FORGOT_PASSWORD": {
@@ -80,7 +82,16 @@
   },
   "BUILDER": {
     "BACK": "Voltar",
+    "ATS_SCORE": "Pontuação ATS",
     "UNTITLED_RESUME": "Nome do currículo...",
+    "IMPORT_LINKEDIN": {
+      "TITLE": "Importar do LinkedIn",
+      "DESC": "Envie o PDF do seu perfil do LinkedIn e deixe a IA preencher seu currículo automaticamente.",
+      "LOADING": "Lendo perfil com IA..."
+    },
+    "RESUMES_TITLE": "Meus Currículos",
+    "DEFAULT_RESUME_TITLE": "Meu Currículo",
+    "IMPORTED_RESUME_TITLE": "Currículo Importado",
     "SAVING": "Salvando...",
     "SAVED": "Salvo",
     "EXPORT_PDF": "Exportar PDF",
@@ -115,6 +126,13 @@
       "DESC": "Adicione os idiomas que você domina e seu nível de proficiência.",
       "ADD_PLACEHOLDER": "Ex: Inglês, Espanhol...",
       "LEVEL": "Nível",
+      "LEVELS": {
+        "BASIC": "Básico",
+        "INTERMEDIATE": "Intermediário",
+        "ADVANCED": "Avançado",
+        "FLUENT": "Fluente",
+        "NATIVE": "Nativo"
+      },
       "ADD_BTN": "Adicionar",
       "EMPTY": "Nenhum idioma adicionado ainda."
     },
@@ -125,37 +143,37 @@
       "COMPANY": "Empresa",
       "START": "Início",
       "END": "Fim",
-      "CURRENT": "Emprego atual",
+      "CURRENT": "Trabalho atual",
       "DESCRIPTION": "Descrição das atividades",
       "DESCRIPTION_PLACEHOLDER": "Descreva suas principais responsabilidades e conquistas...",
-      "ADD_BTN": "Adicionar experiência",
+      "ADD_BTN": "Adicionar Experiência",
       "EMPTY_ROLE": "Cargo não informado"
     },
     "EDUCATION": {
       "TITLE": "Educação",
       "DESC": "Formação acadêmica e cursos relevantes",
-      "DEGREE": "Grau / Tipo",
-      "FIELD": "Área / Curso",
-      "INSTITUTION": "Instituição",
+      "DEGREE": "Grau / Tipo de formação",
+      "FIELD": "Curso / Área de estudo",
+      "INSTITUTION": "Instituição de ensino",
       "START": "Início",
       "END": "Fim",
-      "CURRENT": "Em andamento",
-      "ADD_BTN": "Adicionar formação",
+      "CURRENT": "Estudando atualmente",
+      "ADD_BTN": "Adicionar Educação",
       "EMPTY_DEGREE": "Formação não informada"
     },
     "SKILLS": {
       "TITLE": "Habilidades",
-      "DESC": "Adicione suas skills técnicas e comportamentais",
+      "DESC": "Adicione suas competências técnicas e comportamentais (soft skills)",
       "ADD_PLACEHOLDER": "Ex: TypeScript, Liderança, Photoshop...",
       "LEVEL": "Nível:",
       "ADD_BTN": "Adicionar",
-      "EMPTY": "Nenhuma skill adicionada ainda. Use o campo acima!",
+      "EMPTY": "Nenhuma habilidade adicionada ainda. Use o campo acima!",
       "SUGGESTIONS": "Sugestões populares:",
       "RESUME_NAME_LABEL": "Nome do Currículo (usado nas rotas e busca)",
       "RESUME_NAME_PLACEHOLDER": "Ex: Desenvolvedor Frontend Angular"
     },
     "TEMPLATE": {
-      "TITLE": "Escolha o Template",
+      "TITLE": "Escolha o Modelo",
       "DESC": "Selecione o design que melhor representa você",
       "COLOR": "Cor de Destaque",
       "COLOR_DESC": "Selecione uma paleta profissional para os realces e títulos",
@@ -167,7 +185,7 @@
       "NORMAL": "Padrão",
       "SPACIOUS": "Amplo"
     },
-    "PREVIEW_LABEL": "Preview ao vivo",
+    "PREVIEW_LABEL": "Visualização ao vivo",
     "MOBILE_PREVIEW": "Ver Prévia",
     "MOBILE_EDIT": "Editar Conteúdo",
     "PREV": "Anterior",
@@ -212,11 +230,17 @@
       "COPIED": "Copiado!",
       "MODAL_TITLE": "Sua Carta de Apresentação",
       "LOADING_RESUMES": "Carregando currículos...",
-      "WORKSPACE_DESC": "Preencha as informações da vaga ao lado para gerar sua carta de apresentação personalizada com nossa inteligência artificial."
+      "WORKSPACE_DESC": "Preencha as informações da vaga ao lado para gerar sua carta de apresentação personalizada com nossa inteligência artificial.",
+      "TABS": {
+        "EDIT_TEXT": "Ver Texto",
+        "VIEW_PAPER": "Visualizar Papel"
+      },
+      "MATCH_RATE": "Match Vaga",
+      "DEFAULT_TEXT": "Prezado(a) Gestor(a) de Contratação,\n\nEscrevo para expressar meu forte interesse na vaga anunciada. Com base no meu currículo profissional, possuo experiência no desenvolvimento de soluções eficientes e gostaria de contribuir para o sucesso da sua equipe.\n\nAtenciosamente,"
     },
     "ROAST": {
       "BTN": "🔥 Analisar meu Currículo",
-      "TITLE": "Análise Sincera de Currículo (Modo Sincero)",
+      "TITLE": "Análise Crítica de Currículo (Modo Sincero)",
       "DESC": "Nossa IA vai atuar como um recrutador exigente e apontar as falhas do seu currículo. Você aguenta?",
       "SELECT_RESUME": "Selecione o Currículo para Avaliação",
       "CHOOSE_RESUME": "Escolha um currículo...",
@@ -230,7 +254,20 @@
       "LOADING": "Analisando seu currículo friamente...",
       "ERROR": "O recrutador foi tomar um café, tente de novo.",
       "LOADING_RESUMES": "Carregando currículos...",
-      "WORKSPACE_DESC": "Selecione um currículo ao lado para que nossa IA de recrutamento possa fazer uma avaliação sincera e apontar as falhas."
+      "WORKSPACE_DESC": "Selecione um currículo ao lado para que nossa IA de recrutamento possa fazer uma avaliação sincera e apontar as falhas.",
+      "TABS": {
+        "SUMMARY": "Resumo",
+        "ATS": "Problemas ATS",
+        "ACTIONABLE": "Próximos Passos"
+      },
+      "EXAMPLE_BADGE": "Exemplo de Visualização",
+      "SCORE_DESC": "Nota geral baseada no potencial do currículo em processos seletivos.",
+      "EXAMPLE_STRENGTH_1": "Foco claro no resumo profissional descrevendo conquistas e tecnologias chave.",
+      "EXAMPLE_STRENGTH_2": "Seção de experiências com impactos quantificáveis e resultados alcançados.",
+      "EXAMPLE_WEAKNESS_1": "Falta de métricas quantificáveis em algumas das experiências profissionais.",
+      "EXAMPLE_WEAKNESS_2": "Formatação em múltiplas colunas pode dificultar a análise por parsers ATS antigos.",
+      "EXAMPLE_ACTIONABLE_1": "Reescreva as conquistas usando a fórmula X-Y-Z (ex: Realizei X, medido por Y, fazendo Z).",
+      "EXAMPLE_ACTIONABLE_2": "Use modelos de currículo ATS-friendly de coluna única, como \"Minimal\" ou \"Elegance\"."
     },
     "CV": {
       "ABOUT": "Sobre mim",
@@ -308,6 +345,11 @@
         "PDF": "PDF exportado"
       }
     },
+    "IMPORT_LINKEDIN": {
+      "TITLE": "Importar do LinkedIn",
+      "DESC": "Envie o PDF do seu perfil do LinkedIn e deixe a IA montar seu currículo automaticamente.",
+      "LOADING": "Lendo perfil com IA..."
+    },
     "FEATURES": {
       "EYEBROW": "Funcionalidades",
       "TITLE_1": "Tudo que você precisa para ",
@@ -330,8 +372,8 @@
           "DESC": "Templates otimizados para passar pelos filtros de sistemas de rastreio de candidatos."
         },
         "PREMIUM": {
-          "TITLE": "8 modelos premium",
-          "DESC": "Templates profissionais com designs sob medida para todas as carreiras."
+          "TITLE": "Modelos premium com foto",
+          "DESC": "Templates profissionais atualizados com designs sob medida para todas as carreiras."
         },
         "ROAST": {
           "TITLE": "Análise Sincera de Currículo",
@@ -341,9 +383,9 @@
     },
     "TEMPLATES": {
       "EYEBROW": "Modelos",
-      "TITLE_1": "8 modelos ",
+      "TITLE_1": "Dezenas de modelos ",
       "TITLE_GRADIENT": "prontos para usar",
-      "DESC": "Escolha o que melhor combina com seu perfil e ajuste o espaçamento. Todos são otimizados para ATS e exportáveis em PDF.",
+      "DESC": "Escolha o que melhor combina com seu perfil (com ou sem foto) e ajuste o espaçamento. Todos são otimizados para ATS e exportáveis em PDF.",
       "POPULAR": "Popular",
       "USE_TEMPLATE": "Usar este modelo",
       "ITEMS": {
@@ -390,7 +432,7 @@
         "PRICE": "R$ 0",
         "PERIOD": "/mês",
         "FEATURES": {
-          "F1": "3 currículos",
+          "F1": "Currículos ilimitados",
           "F2": "Modelos profissionais",
           "F3": "Exportação PDF",
           "F4": "Carta de apresentação",

@@ -11,20 +11,20 @@ import { MatchResult } from '../models/ai.model';
 export class AiService {
   private http = inject(HttpClient);
 
-  improveBio(bio: string): Observable<string> {
-    return this.http.post<{ result: string }>(`${environment.apiUrl}/ai/improve-bio`, { bio }).pipe(
+  improveBio(bio: string, language?: string): Observable<string> {
+    return this.http.post<{ result: string }>(`${environment.apiUrl}/ai/improve-bio`, { bio, language }).pipe(
       map(res => res.result)
     );
   }
 
-  improveExperience(description: string, jobTitle?: string): Observable<string> {
-    return this.http.post<{ result: string }>(`${environment.apiUrl}/ai/improve-experience`, { description, jobTitle }).pipe(
+  improveExperience(description: string, jobTitle?: string, language?: string): Observable<string> {
+    return this.http.post<{ result: string }>(`${environment.apiUrl}/ai/improve-experience`, { description, jobTitle, language }).pipe(
       map(res => res.result)
     );
   }
 
-  suggestSkills(jobTitle: string): Observable<string[]> {
-    return this.http.post<string[]>(`${environment.apiUrl}/ai/suggest-skills`, { jobTitle }).pipe(
+  suggestSkills(jobTitle: string, language?: string): Observable<string[]> {
+    return this.http.post<string[]>(`${environment.apiUrl}/ai/suggest-skills`, { jobTitle, language }).pipe(
       catchError(() => of(['JavaScript', 'Comunicação', 'Resolução de Problemas']))
     );
   }
@@ -39,5 +39,14 @@ export class AiService {
 
   roastResume(resumeId: string, language?: string): Observable<any> {
     return this.http.post<any>(`${environment.apiUrl}/ai/roast-resume`, { resumeId, language });
+  }
+
+  importLinkedIn(file: File, language?: string): Observable<any> {
+    const formData = new FormData();
+    formData.append('file', file);
+    if (language) {
+      formData.append('language', language);
+    }
+    return this.http.post<any>(`${environment.apiUrl}/ai/import-linkedin`, formData);
   }
 }

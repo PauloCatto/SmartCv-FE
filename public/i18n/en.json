@@ -40,11 +40,13 @@
       "LOGIN": "Sign in now",
       "TERMS": "By creating an account, you agree to the <a href='#' class='terms-link'>Terms of Service</a> and <a href='#' class='terms-link'>Privacy Policy</a>.",
       "BENEFITS": {
-        "0": "3 free resumes",
-        "1": "Professional templates",
+        "0": "Unlimited free resumes",
+        "1": "Professional templates (with/without photo)",
         "2": "Real-time preview",
-        "3": "PDF export",
-        "4": "Basic AI analysis"
+        "3": "High-quality PDF export",
+        "4": "Harsh CV Roast by AI",
+        "5": "Custom Cover Letters with AI",
+        "6": "Easy LinkedIn profile import"
       }
     },
     "FORGOT_PASSWORD": {
@@ -80,7 +82,16 @@
   },
   "BUILDER": {
     "BACK": "Go Back",
+    "ATS_SCORE": "ATS Score",
     "UNTITLED_RESUME": "Resume name...",
+    "DEFAULT_RESUME_TITLE": "My Resume",
+    "IMPORT_LINKEDIN": {
+      "TITLE": "Import from LinkedIn",
+      "DESC": "Upload your LinkedIn profile PDF and let AI build your resume automatically.",
+      "LOADING": "Reading profile with AI..."
+    },
+    "RESUMES_TITLE": "My Resumes",
+    "IMPORTED_RESUME_TITLE": "Imported Resume",
     "SAVING": "Saving...",
     "SAVED": "Saved",
     "EXPORT_PDF": "Export PDF",
@@ -115,6 +126,13 @@
       "DESC": "Add the languages you speak and your proficiency level.",
       "ADD_PLACEHOLDER": "Ex: English, Spanish...",
       "LEVEL": "Level",
+      "LEVELS": {
+        "BASIC": "Basic",
+        "INTERMEDIATE": "Intermediate",
+        "ADVANCED": "Advanced",
+        "FLUENT": "Fluent",
+        "NATIVE": "Native"
+      },
       "ADD_BTN": "Add",
       "EMPTY": "No languages added yet."
     },
@@ -212,7 +230,13 @@
       "COPIED": "Copied!",
       "MODAL_TITLE": "Your Cover Letter",
       "LOADING_RESUMES": "Loading resumes...",
-      "WORKSPACE_DESC": "Fill in the job details on the left to generate your custom cover letter using our artificial intelligence."
+      "WORKSPACE_DESC": "Fill in the job details on the left to generate your custom cover letter using our artificial intelligence.",
+      "TABS": {
+        "EDIT_TEXT": "View Text",
+        "VIEW_PAPER": "View Paper"
+      },
+      "MATCH_RATE": "Job Match",
+      "DEFAULT_TEXT": "Dear Hiring Manager,\n\nI am writing to express my strong interest in the advertised position. Based on my professional background, I have relevant experience in developing efficient solutions and I would love to contribute to your team's success.\n\nSincerely,"
     },
     "ROAST": {
       "BTN": "🔥 Roast my CV",
@@ -230,7 +254,20 @@
       "LOADING": "Analyzing your resume coldly...",
       "ERROR": "The recruiter went for coffee, try again.",
       "LOADING_RESUMES": "Loading resumes...",
-      "WORKSPACE_DESC": "Select a resume on the left so our AI recruiter can analyze it and point out the flaws."
+      "WORKSPACE_DESC": "Select a resume on the left so our AI recruiter can give an honest assessment and point out flaws.",
+      "TABS": {
+        "SUMMARY": "Summary",
+        "ATS": "ATS Problems",
+        "ACTIONABLE": "Next Steps"
+      },
+      "EXAMPLE_BADGE": "Example Preview",
+      "SCORE_DESC": "Overall score based on resume potential in selection processes.",
+      "EXAMPLE_STRENGTH_1": "Clear focus in professional summary describing achievements and key technologies.",
+      "EXAMPLE_STRENGTH_2": "Experience section with quantifiable impacts and achieved results.",
+      "EXAMPLE_WEAKNESS_1": "Lack of quantifiable metrics in some of the professional experiences.",
+      "EXAMPLE_WEAKNESS_2": "Multi-column formatting may make it difficult for older ATS parsers to read.",
+      "EXAMPLE_ACTIONABLE_1": "Rewrite achievements using the X-Y-Z formula (e.g. Accomplished X, as measured by Y, by doing Z).",
+      "EXAMPLE_ACTIONABLE_2": "Use ATS-friendly single-column resume templates, such as \"Minimal\" or \"Elegance\"."
     },
     "CV": {
       "ABOUT": "About Me",
@@ -330,8 +367,8 @@
           "DESC": "Templates optimized to pass through Applicant Tracking System filters."
         },
         "PREMIUM": {
-          "TITLE": "8 premium templates",
-          "DESC": "Professional templates with tailored designs for all careers."
+          "TITLE": "Premium photo templates",
+          "DESC": "Professional templates updated with tailored designs for all careers."
         },
         "ROAST": {
           "TITLE": "Harsh CV Evaluation (Roast)",
@@ -341,9 +378,9 @@
     },
     "TEMPLATES": {
       "EYEBROW": "Templates",
-      "TITLE_1": "8 models ",
+      "TITLE_1": "Dozens of models ",
       "TITLE_GRADIENT": "ready to use",
-      "DESC": "Choose the one that best fits your profile and adjust the spacing. All are ATS-friendly and exportable in PDF.",
+      "DESC": "Choose the one that best fits your profile (with or without a photo) and adjust the spacing. All are ATS-friendly and exportable in PDF.",
       "POPULAR": "Popular",
       "USE_TEMPLATE": "Use this template",
       "ITEMS": {
@@ -390,7 +427,7 @@
         "PRICE": "$ 0",
         "PERIOD": "/month",
         "FEATURES": {
-          "F1": "3 resumes",
+          "F1": "Unlimited resumes",
           "F2": "Professional templates",
           "F3": "PDF export",
           "F4": "Cover letter generator",

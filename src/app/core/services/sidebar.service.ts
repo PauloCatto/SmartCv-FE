@@ -4,9 +4,13 @@ import { Injectable, signal } from '@angular/core';
   providedIn: 'root'
 })
 export class SidebarService {
-  isCollapsed = signal(false);
+  isCollapsed = signal(typeof window !== 'undefined' ? window.innerWidth <= 768 : false);
 
   toggle() {
     this.isCollapsed.update(val => !val);
+  }
+
+  collapse() {
+    this.isCollapsed.set(true);
   }
 }
