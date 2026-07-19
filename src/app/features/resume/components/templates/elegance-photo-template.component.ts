@@ -1,15 +1,19 @@
 import { Component, input, computed, inject } from '@angular/core';
 import { Resume } from '../../../../core/models/resume.model';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { environment } from '../../../../../environments/environment';
 
 @Component({
-  selector: 'app-elegance-template',
+  selector: 'app-elegance-photo-template',
   imports: [TranslateModule],
   template: `
     <div [class]="'cv-elegance cv-spacing-' + (resolvedResume().spacingMode || 'normal')" id="cv-elegance" spellcheck="false" [style.--cv-primary]="resolvedResume().colorTheme || '#1e293b'" [style.font-family]="resolvedResume().fontFamily || 'Georgia, serif'">
       <!-- Header -->
       <div class="cv-header">
         <div class="header-left">
+          @if (resolvedResume().personalInfo.photo) {
+            <img [src]="resolvedResume().personalInfo.photo" class="cv-photo" alt="Foto" />
+          }
           <div class="header-info">
             <h1 class="cv-name">{{ resolvedResume().personalInfo.name }}</h1>
             <p class="cv-job">{{ resolvedResume().personalInfo.jobTitle }}</p>
@@ -269,13 +273,19 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
     .cv-spacing-spacious .bio-text { line-height: 1.8; }
   `]
 })
-export class EleganceTemplateComponent {
+export class ElegancePhotoTemplateComponent {
   resume = input.required<Resume>();
   private translate = inject(TranslateService);
 
   resolvedResume = computed(() => {
     const res = this.resume();
     const isEn = this.translate.currentLang === 'en';
+
+    let photoUrl = res.personalInfo.photo || '';
+    if (photoUrl && !photoUrl.startsWith('data:') && !photoUrl.startsWith('http')) {
+      photoUrl = environment.uploadUrl + photoUrl;
+    }
+
     return {
       ...res,
       personalInfo: {
@@ -286,6 +296,7 @@ export class EleganceTemplateComponent {
         phone: res.personalInfo.phone || (isEn ? '+55 (11) 99999-0000' : '(11) 99999-0000'),
         location: res.personalInfo.location || (isEn ? 'São Paulo, SP - Brazil' : 'São Paulo, SP'),
         bio: res.personalInfo.bio || this.translate.instant('BUILDER.CV.MOCK_BIO'),
+        photo: photoUrl,
       },
       experience: (res.experience && res.experience.length > 0) ? res.experience : [
         {
@@ -333,4 +344,3 @@ export class EleganceTemplateComponent {
     return this.translate.instant(keys[level] || '');
   }
 }
-

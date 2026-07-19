@@ -1,9 +1,10 @@
 import { Component, input, computed, inject } from '@angular/core';
 import { Resume } from '../../../../core/models/resume.model';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { environment } from '../../../../../environments/environment';
 
 @Component({
-  selector: 'app-creative-template',
+  selector: 'app-creative-photo-template',
   imports: [TranslateModule],
   template: `
     <div [class]="'cv-creative cv-spacing-' + (resolvedResume().spacingMode || 'normal')" id="cv-creative" spellcheck="false" [style.--cv-primary]="resolvedResume().colorTheme || '#e11d48'" [style.font-family]="resolvedResume().fontFamily || 'Outfit, sans-serif'">
@@ -66,6 +67,16 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
       <!-- Sidebar (Right) -->
       <div class="cv-sidebar">
+        <!-- Photo -->
+        <div class="photo-container">
+          @if (resolvedResume().personalInfo.photo) {
+            <img [src]="resolvedResume().personalInfo.photo" class="cv-photo" alt="Foto de perfil" />
+          } @else {
+            <div class="cv-photo-placeholder">
+              {{ getInitials() }}
+            </div>
+          }
+        </div>
 
         <!-- Contact Info -->
         <div class="sidebar-section">
@@ -113,16 +124,18 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
         <!-- Skills -->
         @if (resolvedResume().skills.length > 0) {
           <div class="sidebar-section">
-            <h3 class="sidebar-title">{{ 'BUILDER.CV.COMPETENCIES' | translate }}</h3>
+            <h3 class="sidebar-title">{{ 'BUILDER.CV.SKILLS' | translate }}</h3>
             <div class="skills-list">
               @for (skill of resolvedResume().skills; track skill.id) {
                 <div class="skill-item">
                   <div class="skill-info">
                     <span class="skill-name">{{ skill.name }}</span>
-                    <span class="skill-percent">{{ skill.level * 20 }}%</span>
+                    <span class="skill-level-text">{{ getLevelLabel(skill.level) }}</span>
                   </div>
-                  <div class="skill-progress-bar">
-                    <div class="skill-progress-fill" [style.width.%]="skill.level * 20"></div>
+                  <div class="skill-dots">
+                    @for (dot of [1,2,3,4,5]; track dot) {
+                      <div class="dot" [class.active]="skill.level >= dot"></div>
+                    }
                   </div>
                 </div>
               }
@@ -134,13 +147,11 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
         @if (resolvedResume().languages && resolvedResume().languages.length > 0) {
           <div class="sidebar-section">
             <h3 class="sidebar-title">{{ 'BUILDER.CV.LANGUAGES' | translate }}</h3>
-            <div class="skills-list">
+            <div class="languages-list">
               @for (lang of resolvedResume().languages; track lang.id) {
-                <div class="skill-item">
-                  <div class="skill-info">
-                    <span class="skill-name">{{ lang.name }}</span>
-                    <span class="skill-percent">{{ lang.level }}</span>
-                  </div>
+                <div class="lang-item">
+                  <span class="lang-name">{{ lang.name }}</span>
+                  <span class="lang-level">{{ lang.level }}</span>
                 </div>
               }
             </div>
@@ -151,26 +162,24 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
   `,
   styles: [`
     .cv-creative {
-      background: #ffffff;
+      display: grid;
+      grid-template-columns: 1fr 260px;
+      background: white;
       color: #334155;
       width: 100%;
       min-height: 100%;
-      display: flex;
       box-sizing: border-box;
-      transition: all 0.2s ease;
     }
 
-    /* MAIN LEFT */
     .cv-main {
-      flex: 1;
+      padding: 36px;
       display: flex;
       flex-direction: column;
+      gap: 28px;
     }
 
     .cv-header {
-      display: flex;
-      flex-direction: column;
-      margin-bottom: 20px;
+      margin-bottom: 8px;
     }
 
     .cv-name {
@@ -192,40 +201,38 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
     .job-bar {
       height: 4px;
-      background: var(--cv-primary);
       width: 60px;
+      background: var(--cv-primary);
       border-radius: 2px;
     }
 
     .cv-section {
       display: flex;
       flex-direction: column;
-      margin-bottom: 24px;
+      gap: 14px;
     }
 
     .section-title {
       font-size: 14px;
       font-weight: 800;
+      color: #0f172a;
       text-transform: uppercase;
       letter-spacing: 0.05em;
-      color: #0f172a;
       border-bottom: 2px solid #f1f5f9;
       padding-bottom: 6px;
-      margin-bottom: 12px;
+      margin-bottom: 4px;
     }
 
     .bio-text {
       font-size: 13px;
       color: #475569;
       line-height: 1.7;
-      white-space: pre-wrap; word-break: break-word;
     }
 
-    /* EXPERIENCE & EDUCATION */
     .experience-list, .education-list {
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 20px;
     }
 
     .exp-item, .edu-item {
@@ -237,25 +244,27 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
     .exp-header, .edu-header {
       display: flex;
       justify-content: space-between;
-      align-items: baseline;
+      align-items: flex-start;
       gap: 8px;
     }
 
     .exp-role, .edu-degree {
-      font-size: 13px;
+      font-size: 14px;
       font-weight: 700;
       color: #1e293b;
     }
 
     .exp-period, .edu-period {
       font-size: 11px;
-      color: #64748b;
+      color: #94a3b8;
       font-weight: 500;
       white-space: nowrap;
+      flex-shrink: 0;
+      margin-top: 2px;
     }
 
     .exp-company, .edu-institution {
-      font-size: 12px;
+      font-size: 13px;
       font-weight: 600;
       color: var(--cv-primary);
     }
@@ -264,65 +273,64 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
       font-size: 12px;
       color: #475569;
       line-height: 1.6;
-      margin-top: 2px;
-      white-space: pre-wrap; word-break: break-word;
+      white-space: pre-wrap;
+      word-break: break-word;
+      margin-top: 4px;
     }
 
-    /* SIDEBAR RIGHT */
+    /* Sidebar Styles */
     .cv-sidebar {
-      width: 230px;
-      flex-shrink: 0;
       background: #f8fafc;
       border-left: 1px solid #f1f5f9;
+      padding: 36px 24px;
       display: flex;
       flex-direction: column;
-      align-items: stretch;
+      gap: 28px;
     }
 
     .photo-container {
       display: flex;
       justify-content: center;
-      margin-bottom: 24px;
+      margin-bottom: 8px;
     }
 
     .cv-photo {
-      width: 100px;
-      height: 100px;
-      border-radius: 50%;
+      width: 130px;
+      height: 130px;
+      border-radius: 14px;
       object-fit: cover;
       border: 4px solid white;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
     }
 
     .cv-photo-placeholder {
-      width: 100px;
-      height: 100px;
-      border-radius: 50%;
+      width: 130px;
+      height: 130px;
+      border-radius: 14px;
       background: var(--cv-primary);
       color: white;
-      font-size: 28px;
-      font-weight: 800;
+      font-size: 36px;
+      font-weight: 700;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
     }
 
     .sidebar-section {
       display: flex;
       flex-direction: column;
-      margin-bottom: 24px;
+      gap: 12px;
     }
 
     .sidebar-title {
       font-size: 12px;
       font-weight: 800;
+      color: #475569;
       text-transform: uppercase;
       letter-spacing: 0.05em;
-      color: #0f172a;
-      border-bottom: 2px solid #e2e8f0;
-      padding-bottom: 6px;
-      margin-bottom: 12px;
+      border-bottom: 1px solid #e2e8f0;
+      padding-bottom: 4px;
     }
 
     .contact-list {
@@ -333,23 +341,21 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
     .contact-item {
       display: flex;
-      align-items: flex-start;
-      gap: 10px;
+      align-items: center;
+      gap: 8px;
     }
 
     .contact-icon {
-      font-size: 14px;
+      font-size: 13px;
       color: var(--cv-primary);
       width: 16px;
       text-align: center;
-      font-weight: 700;
     }
 
     .contact-text {
       font-size: 11px;
       color: #475569;
       word-break: break-all;
-      line-height: 1.4;
     }
 
     .skills-list {
@@ -367,96 +373,97 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
     .skill-info {
       display: flex;
       justify-content: space-between;
-      font-size: 11px;
+      align-items: center;
+    }
+
+    .skill-name {
+      font-size: 12px;
       font-weight: 600;
-      color: #334155;
+      color: #1e293b;
     }
 
-    .skill-progress-bar {
-      height: 6px;
+    .skill-level-text {
+      font-size: 10px;
+      color: #94a3b8;
+    }
+
+    .skill-dots {
+      display: flex;
+      gap: 4px;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
       background: #e2e8f0;
-      border-radius: 3px;
-      overflow: hidden;
     }
 
-    .skill-progress-fill {
-      height: 100%;
+    .dot.active {
       background: var(--cv-primary);
-      border-radius: 3px;
-      transition: width 0.5s ease;
     }
 
-    /* =======================================
-       DENSITY MODIFIERS (SPACING CONTROLS)
-       ======================================= */
-    
-    /* COMPACT MODE */
-    .cv-spacing-compact {
-      padding: 20px;
+    .languages-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
     }
-    .cv-spacing-compact .cv-main {
-      padding-right: 20px;
+
+    .lang-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
-    .cv-spacing-compact .cv-sidebar {
-      padding: 16px;
-      gap: 16px;
+
+    .lang-name {
+      font-size: 12px;
+      font-weight: 600;
+      color: #1e293b;
     }
-    .cv-spacing-compact .cv-name { font-size: 26px; }
-    .cv-spacing-compact .cv-section, 
-    .cv-spacing-compact .sidebar-section { margin-bottom: 14px; }
-    .cv-spacing-compact .section-title,
-    .cv-spacing-compact .sidebar-title { margin-bottom: 8px; padding-bottom: 4px; }
-    .cv-spacing-compact .experience-list,
-    .cv-spacing-compact .education-list,
-    .cv-spacing-compact .skills-list { gap: 8px; }
+
+    .lang-level {
+      font-size: 10px;
+      color: white;
+      background: var(--cv-primary);
+      padding: 1px 6px;
+      border-radius: 100px;
+      font-weight: 600;
+    }
+
+    /* Spacing Modifiers */
+    .cv-spacing-compact .cv-main { padding: 24px; gap: 16px; }
+    .cv-spacing-compact .cv-sidebar { padding: 24px 16px; gap: 16px; }
     .cv-spacing-compact .photo-container { margin-bottom: 12px; }
     .cv-spacing-compact .cv-photo,
     .cv-spacing-compact .cv-photo-placeholder { width: 70px; height: 70px; font-size: 20px; }
+    .cv-spacing-compact .sidebar-section { gap: 8px; }
+    .cv-spacing-compact .contact-list { gap: 6px; }
+    .cv-spacing-compact .skills-list { gap: 8px; }
+    .cv-spacing-compact .exp-item, .cv-spacing-compact .edu-item { gap: 2px; }
 
-    /* NORMAL MODE */
-    .cv-spacing-normal {
-      padding: 32px;
-    }
-    .cv-spacing-normal .cv-main {
-      padding-right: 32px;
-    }
-    .cv-spacing-normal .cv-sidebar {
-      padding: 24px;
-      gap: 24px;
-    }
-
-    /* SPACIOUS MODE */
-    .cv-spacing-spacious {
-      padding: 48px;
-    }
-    .cv-spacing-spacious .cv-main {
-      padding-right: 40px;
-      gap: 8px;
-    }
-    .cv-spacing-spacious .cv-sidebar {
-      padding: 32px;
-      gap: 32px;
-    }
-    .cv-spacing-spacious .cv-name { font-size: 36px; }
-    .cv-spacing-spacious .cv-section, 
-    .cv-spacing-spacious .sidebar-section { margin-bottom: 36px; }
-    .cv-spacing-spacious .section-title,
-    .cv-spacing-spacious .sidebar-title { margin-bottom: 18px; padding-bottom: 8px; }
-    .cv-spacing-spacious .experience-list,
-    .cv-spacing-spacious .education-list,
-    .cv-spacing-spacious .skills-list { gap: 24px; }
+    .cv-spacing-spacious .cv-main { padding: 48px; gap: 36px; }
+    .cv-spacing-spacious .cv-sidebar { padding: 48px 32px; gap: 36px; }
     .cv-spacing-spacious .photo-container { margin-bottom: 32px; }
     .cv-spacing-spacious .cv-photo,
     .cv-spacing-spacious .cv-photo-placeholder { width: 110px; height: 110px; }
+    .cv-spacing-spacious .sidebar-section { gap: 16px; }
+    .cv-spacing-spacious .contact-list { gap: 12px; }
+    .cv-spacing-spacious .skills-list { gap: 16px; }
   `]
 })
-export class CreativeTemplateComponent {
+export class CreativePhotoTemplateComponent {
   resume = input.required<Resume>();
   private translate = inject(TranslateService);
 
   resolvedResume = computed(() => {
     const res = this.resume();
     const isEn = this.translate.currentLang === 'en';
+
+    let photoUrl = res.personalInfo.photo || '';
+    if (photoUrl && !photoUrl.startsWith('data:') && !photoUrl.startsWith('http')) {
+      photoUrl = environment.uploadUrl + photoUrl;
+    }
+
     return {
       ...res,
       personalInfo: {
@@ -467,6 +474,7 @@ export class CreativeTemplateComponent {
         phone: res.personalInfo.phone || (isEn ? '+55 (11) 99999-0000' : '(11) 99999-0000'),
         location: res.personalInfo.location || (isEn ? 'São Paulo, SP - Brazil' : 'São Paulo, SP'),
         bio: res.personalInfo.bio || this.translate.instant('BUILDER.CV.MOCK_BIO'),
+        photo: photoUrl,
       },
       experience: (res.experience && res.experience.length > 0) ? res.experience : [
         {
@@ -510,8 +518,12 @@ export class CreativeTemplateComponent {
   });
 
   getInitials(): string {
-    return (this.resolvedResume().personalInfo.name || 'SC')
-      .split(' ').map((n: string) => n[0]).slice(0, 2).join('').toUpperCase();
+    const name = this.resolvedResume().personalInfo.name || '';
+    return name.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase();
+  }
+
+  getLevelLabel(level: number): string {
+    const keys = ['', 'BUILDER.CV.LEVEL_1', 'BUILDER.CV.LEVEL_2', 'BUILDER.CV.LEVEL_3', 'BUILDER.CV.LEVEL_4', 'BUILDER.CV.LEVEL_5'];
+    return this.translate.instant(keys[level] || '');
   }
 }
-

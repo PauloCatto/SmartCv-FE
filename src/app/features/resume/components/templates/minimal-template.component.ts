@@ -7,12 +7,9 @@ import { UpperCasePipe } from '@angular/common';
   selector: 'app-minimal-template',
   imports: [TranslateModule, UpperCasePipe],
   template: `
-    <div [class]="'cv-minimal cv-spacing-' + (resolvedResume().spacingMode || 'normal')" id="cv-minimal" [style.--cv-primary]="resolvedResume().colorTheme || '#111827'" [style.font-family]="resolvedResume().fontFamily || 'Inter, sans-serif'">
+    <div [class]="'cv-minimal cv-spacing-' + (resolvedResume().spacingMode || 'normal')" id="cv-minimal" spellcheck="false" [style.--cv-primary]="resolvedResume().colorTheme || '#111827'" [style.font-family]="resolvedResume().fontFamily || 'Inter, sans-serif'">
       <!-- Header -->
       <div class="cv-header">
-        @if (resolvedResume().personalInfo.photo) {
-          <img [src]="resolvedResume().personalInfo.photo" class="cv-photo" alt="Foto" />
-        }
         <div class="header-text">
           <h1 class="cv-name">{{ resolvedResume().personalInfo.name }}</h1>
           <p class="cv-job">{{ resolvedResume().personalInfo.jobTitle }}</p>
@@ -257,23 +254,24 @@ export class MinimalTemplateComponent {
 
   resolvedResume = computed(() => {
     const res = this.resume();
+    const isEn = this.translate.currentLang === 'en';
     return {
       ...res,
       personalInfo: {
         ...res.personalInfo,
         name: res.personalInfo.name || 'João da Silva',
-        jobTitle: res.personalInfo.jobTitle || 'Desenvolvedor Full Stack Senior',
+        jobTitle: res.personalInfo.jobTitle || (isEn ? 'Senior Full Stack Developer' : 'Desenvolvedor Full Stack Senior'),
         email: res.personalInfo.email || 'joao@email.com',
-        phone: res.personalInfo.phone || '(11) 99999-0000',
-        location: res.personalInfo.location || 'São Paulo, SP',
+        phone: res.personalInfo.phone || (isEn ? '+55 (11) 99999-0000' : '(11) 99999-0000'),
+        location: res.personalInfo.location || (isEn ? 'São Paulo, SP - Brazil' : 'São Paulo, SP'),
         bio: res.personalInfo.bio || this.translate.instant('BUILDER.CV.MOCK_BIO'),
       },
       experience: (res.experience && res.experience.length > 0) ? res.experience : [
         {
           id: 'mock-exp-1',
-          company: 'Google Brasil',
-          role: 'Desenvolvedor Full Stack Senior',
-          startDate: 'Jan 2022',
+          company: isEn ? 'Google Brazil' : 'Google Brasil',
+          role: isEn ? 'Senior Full Stack Developer' : 'Desenvolvedor Full Stack Senior',
+          startDate: isEn ? 'Jan 2022' : 'Jan 2022',
           endDate: '',
           current: true,
           description: this.translate.instant('BUILDER.CV.MOCK_EXP1_DESC')
@@ -281,9 +279,9 @@ export class MinimalTemplateComponent {
         {
           id: 'mock-exp-2',
           company: 'Tech Solutions Inc.',
-          role: 'Desenvolvedor Front-end',
-          startDate: 'Mar 2020',
-          endDate: 'Dez 2021',
+          role: isEn ? 'Front-end Developer' : 'Desenvolvedor Front-end',
+          startDate: isEn ? 'Mar 2020' : 'Mar 2020',
+          endDate: isEn ? 'Dec 2021' : 'Dez 2021',
           current: false,
           description: this.translate.instant('BUILDER.CV.MOCK_EXP2_DESC')
         }
@@ -291,9 +289,9 @@ export class MinimalTemplateComponent {
       education: (res.education && res.education.length > 0) ? res.education : [
         {
           id: 'mock-edu-1',
-          institution: 'Universidade de São Paulo (USP)',
-          degree: 'Bacharelado',
-          field: 'Ciência da Computação',
+          institution: isEn ? 'University of São Paulo (USP)' : 'Universidade de São Paulo (USP)',
+          degree: isEn ? 'Bachelor\'s Degree' : 'Bacharelado',
+          field: isEn ? 'Computer Science' : 'Ciência da Computação',
           startDate: '2016',
           endDate: '2020',
           current: false
@@ -304,8 +302,9 @@ export class MinimalTemplateComponent {
         { id: 'mock-skill-2', name: 'TypeScript', level: 4 },
         { id: 'mock-skill-3', name: 'Node.js', level: 4 },
         { id: 'mock-skill-4', name: 'SASS / CSS', level: 5 },
-        { id: 'mock-skill-5', name: 'Bancos de Dados', level: 4 }
+        { id: 'mock-skill-5', name: isEn ? 'Databases' : 'Bancos de Dados', level: 4 }
       ]
     };
   });
 }
+
