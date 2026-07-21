@@ -70,6 +70,7 @@ export const routes: Routes = [
       {
         path: 'cover-letter',
         loadComponent: () => import('./features/ai/pages/cover-letter/cover-letter.component').then(m => m.CoverLetterPageComponent),
+        canDeactivate: [canDeactivateGuard],
       },
       {
         path: 'roast',

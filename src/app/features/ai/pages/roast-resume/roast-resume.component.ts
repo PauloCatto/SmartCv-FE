@@ -2,6 +2,7 @@ import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { ResumeService } from '../../../../core/services/resume';
 import { AiService } from '../../../../core/services/ai';
@@ -164,6 +165,15 @@ import { Resume } from '../../../../core/models/resume.model';
                     </div>
                   }
                 </div>
+
+                <div class="next-steps-card animate-fade-in-up" style="margin-top: 24px; padding: 24px; background: var(--color-surface-2); border-radius: var(--radius-md); border: 1px solid var(--color-border); text-align: center;">
+                  <h3 style="margin-bottom: 8px; font-size: 16px; font-weight: 600;">Próximos Passos</h3>
+                  <p style="color: var(--color-text-muted); margin-bottom: 20px; font-size: 14px;">Use o feedback acima para melhorar seu currículo no editor e aumentar suas chances nas vagas.</p>
+                  <div style="display: flex; gap: 16px; justify-content: center;">
+                     <button class="btn btn-primary" (click)="goToBuilder()">Melhorar Currículo Agora</button>
+                     <button class="btn btn-secondary" (click)="roastResume()">Reavaliar Currículo</button>
+                  </div>
+                </div>
               } @else {
                 <div class="workspace-placeholder-example">
                   <div class="example-badge">{{ 'BUILDER.ROAST.EXAMPLE_BADGE' | translate }}</div>
@@ -252,6 +262,7 @@ export class RoastResumePageComponent implements OnInit {
   private aiService = inject(AiService);
   private toastr = inject(ToastrService);
   private translate = inject(TranslateService);
+  private router = inject(Router);
 
   resumes = signal<Resume[]>([]);
   isLoadingResumes = signal(true);
@@ -298,5 +309,11 @@ export class RoastResumePageComponent implements OnInit {
         this.isRoasting.set(false);
       }
     });
+  }
+
+  goToBuilder() {
+    if (this.selectedResumeId) {
+      this.router.navigate(['/resume', this.selectedResumeId, 'edit']);
+    }
   }
 }
