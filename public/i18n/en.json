@@ -83,6 +83,17 @@
   "BUILDER": {
     "BACK": "Go Back",
     "ATS_SCORE": "ATS Score",
+    "ATS_MODAL": {
+      "TITLE": "Understanding ATS Score",
+      "DESC": "ATS (Applicant Tracking System) is software used by recruiters to automatically filter resumes before a human reads them.",
+      "HOW_IT_WORKS": "How it works?",
+      "P1": "The system scans your resume for keywords, clean formatting, and relevance to the job description.",
+      "TIPS": "Tips to score higher:",
+      "TIP_1": "Use keywords directly from the job description",
+      "TIP_2": "Avoid complex layouts (our templates handle this)",
+      "TIP_3": "Add quantifiable results to your experiences",
+      "CLOSE": "Got it"
+    },
     "UNTITLED_RESUME": "Resume name...",
     "DEFAULT_RESUME_TITLE": "My Resume",
     "IMPORT_LINKEDIN": {
@@ -209,6 +220,12 @@
     "LEAVE_MODAL": {
       "TITLE": "Leave without saving?",
       "DESC": "Your resume hasn't been published yet. If you leave, it won't appear in the dashboard. Do you want to continue?",
+      "STAY": "Keep editing",
+      "LEAVE": "Leave anyway"
+    },
+    "COVER_LETTER_LEAVE": {
+      "TITLE": "Leave without saving?",
+      "DESC": "Your cover letter hasn't been copied or exported to PDF yet. If you leave, it will be lost. Do you want to continue?",
       "STAY": "Keep editing",
       "LEAVE": "Leave anyway"
     },

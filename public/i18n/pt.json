@@ -83,6 +83,17 @@
   "BUILDER": {
     "BACK": "Voltar",
     "ATS_SCORE": "Pontuação ATS",
+    "ATS_MODAL": {
+      "TITLE": "Entendendo o ATS Score",
+      "DESC": "ATS (Applicant Tracking System) são softwares usados por recrutadores para filtrar currículos automaticamente.",
+      "HOW_IT_WORKS": "Como funciona?",
+      "P1": "O sistema analisa seu currículo buscando palavras-chave, formatação limpa e relevância para a vaga.",
+      "TIPS": "Dicas para pontuar mais:",
+      "TIP_1": "Use as mesmas palavras-chave da descrição da vaga",
+      "TIP_2": "Evite layouts complexos (nossos templates já cuidam disso)",
+      "TIP_3": "Adicione resultados quantificáveis nas experiências",
+      "CLOSE": "Entendi"
+    },
     "UNTITLED_RESUME": "Nome do currículo...",
     "IMPORT_LINKEDIN": {
       "TITLE": "Importar do LinkedIn",
@@ -209,6 +220,12 @@
     "LEAVE_MODAL": {
       "TITLE": "Sair sem salvar?",
       "DESC": "Seu currículo ainda não foi publicado. Se você sair, ele não aparecerá no painel. Deseja continuar?",
+      "STAY": "Continuar editando",
+      "LEAVE": "Sair mesmo assim"
+    },
+    "COVER_LETTER_LEAVE": {
+      "TITLE": "Sair sem salvar?",
+      "DESC": "Sua carta de apresentação ainda não foi copiada ou salva em PDF. Se você sair, ela será perdida. Deseja continuar?",
       "STAY": "Continuar editando",
       "LEAVE": "Sair mesmo assim"
     },
