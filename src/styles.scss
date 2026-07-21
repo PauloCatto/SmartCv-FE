@@ -483,3 +483,56 @@ textarea.form-control {
   display: flex;
   flex-direction: column;
 }
+
+/* =============================================
+   PRINT / PDF EXPORT STYLES
+   ============================================= */
+@media print {
+  body {
+    background: white !important;
+  }
+  
+  app-sidebar, app-header, app-footer, .builder-sidebar, .builder-header, .btn, .leave-modal-overlay, .ats-modal-overlay {
+    display: none !important;
+  }
+  
+  .app-layout-body, .builder-layout {
+    display: block !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    height: auto !important;
+  }
+  
+  .app-layout-main, .builder-main {
+    margin: 0 !important;
+    padding: 0 !important;
+    display: block !important;
+    overflow: visible !important;
+  }
+
+  .preview-container {
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow: visible !important;
+    display: block !important;
+  }
+
+  .preview-sheet {
+    box-shadow: none !important;
+    margin: 0 !important;
+    width: 210mm !important; /* A4 width */
+    transform: none !important;
+    min-height: 297mm !important;
+    page-break-after: always;
+  }
+  
+  .cv-item, .timeline-item, .skill-item, .experience-item, .education-item {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+  
+  @page {
+    size: A4 portrait;
+    margin: 0mm;
+  }
+}

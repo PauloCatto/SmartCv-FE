@@ -1,6 +1,9 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
+import { Observable, Subject, of } from 'rxjs';
+import { CanComponentDeactivate } from '../../../../core/guards/can-deactivate.guard';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { ToastrService } from 'ngx-toastr';
 import { ResumeService } from '../../../../core/services/resume';
@@ -10,7 +13,7 @@ import { Resume } from '../../../../core/models/resume.model';
 @Component({
   selector: 'app-cover-letter',
   standalone: true,
-  imports: [CommonModule, FormsModule, TranslateModule],
+  imports: [CommonModule, FormsModule, RouterModule, TranslateModule],
   template: `
     <div class="ai-page-container fade-in">
       <div class="glow-bg"></div>
@@ -45,7 +48,7 @@ import { Resume } from '../../../../core/models/resume.model';
             </svg>
             <h3>{{ 'BUILDER.COVER_LETTER.NO_RESUME' | translate }}</h3>
             <p>{{ 'BUILDER.COVER_LETTER.NO_RESUME_DESC' | translate }}</p>
-            <a href="/resume/new" class="btn btn-primary" style="margin-top: 16px;">{{ 'BUILDER.COVER_LETTER.CREATE_RESUME' | translate }}</a>
+            <a routerLink="/resume/new" class="btn btn-primary" style="margin-top: 16px;">{{ 'BUILDER.COVER_LETTER.CREATE_RESUME' | translate }}</a>
           </div>
         } @else {
           <div class="workspace-grid">
@@ -260,10 +263,39 @@ Atenciosamente,
         }
       </div>
     </div>
+
+    @if (showLeaveModal()) {
+    <div class="modal-overlay leave-modal-overlay" (click)="cancelLeave()">
+      <div class="modal-content leave-modal" (click)="$event.stopPropagation()">
+
+        <div class="leave-modal-icon">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+            <line x1="12" y1="9" x2="12" y2="13"/>
+            <line x1="12" y1="17" x2="12.01" y2="17"/>
+          </svg>
+        </div>
+
+        <div class="modal-header" style="text-align:center; border-bottom:none; padding-bottom:0;">
+          <h2 class="modal-title" style="font-size:18px;">{{ 'BUILDER.COVER_LETTER_LEAVE.TITLE' | translate }}</h2>
+          <p class="modal-desc">{{ 'BUILDER.COVER_LETTER_LEAVE.DESC' | translate }}</p>
+        </div>
+
+        <div class="leave-modal-actions">
+          <button class="btn btn-secondary" (click)="cancelLeave()">
+            {{ 'BUILDER.COVER_LETTER_LEAVE.STAY' | translate }}
+          </button>
+          <button class="btn btn-danger" (click)="confirmLeave()">
+            {{ 'BUILDER.COVER_LETTER_LEAVE.LEAVE' | translate }}
+          </button>
+        </div>
+      </div>
+    </div>
+    }
   `,
   styleUrls: ['./cover-letter.scss']
 })
-export class CoverLetterPageComponent implements OnInit {
+export class CoverLetterPageComponent implements OnInit, CanComponentDeactivate {
   private resumeService = inject(ResumeService);
   private aiService = inject(AiService);
   private toastr = inject(ToastrService);
@@ -277,6 +309,10 @@ export class CoverLetterPageComponent implements OnInit {
   jobDescription = '';
   
   isGenerating = signal(false);
+
+  showLeaveModal = signal(false);
+  private leaveSubject = new Subject<boolean>();
+  isSavedOrExported = false;
 
   defaultLetterText = '';
 
@@ -370,8 +406,36 @@ export class CoverLetterPageComponent implements OnInit {
     const letter = this.generatedLetterEditable;
     if (letter) {
       navigator.clipboard.writeText(letter);
+      this.isSavedOrExported = true;
       this.toastr.success('Carta copiada para a área de transferência!', 'Sucesso');
     }
+  }
+
+  slugify(text: string): string {
+    return (text || '')
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+  }
+
+  canDeactivate(): Observable<boolean> | boolean {
+    if (this.generatedLetter() && this.generatedLetter() !== this.defaultLetterText && !this.isSavedOrExported) {
+      this.showLeaveModal.set(true);
+      return this.leaveSubject.asObservable();
+    }
+    return true;
+  }
+
+  confirmLeave() {
+    this.showLeaveModal.set(false);
+    this.leaveSubject.next(true);
+  }
+
+  cancelLeave() {
+    this.showLeaveModal.set(false);
+    this.leaveSubject.next(false);
   }
 
   async exportPdf() {
@@ -398,7 +462,10 @@ export class CoverLetterPageComponent implements OnInit {
       const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
       
       pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
-      pdf.save(`Carta_de_Apresentacao_${this.selectedResumeName().replace(/\s+/g, '_')}.pdf`);
+      pdf.save(`cover_letter_${this.slugify(this.selectedResumeName())}.pdf`);
+      
+      this.isSavedOrExported = true;
+      this.exportingPdf.set(false);
       this.toastr.success('PDF baixado com sucesso!', 'Download');
     } catch (e) {
       console.error('PDF export error:', e);
