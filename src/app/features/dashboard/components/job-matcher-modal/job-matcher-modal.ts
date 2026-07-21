@@ -1,6 +1,7 @@
 import { Component, Input, Output, EventEmitter, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { AiService } from '../../../../core/services/ai';
 import { ResumeService } from '../../../../core/services/resume';
 import { MatchResult } from '../../../../core/models/ai.model';
@@ -15,11 +16,12 @@ import { MatchResult } from '../../../../core/models/ai.model';
 export class JobMatcherModalComponent {
   private aiService = inject(AiService);
   private resumeService = inject(ResumeService);
+  private router = inject(Router);
 
   @Input() resumeId!: string;
   @Output() close = new EventEmitter<void>();
 
-  jobDescription = '';
+  jobDescription: string = '';
   loading = signal(false);
   result = signal<MatchResult | null>(null);
   error = signal('');
@@ -78,6 +80,7 @@ export class JobMatcherModalComponent {
           next: () => {
             this.applying.set(false);
             this.close.emit();
+            this.router.navigate(['/resume', this.resumeId, 'edit']);
           },
           error: () => {
             this.error.set('Erro ao aplicar as otimizações no currículo');

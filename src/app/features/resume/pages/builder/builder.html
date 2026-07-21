@@ -12,7 +12,7 @@
         (blur)="saveTitle()" />
     </div>
     <div class="topbar-right">
-      <div class="ats-score-widget"
+      <div class="ats-score-widget" (click)="showAtsInfoModal.set(true)" style="cursor: pointer;"
         [class]="'score-' + (atsScore() >= 80 ? 'high' : atsScore() >= 50 ? 'medium' : 'low')" [title]="'BUILDER.ATS_SCORE' | translate">
         <div class="ats-score-circle">
           <svg viewBox="0 0 36 36" class="circular-chart">
@@ -95,7 +95,8 @@
           </div>
 
           <!-- Photo Upload Section -->
-          <div class="photo-upload-section">
+          @if (draft().template.includes('-photo')) {
+          <div class="photo-upload-section animate-fade-in-up">
             <div class="photo-preview-wrapper">
               @if (draft().personalInfo.photo) {
                <img [src]="((draft().personalInfo.photo || '').startsWith('data:') || (draft().personalInfo.photo || '').startsWith('http')) ? (draft().personalInfo.photo || '') : environment.uploadUrl + (draft().personalInfo.photo || '')" class="photo-preview-img" alt="Foto de perfil" />
@@ -122,6 +123,7 @@
               <span class="photo-hint">Máx: 2MB (JPG/PNG)</span>
             </div>
           </div>
+          }
 
           <div class="form-grid">
             <div class="form-group col-2">
@@ -1019,6 +1021,54 @@
       <button class="btn btn-danger" style="flex:1;" (click)="confirmLeave()">
         {{ 'BUILDER.LEAVE_MODAL.LEAVE' | translate }}
       </button>
+    </div>
+  </div>
+</div>
+}
+
+@if (showAtsInfoModal()) {
+<div class="modal-overlay ats-modal-overlay animate-fade-in" (click)="showAtsInfoModal.set(false)">
+  <div class="modal-content ats-modal animate-fade-in-up" (click)="$event.stopPropagation()">
+    <button class="modal-close-btn" (click)="showAtsInfoModal.set(false)">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+    </button>
+    
+    <div class="modal-header">
+      <div class="modal-icon" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline>
+        </svg>
+      </div>
+      <h2 style="margin:0; font-size: 20px; font-weight: 700;">{{ 'BUILDER.ATS_MODAL.TITLE' | translate }}</h2>
+    </div>
+
+    <div class="modal-body" style="padding: 24px; color: var(--color-text-muted); font-size: 15px; line-height: 1.6;">
+      <p style="margin-bottom: 20px;">{{ 'BUILDER.ATS_MODAL.DESC' | translate }}</p>
+      
+      <h3 style="color: var(--color-text); font-size: 16px; font-weight: 600; margin-bottom: 8px;">{{ 'BUILDER.ATS_MODAL.HOW_IT_WORKS' | translate }}</h3>
+      <p style="margin-bottom: 24px;">{{ 'BUILDER.ATS_MODAL.P1' | translate }}</p>
+
+      <div style="background: var(--color-surface-hover); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--color-border);">
+        <h3 style="color: var(--color-text); font-size: 15px; font-weight: 600; margin-bottom: 12px;">{{ 'BUILDER.ATS_MODAL.TIPS' | translate }}</h3>
+        <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px;">
+          <li style="display: flex; gap: 8px; align-items: flex-start;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" style="flex-shrink:0; margin-top:3px;"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <span>{{ 'BUILDER.ATS_MODAL.TIP_1' | translate }}</span>
+          </li>
+          <li style="display: flex; gap: 8px; align-items: flex-start;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" style="flex-shrink:0; margin-top:3px;"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <span>{{ 'BUILDER.ATS_MODAL.TIP_2' | translate }}</span>
+          </li>
+          <li style="display: flex; gap: 8px; align-items: flex-start;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" style="flex-shrink:0; margin-top:3px;"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <span>{{ 'BUILDER.ATS_MODAL.TIP_3' | translate }}</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="modal-footer" style="padding: 20px 24px; border-top: 1px solid var(--color-border);">
+      <button class="btn btn-primary" style="width: 100%; justify-content: center;" (click)="showAtsInfoModal.set(false)">{{ 'BUILDER.ATS_MODAL.CLOSE' | translate }}</button>
     </div>
   </div>
 </div>

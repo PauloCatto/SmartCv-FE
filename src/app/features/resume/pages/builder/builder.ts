@@ -64,16 +64,16 @@ export class BuilderComponent implements OnInit, OnDestroy, CanComponentDeactiva
   exporting = signal(false);
   previewScale = signal(0.75);
   activeTab = signal<'edit' | 'preview'>('edit');
-  newSkillName = '';
+  newSkillName: string = '';
   newSkillLevel: 1 | 2 | 3 | 4 | 5 = 3;
-  newLanguageName = '';
+  newLanguageName: string = '';
   newLanguageLevel: 'Básico' | 'Intermediário' | 'Avançado' | 'Fluente' | 'Nativo' = 'Básico';
   isAILoading = signal<string | null>(null);
   showValidation = signal(false);
+  showAtsInfoModal = signal(false);
   isSaving = signal(false);
   environment = environment;
 
-  // Leave-without-saving modal
   showLeaveModal = signal(false);
   private leaveSubject = new Subject<boolean>();
   isPublishedLocally = false;
@@ -297,8 +297,9 @@ export class BuilderComponent implements OnInit, OnDestroy, CanComponentDeactiva
     }
 
     const tplParam = this.route.snapshot.queryParamMap.get('template') as TemplateType;
+    const translatedTitle = this.translate.instant('BUILDER.DEFAULT_RESUME_TITLE');
 
-    this.resumeService.create().subscribe({
+    this.resumeService.create({ title: translatedTitle }).subscribe({
       next: (created) => {
         if (tplParam && ['elegance', 'modern', 'minimal', 'creative', 'compact'].includes(tplParam)) {
           created.template = tplParam;
@@ -696,7 +697,7 @@ export class BuilderComponent implements OnInit, OnDestroy, CanComponentDeactiva
   importMockData() {
     const isEn = this.translate.currentLang === 'en';
     const title = this.translate.instant('BUILDER.IMPORTED_RESUME_TITLE');
-    
+
     this.draft.set({
       id: this.draft().id,
       title: title,
@@ -713,7 +714,7 @@ export class BuilderComponent implements OnInit, OnDestroy, CanComponentDeactiva
         phone: '+55 11 98765-4321',
         location: isEn ? 'São Paulo, SP - Hybrid' : 'São Paulo, SP - Híbrido',
         linkedin: 'linkedin.com/in/alexmagno',
-        bio: isEn 
+        bio: isEn
           ? 'Software engineer passionate about building scalable architectures and products with excellent user experience. With over 8 years in tech, I have solid experience technically leading agile squads and transitioning monolithic systems to cloud microservices.'
           : 'Engenheiro de software apaixonado por criar arquiteturas escaláveis e produtos com excelente experiência de usuário. Com mais de 8 anos na área de tecnologia, possuo sólida experiência na liderança técnica de esquadrões ágeis e na transição de sistemas monolíticos para microsserviços na nuvem.'
       },
@@ -725,7 +726,7 @@ export class BuilderComponent implements OnInit, OnDestroy, CanComponentDeactiva
           startDate: isEn ? 'Jan 2021' : 'Jan 2021',
           endDate: '',
           current: true,
-          description: isEn 
+          description: isEn
             ? '• Led a tribe with 4 squads and over 20 developers, focused on core banking.\n• Architected and migrated legacy monolith to Node.js and Go microservices, improving response time by 45%.\n• Implemented DevOps culture and CI/CD with GitHub Actions, reducing time-to-market.'
             : '• Liderança de uma tribo com 4 squads e mais de 20 desenvolvedores, focada no core bancário.\n• Arquitetura e migração do monolito legado para microsserviços Node.js e Go, melhorando o tempo de resposta em 45%.\n• Implementação de cultura DevOps e CI/CD com GitHub Actions, reduzindo o time-to-market.'
         },
@@ -736,7 +737,7 @@ export class BuilderComponent implements OnInit, OnDestroy, CanComponentDeactiva
           startDate: isEn ? 'Feb 2018' : 'Fev 2018',
           endDate: isEn ? 'Dec 2020' : 'Dez 2020',
           current: false,
-          description: isEn 
+          description: isEn
             ? '• Developed the new platform checkout using React and Node.js.\n• Frontend performance optimization that increased sales conversion by 12%.\n• Mentored junior and mid-level developers.'
             : '• Desenvolvimento do novo checkout da plataforma utilizando React e Node.js.\n• Otimização de performance no frontend que aumentou a conversão de vendas em 12%.\n• Mentoria de desenvolvedores juniores e plenos.'
         }
@@ -883,53 +884,25 @@ export class BuilderComponent implements OnInit, OnDestroy, CanComponentDeactiva
   async exportPdf() {
     this.exporting.set(true);
     try {
-      const { default: jsPDF } = await import('jspdf');
-      const { default: html2canvas } = await import('html2canvas');
+      // Small timeout to allow UI loading states to vanish before print dialog
+      setTimeout(() => {
+        window.print();
+        this.exporting.set(false);
+        this.toastr.success('Pronto para salvar como PDF!', 'Sucesso');
 
-      const templateIds = ['cv-elegance', 'cv-modern', 'cv-minimal', 'cv-creative', 'cv-compact'];
-      let el: HTMLElement | null = null;
-      for (const id of templateIds) {
-        el = document.getElementById(id);
-        if (el) break;
-      }
-
-      if (!el) { this.exporting.set(false); return; }
-
-      const canvas = await html2canvas(el, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
-      const imgData = canvas.toDataURL('image/jpeg', 0.95);
-      const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pageHeight = pdf.internal.pageSize.getHeight();
-      const imgHeight = (canvas.height * pdfWidth) / canvas.width;
-
-      let heightLeft = imgHeight;
-      let position = 0;
-
-      pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, imgHeight);
-      heightLeft -= pageHeight;
-
-      while (heightLeft > 0) {
-        position -= pageHeight;
-        pdf.addPage();
-        pdf.addImage(imgData, 'JPEG', 0, position, pdfWidth, imgHeight);
-        heightLeft -= pageHeight;
-      }
-
-      pdf.save(`${this.slugify(this.resumeTitle || 'curriculo')}.pdf`);
-      this.toastr.success('PDF exportado com sucesso!', 'Download');
-
-      // Mark as published after successful PDF download
-      const current = this.draft();
-      if (current.id && !this.isPublishedLocally) {
-        this.resumeService.publish(current.id).subscribe({
-          next: () => { this.isPublishedLocally = true; }
-        });
-      }
+        // Mark as published after successful print invocation
+        const current = this.draft();
+        if (current.id && !this.isPublishedLocally) {
+          this.resumeService.publish(current.id).subscribe({
+            next: () => { this.isPublishedLocally = true; }
+          });
+        }
+      }, 500);
     } catch (e) {
       console.error('PDF export error:', e);
-      this.toastr.error('Erro ao exportar PDF. Tente novamente.', 'Erro');
+      this.toastr.error('Erro ao abrir impressão. Tente novamente.', 'Erro');
+      this.exporting.set(false);
     }
-    this.exporting.set(false);
   }
 
   // Roast states
@@ -997,7 +970,7 @@ export class BuilderComponent implements OnInit, OnDestroy, CanComponentDeactiva
 
   async exportToPDF() {
     this.isExportingPdf.set(true);
-    
+
     // Create a temporary clone of the preview for high-res rendering
     const originalElement = document.querySelector('.preview-sheet') as HTMLElement;
     if (!originalElement) {
@@ -1006,7 +979,7 @@ export class BuilderComponent implements OnInit, OnDestroy, CanComponentDeactiva
     }
 
     const clone = originalElement.cloneNode(true) as HTMLElement;
-    
+
     // Temporarily reset transforms and scale to capture in full resolution (A4 size approx)
     Object.assign(clone.style, {
       transform: 'none',
@@ -1026,16 +999,16 @@ export class BuilderComponent implements OnInit, OnDestroy, CanComponentDeactiva
         useCORS: true,
         logging: false
       });
-      
+
       const imgData = canvas.toDataURL('image/png');
       const pdf = new jsPDF('p', 'mm', 'a4');
-      
+
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-      
+
       pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
       pdf.save(`${this.draft().title || 'Curriculo'}.pdf`);
-      
+
       this.toastr.success(this.translate.instant('BUILDER.DOWNLOAD_PDF') + ' gerado com sucesso!');
     } catch (err) {
       console.error(err);
