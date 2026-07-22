@@ -33,14 +33,14 @@ export class Register implements OnInit, OnDestroy {
     'AUTH.REGISTER.BENEFITS.4'
   ];
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.authSubscription = this.socialAuthService.authState.subscribe((user) => {
       if (user && user.idToken) {
         this.auth.googleLogin(user.idToken as string).subscribe({
           next: () => {
             this.router.navigate(['/dashboard']);
           },
-          error: (err: any) => {
+          error: (err: Error) => {
             this.error.set(err.message || 'Falha no cadastro com Google');
           }
         });
@@ -48,13 +48,13 @@ export class Register implements OnInit, OnDestroy {
     });
   }
 
-  ngOnDestroy() {
+  ngOnDestroy(): void {
     if (this.authSubscription) {
       this.authSubscription.unsubscribe();
     }
   }
 
-  passwordStrength() {
+  passwordStrength(): number {
     let s = 0;
     if (this.password.length >= 6) s++;
     if (this.password.match(/[A-Z]/)) s++;
@@ -63,7 +63,7 @@ export class Register implements OnInit, OnDestroy {
     return s;
   }
 
-  strengthLabel() {
+  strengthLabel(): string {
     const s = this.passwordStrength();
     if (s <= 1) return 'Fraca';
     if (s === 2) return 'Razoável';
@@ -71,7 +71,7 @@ export class Register implements OnInit, OnDestroy {
     return 'Forte';
   }
 
-  onSubmit() {
+  onSubmit(): void {
     this.error.set('');
     if (!this.name || !this.email || !this.password) {
       this.error.set('Preencha todos os campos');
@@ -86,7 +86,7 @@ export class Register implements OnInit, OnDestroy {
       next: () => {
         this.router.navigate(['/dashboard']);
       },
-      error: (err: any) => {
+      error: (err: Error) => {
         this.error.set(err.message || 'Falha no cadastro');
       }
     });

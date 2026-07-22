@@ -27,7 +27,7 @@ export class ResetPassword implements OnInit {
   message = signal('');
   submitted = signal(false);
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.route.queryParams.subscribe(params => {
       if (params['token']) {
         this.token = params['token'];
@@ -37,7 +37,7 @@ export class ResetPassword implements OnInit {
     });
   }
 
-  onSubmit() {
+  onSubmit(): void {
     this.submitted.set(true);
     this.error.set('');
     this.message.set('');
@@ -69,7 +69,7 @@ export class ResetPassword implements OnInit {
           this.router.navigate(['/auth/login']);
         }, 2000);
       },
-      error: (err: any) => {
+      error: (err: Error) => {
         this.error.set(err.message || 'Falha ao redefinir a senha');
       }
     });

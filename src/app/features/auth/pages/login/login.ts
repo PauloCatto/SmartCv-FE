@@ -25,14 +25,14 @@ export class Login implements OnInit, OnDestroy {
   showPassword = signal(false);
   authSubscription!: Subscription;
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.authSubscription = this.socialAuthService.authState.subscribe((user) => {
       if (user && user.idToken) {
         this.auth.googleLogin(user.idToken as string).subscribe({
           next: () => {
             this.router.navigate(['/dashboard']);
           },
-          error: (err: any) => {
+          error: (err: Error) => {
             this.error.set(err.message || 'Falha no login com Google');
           }
         });
@@ -40,13 +40,13 @@ export class Login implements OnInit, OnDestroy {
     });
   }
 
-  ngOnDestroy() {
+  ngOnDestroy(): void {
     if (this.authSubscription) {
       this.authSubscription.unsubscribe();
     }
   }
 
-  onSubmit() {
+  onSubmit(): void {
     this.submitted.set(true);
     this.error.set('');
 
@@ -56,7 +56,7 @@ export class Login implements OnInit, OnDestroy {
       next: () => {
         this.router.navigate(['/dashboard']);
       },
-      error: (err: any) => {
+      error: (err: Error) => {
         this.error.set(err.message || 'Falha no login');
       }
     });
