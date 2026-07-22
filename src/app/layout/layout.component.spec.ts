@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { LayoutComponent } from './layout.component';
 import { RouterTestingModule } from '@angular/router/testing';
+import { TranslateModule } from '@ngx-translate/core';
 
 describe('LayoutComponent', () => {
   let component: LayoutComponent;
@@ -8,7 +9,7 @@ describe('LayoutComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [LayoutComponent, RouterTestingModule]
+      imports: [LayoutComponent, RouterTestingModule, TranslateModule.forRoot()]
     })
     .compileComponents();
 
