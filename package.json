@@ -6,7 +6,9 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "test:coverage": "ng test --coverage",
+    "test:serve": "npx http-server coverage/smart-cv -o"
   },
   "prettier": {
     "printWidth": 100,
@@ -46,6 +48,7 @@
     "@angular/cli": "^21.0.3",
     "@angular/compiler-cli": "^21.0.0",
     "@tailwindcss/postcss": "^4.3.0",
+    "@vitest/coverage-v8": "^4.1.10",
     "autoprefixer": "^10.5.0",
     "jsdom": "^27.1.0",
     "postcss": "^8.5.15",
