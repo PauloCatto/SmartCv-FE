@@ -14,4 +14,10 @@ describe('authInterceptor', () => {
   it('should be created', () => {
     expect(interceptor).toBeTruthy();
   });
+
+  it('should call next', () => {
+    const nextMock = vi.fn();
+    interceptor({} as any, nextMock as any);
+    expect(nextMock).toHaveBeenCalledWith({});
+  });
 });

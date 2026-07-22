@@ -52,12 +52,12 @@ export const routes: Routes = [
     children: [
       {
         path: 'new',
-        loadComponent: () => import('./features/resume/pages/builder/builder').then(m => m.BuilderComponent),
+        loadComponent: () => import('./features/resume/pages/builder/builder.component').then(m => m.BuilderComponent),
         canDeactivate: [canDeactivateGuard],
       },
       {
         path: ':id/edit',
-        loadComponent: () => import('./features/resume/pages/builder/builder').then(m => m.BuilderComponent),
+        loadComponent: () => import('./features/resume/pages/builder/builder.component').then(m => m.BuilderComponent),
         canDeactivate: [canDeactivateGuard],
       },
     ],
