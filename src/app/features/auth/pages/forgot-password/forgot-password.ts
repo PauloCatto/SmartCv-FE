@@ -20,9 +20,9 @@ export class ForgotPassword implements OnInit {
   error = signal('');
   submitted = signal(false);
 
-  ngOnInit() { }
+  ngOnInit(): void { }
 
-  onSubmit() {
+  onSubmit(): void {
     this.submitted.set(true);
     this.error.set('');
     this.message.set('');
@@ -33,7 +33,7 @@ export class ForgotPassword implements OnInit {
       next: (res) => {
         this.message.set(res.message);
       },
-      error: (err: any) => {
+      error: (err: Error) => {
         this.error.set(err.message || 'Falha ao solicitar recuperação');
       }
     });
