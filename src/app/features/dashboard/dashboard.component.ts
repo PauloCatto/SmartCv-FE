@@ -5,8 +5,8 @@ import { combineLatest, map, BehaviorSubject, Subscription, finalize, catchError
 import { ResumeService } from '../../core/services/resume';
 import { AuthService } from '../../core/services/auth';
 import { Resume, DashboardStats, TEMPLATE_OPTIONS } from '../../core/models/resume.model';
-import { JobMatcherModalComponent } from './components/job-matcher-modal/job-matcher-modal';
-import { ConfirmModalComponent } from '../../shared/components/confirm-modal/confirm-modal';
+import { JobMatcherModalComponent } from '../../shared/components/job-matcher-modal/job-matcher-modal.component';
+import { ConfirmModalComponent } from '../../shared/components/confirm-modal/confirm-modal.component';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { ToastrService } from 'ngx-toastr';
 import { AiService } from '../../core/services/ai';
@@ -67,7 +67,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   private subs: Subscription[] = [];
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.resumeService.loadResumes(true).subscribe(resumes => {
       this.loadingSubject.next(false);
     });
@@ -77,7 +77,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.subs.push(sub);
   }
 
-  ngOnDestroy() {
+  ngOnDestroy(): void {
     this.subs.forEach(s => s.unsubscribe());
   }
 
@@ -98,7 +98,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     return date.toLocaleDateString('pt-BR');
   }
 
-  duplicate(resume: Resume) {
+  duplicate(resume: Resume): void {
     this.resumeService.duplicate(resume.id).subscribe({
       next: () => {
         this.toastr.success('Currículo duplicado com sucesso!', 'Duplicado');
@@ -109,11 +109,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
     });
   }
 
-  requestDelete(id: string) {
+  requestDelete(id: string): void {
     this.deleteTargetId = id;
   }
 
-  confirmDelete() {
+  confirmDelete(): void {
     if (!this.deleteTargetId) return;
     const id = this.deleteTargetId;
     this.deleteTargetId = null;
@@ -128,7 +128,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     });
   }
 
-  cancelDelete() {
+  cancelDelete(): void {
     this.deleteTargetId = null;
   }
 
@@ -145,12 +145,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
       .replace(/^-+|-+$/g, '');
   }
 
-  createWithTemplate(tmpl: any) {
+  createWithTemplate(tmpl: { id: string, name?: string, ptName?: string, customColor?: string, customFont?: string }): void {
     const isEn = this.translate.currentLang === 'en';
     const titulo = isEn && tmpl.name ? tmpl.name : tmpl.ptName;
 
     this.resumeService.create({
-      template: tmpl.id,
+      template: tmpl.id as any,
       colorTheme: tmpl.customColor || '#1e293b',
       fontFamily: tmpl.customFont || "'Inter', sans-serif",
       title: titulo
@@ -161,19 +161,19 @@ export class DashboardComponent implements OnInit, OnDestroy {
     });
   }
 
-  openJobMatcher(resumeId: string) {
+  openJobMatcher(resumeId: string): void {
     this.selectedResumeId = resumeId;
   }
 
-  closeJobMatcher() {
+  closeJobMatcher(): void {
     this.selectedResumeId = null;
   }
 
-  editResume(resume: any) {
+  editResume(resume: Resume): void {
     this.router.navigate(['/resume', this.slugify(resume.title), 'edit']);
   }
 
-  scrollCarousel(offset: number) {
+  scrollCarousel(offset: number): void {
     if (this.carouselContainer) {
       this.carouselContainer.nativeElement.scrollBy({
         left: offset,
@@ -182,11 +182,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }
   }
 
-  triggerLinkedInImport() {
+  triggerLinkedInImport(): void {
     this.fileInput.nativeElement.click();
   }
 
-  onLinkedInFileSelected(event: Event) {
+  onLinkedInFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (!input.files || input.files.length === 0) return;
 
@@ -212,7 +212,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         const mes = monthFormatter.format(now).replace('.', '');
         const ano = now.getFullYear();
         const prefix = isEn ? 'Resume' : 'Currículo';
-        
+
         parsedResume.title = `${prefix} LinkedIn - ${mes.charAt(0).toUpperCase() + mes.slice(1)} ${ano}`;
         parsedResume.template = 'elegance'; // Template padrão
 
