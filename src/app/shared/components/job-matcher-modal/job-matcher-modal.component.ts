@@ -53,7 +53,6 @@ export class JobMatcherModalComponent {
 
     this.applying.set(true);
 
-    // Fetch the current resume state first
     this.resumeService.getById(this.resumeId).subscribe({
       next: (currentResume: Resume) => {
         if (!currentResume) {
@@ -62,7 +61,6 @@ export class JobMatcherModalComponent {
           return;
         }
 
-        // Deep copy experience to apply the updates
         const updatedExperiences = currentResume.experience.map((exp: Experience) => {
           const matchedSug = res.suggestedExperiences.find((sug: { id: string, description: string }) => sug.id === exp.id);
           return matchedSug ? { ...exp, description: matchedSug.description } : exp;
