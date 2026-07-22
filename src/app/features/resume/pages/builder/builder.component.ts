@@ -38,8 +38,8 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
     TranslateModule,
     UpperCasePipe
   ],
-  templateUrl: './builder.html',
-  styleUrl: './builder.scss',
+  templateUrl: './builder.component.html',
+  styleUrl: './builder.component.scss',
 })
 export class BuilderComponent implements OnInit, OnDestroy, CanComponentDeactivate {
   private resumeService = inject(ResumeService);
@@ -72,12 +72,12 @@ export class BuilderComponent implements OnInit, OnDestroy, CanComponentDeactiva
   showValidation = signal(false);
   showAtsInfoModal = signal(false);
   isSaving = signal(false);
-  environment = environment;
 
+  environment = environment;
   showLeaveModal = signal(false);
   private leaveSubject = new Subject<boolean>();
-  isPublishedLocally = false;
-  isNavigatingInternally = false;
+  isPublishedLocally: boolean = false;
+  isNavigatingInternally: boolean = false;
 
   get currentLang(): string {
     return this.translate.currentLang || 'pt';
@@ -93,7 +93,7 @@ export class BuilderComponent implements OnInit, OnDestroy, CanComponentDeactiva
   private savedIndicatorTimeout: any;
 
   locationSearch$ = new Subject<string>();
-  locationSuggestions: any[] = [];
+  locationSuggestions: { display_name: string; name?: string; place_id?: string; address?: any }[] = [];
   isLocationLoading: boolean = false;
   showLocationDropdown: boolean = false;
   private locationSub!: Subscription;
@@ -167,17 +167,17 @@ export class BuilderComponent implements OnInit, OnDestroy, CanComponentDeactiva
     { name: 'Fira Code (Monospace)', value: "'Fira Code', monospace" },
   ];
 
-  selectColorTheme(color: string) {
+  selectColorTheme(color: string): void {
     this.draft.update(d => ({ ...d, colorTheme: color }));
     this.onFieldChange();
   }
 
-  selectFontFamily(font: string) {
+  selectFontFamily(font: string): void {
     this.draft.update(d => ({ ...d, fontFamily: font }));
     this.onFieldChange();
   }
 
-  selectSpacingMode(mode: 'compact' | 'normal' | 'spacious') {
+  selectSpacingMode(mode: 'compact' | 'normal' | 'spacious'): void {
     this.draft.update(d => ({ ...d, spacingMode: mode }));
     this.onFieldChange();
   }
@@ -195,7 +195,7 @@ export class BuilderComponent implements OnInit, OnDestroy, CanComponentDeactiva
       .replace(/^-+|-+$/g, '');
   }
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.locationSub = this.locationSearch$.pipe(
       debounceTime(300),
       distinctUntilChanged(),
@@ -318,15 +318,16 @@ export class BuilderComponent implements OnInit, OnDestroy, CanComponentDeactiva
     });
   }
 
-  ngOnDestroy() {
+  ngOnDestroy(): void {
     this.saveSub?.unsubscribe();
     this.locationSub?.unsubscribe();
     this.languageSub?.unsubscribe();
     clearTimeout(this.savedIndicatorTimeout);
   }
 
-  onLocationInput(event: any) {
-    const value = event.target.value;
+  onLocationInput(event: Event): void {
+    const target = event.target as HTMLInputElement;
+    const value = target.value;
     this.draft.update(d => ({
       ...d,
       personalInfo: { ...d.personalInfo, location: value }
@@ -335,7 +336,7 @@ export class BuilderComponent implements OnInit, OnDestroy, CanComponentDeactiva
     this.locationSearch$.next(value);
   }
 
-  selectLocation(location: any) {
+  selectLocation(location: { display_name: string; name?: string; address?: { city?: string; town?: string; village?: string; state?: string } }): void {
     let formattedName = location.display_name;
     if (location.address) {
       const city = location.address.city || location.address.town || location.address.village;
@@ -355,33 +356,34 @@ export class BuilderComponent implements OnInit, OnDestroy, CanComponentDeactiva
     this.onFieldChange();
   }
 
-  hideLocationDropdown() {
+  hideLocationDropdown(): void {
     setTimeout(() => this.showLocationDropdown = false, 200);
   }
 
-  onLanguageInput(event: any) {
-    const value = event.target.value;
+  onLanguageInput(event: Event): void {
+    const target = event.target as HTMLInputElement;
+    const value = target.value;
     this.newLanguageName = value;
     this.languageSearch$.next(value);
   }
 
-  selectLanguage(lang: string) {
+  selectLanguage(lang: string): void {
     this.newLanguageName = lang;
     this.showLanguageDropdown = false;
   }
 
-  hideLanguageDropdown() {
+  hideLanguageDropdown(): void {
     setTimeout(() => this.showLanguageDropdown = false, 200);
   }
 
-  onFieldChange() {
+  onFieldChange(): void {
     this.draft.update(d => ({ ...d }));
     const current = this.draft();
     if (!current.id) return;
     this.saveSubject.next(current);
   }
 
-  saveTitle() {
+  saveTitle(): void {
     this.draft.update(d => ({ ...d, title: this.resumeTitle }));
     const current = this.draft();
     if (current.id && this.resumeTitle.trim()) {
@@ -404,7 +406,7 @@ export class BuilderComponent implements OnInit, OnDestroy, CanComponentDeactiva
     }
   }
 
-  goToStep(step: Step) {
+  goToStep(step: Step): void {
     this.currentStep.set(step);
     this.showValidation.set(false);
     if (step === 'template') {
@@ -412,7 +414,7 @@ export class BuilderComponent implements OnInit, OnDestroy, CanComponentDeactiva
     }
   }
 
-  scrollToSelectedTemplate() {
+  scrollToSelectedTemplate(): void {
     setTimeout(() => {
       const selectedEl = document.querySelector('.template-option.selected');
       if (selectedEl) {
@@ -421,7 +423,7 @@ export class BuilderComponent implements OnInit, OnDestroy, CanComponentDeactiva
     }, 200);
   }
 
-  nextStep() {
+  nextStep(): void {
     if (this.currentStep() === 'personal') {
       const d = this.draft();
       if (!d.personalInfo.name.trim() || !d.personalInfo.email.trim()) {
@@ -438,7 +440,7 @@ export class BuilderComponent implements OnInit, OnDestroy, CanComponentDeactiva
     }
   }
 
-  prevStep() {
+  prevStep(): void {
     this.showValidation.set(false);
     const idx = this.steps.findIndex(s => s.id === this.currentStep());
     if (idx > 0) {
@@ -451,12 +453,12 @@ export class BuilderComponent implements OnInit, OnDestroy, CanComponentDeactiva
     return order.indexOf(step) < order.indexOf(this.currentStep());
   }
 
-  toggleExpand(type: string, index: number) {
+  toggleExpand(type: string, index: number): void {
     const key = `${type}-${index}`;
     this.expandedItem.update(v => v === key ? null : key);
   }
 
-  addExperience() {
+  addExperience(): void {
     const exp: Experience = {
       id: crypto.randomUUID(), company: '', role: '',
       startDate: '', endDate: '', current: false, description: '',
@@ -466,12 +468,12 @@ export class BuilderComponent implements OnInit, OnDestroy, CanComponentDeactiva
     this.onFieldChange();
   }
 
-  removeExperience(index: number) {
+  removeExperience(index: number): void {
     this.draft.update(d => ({ ...d, experience: d.experience.filter((_, i) => i !== index) }));
     this.onFieldChange();
   }
 
-  addEducation() {
+  addEducation(): void {
     const edu: Education = {
       id: crypto.randomUUID(), institution: '', degree: '',
       field: '', startDate: '', endDate: '', current: false,
@@ -481,12 +483,12 @@ export class BuilderComponent implements OnInit, OnDestroy, CanComponentDeactiva
     this.onFieldChange();
   }
 
-  removeEducation(index: number) {
+  removeEducation(index: number): void {
     this.draft.update(d => ({ ...d, education: d.education.filter((_, i) => i !== index) }));
     this.onFieldChange();
   }
 
-  addSkill() {
+  addSkill(): void {
     if (!this.newSkillName.trim()) return;
     if (this.skillExists(this.newSkillName)) return;
     const skill: Skill = {
@@ -499,12 +501,12 @@ export class BuilderComponent implements OnInit, OnDestroy, CanComponentDeactiva
     this.onFieldChange();
   }
 
-  removeSkill(index: number) {
+  removeSkill(index: number): void {
     this.draft.update(d => ({ ...d, skills: d.skills.filter((_, i) => i !== index) }));
     this.onFieldChange();
   }
 
-  addLanguage() {
+  addLanguage(): void {
     const name = this.newLanguageName.trim();
     if (!name) return;
     if (this.languageExists(name)) {
@@ -521,12 +523,12 @@ export class BuilderComponent implements OnInit, OnDestroy, CanComponentDeactiva
     this.onFieldChange();
   }
 
-  removeLanguage(index: number) {
+  removeLanguage(index: number): void {
     this.draft.update(d => ({ ...d, languages: d.languages.filter((_, i) => i !== index) }));
     this.onFieldChange();
   }
 
-  setLanguageLevel(index: number, level: 'Básico' | 'Intermediário' | 'Avançado' | 'Fluente' | 'Nativo') {
+  setLanguageLevel(index: number, level: 'Básico' | 'Intermediário' | 'Avançado' | 'Fluente' | 'Nativo'): void {
     this.draft.update(d => {
       const languages = [...d.languages];
       languages[index] = { ...languages[index], level };
@@ -553,7 +555,7 @@ export class BuilderComponent implements OnInit, OnDestroy, CanComponentDeactiva
     return this.translate.instant(map[level] || map['Básico']);
   }
 
-  setSkillLevel(index: number, level: number) {
+  setSkillLevel(index: number, level: number): void {
     this.draft.update(d => {
       const skills = [...d.skills];
       skills[index] = { ...skills[index], level: level as 1 | 2 | 3 | 4 | 5 };
@@ -562,7 +564,7 @@ export class BuilderComponent implements OnInit, OnDestroy, CanComponentDeactiva
     this.onFieldChange();
   }
 
-  addSuggestion(name: string) {
+  addSuggestion(name: string): void {
     this.newSkillName = name;
     this.addSkill();
   }
@@ -593,21 +595,21 @@ export class BuilderComponent implements OnInit, OnDestroy, CanComponentDeactiva
     return defaults.some(d => title.toLowerCase().trim() === d.toLowerCase().trim());
   }
 
-  selectTemplate(tmpl: any) {
+  selectTemplate(tmpl: { id: string, name?: string, ptName?: string, customColor?: string, customFont?: string }): void {
     this.draft.update(d => ({
       ...d,
-      template: tmpl.id,
-      colorTheme: tmpl.customColor || d.colorTheme,
-      fontFamily: tmpl.customFont || d.fontFamily
+      template: tmpl.id as TemplateType,
+      colorTheme: tmpl.customColor || d.colorTheme || '#1e293b',
+      fontFamily: tmpl.customFont || d.fontFamily || "'Inter', sans-serif"
     }));
 
     const isEn = this.translate.currentLang === 'en';
-    const newTitle = isEn ? tmpl.name : tmpl.ptName;
 
     if (this.isDefaultTitle(this.resumeTitle)) {
-      this.resumeTitle = newTitle;
-      this.draft.update(d => ({ ...d, title: newTitle }));
-      this.saveTitle(); // Trigger title save in DB and update the route slug
+      const newTitle = isEn && tmpl.name ? tmpl.name : tmpl.ptName;
+      this.resumeTitle = newTitle || '';
+      this.draft.update(d => ({ ...d, title: newTitle || '' }));
+      this.saveTitle();
     } else {
       this.onFieldChange();
     }
@@ -798,13 +800,13 @@ export class BuilderComponent implements OnInit, OnDestroy, CanComponentDeactiva
       }
 
       const reader = new FileReader();
-      reader.onload = (e: any) => {
-        const base64 = e.target.result;
+      reader.onload = (e: ProgressEvent<FileReader>): void => {
+        const base64 = e.target?.result as string;
         this.draft.update(d => ({
           ...d,
           personalInfo: {
             ...d.personalInfo,
-            photo: base64
+            photo: base64 || ''
           }
         }));
         this.onFieldChange();
@@ -813,7 +815,7 @@ export class BuilderComponent implements OnInit, OnDestroy, CanComponentDeactiva
     }
   }
 
-  removePhoto() {
+  removePhoto(): void {
     this.draft.update(d => ({
       ...d,
       personalInfo: {
@@ -824,7 +826,7 @@ export class BuilderComponent implements OnInit, OnDestroy, CanComponentDeactiva
     this.onFieldChange();
   }
 
-  finishAndSave() {
+  finishAndSave(): void {
     const current = this.draft();
     if (!current.id) return;
 
@@ -854,17 +856,17 @@ export class BuilderComponent implements OnInit, OnDestroy, CanComponentDeactiva
     return this.leaveSubject.asObservable();
   }
 
-  confirmLeave() {
+  confirmLeave(): void {
     this.showLeaveModal.set(false);
     this.leaveSubject.next(true);
   }
 
-  cancelLeave() {
+  cancelLeave(): void {
     this.showLeaveModal.set(false);
     this.leaveSubject.next(false);
   }
 
-  toggleMobileView() {
+  toggleMobileView(): void {
     this.activeTab.update(t => {
       const next = t === 'edit' ? 'preview' : 'edit';
       if (next === 'preview') {
@@ -881,7 +883,7 @@ export class BuilderComponent implements OnInit, OnDestroy, CanComponentDeactiva
     });
   }
 
-  async exportPdf() {
+  async exportPdf(): Promise<void> {
     this.exporting.set(true);
     try {
       // Small timeout to allow UI loading states to vanish before print dialog
@@ -908,9 +910,9 @@ export class BuilderComponent implements OnInit, OnDestroy, CanComponentDeactiva
   // Roast states
   showRoastModal = signal(false);
   isRoasting = signal(false);
-  roastResult = signal<any>(null);
+  roastResult = signal<{ roast?: string; score?: number; feedback?: string; weaknesses?: string[]; actionableFeedback?: string[]; strengths?: string[] }>({});
 
-  generateCoverLetter() {
+  generateCoverLetter(): void {
     if (!this.jobDescription || this.jobDescription.length < 20) {
       this.toastr.warning('Por favor, cole uma descrição de vaga com pelo menos 20 caracteres.', 'Atenção');
       return;
@@ -932,7 +934,7 @@ export class BuilderComponent implements OnInit, OnDestroy, CanComponentDeactiva
     });
   }
 
-  roastResume() {
+  roastResume(): void {
     const current = this.draft();
     if (!current.id) return;
 
@@ -953,22 +955,22 @@ export class BuilderComponent implements OnInit, OnDestroy, CanComponentDeactiva
     });
   }
 
-  closeRoastModal() {
+  closeRoastModal(): void {
     this.showRoastModal.set(false);
   }
 
-  copyCoverLetter() {
+  copyCoverLetter(): void {
     navigator.clipboard.writeText(this.generatedCoverLetter());
     this.toastr.success('Carta copiada para a área de transferência!', 'Sucesso');
   }
 
-  closeCoverLetterModal() {
+  closeCoverLetterModal(): void {
     this.showCoverLetterModal.set(false);
   }
 
   isExportingPdf = signal(false);
 
-  async exportToPDF() {
+  async exportToPDF(): Promise<void> {
     this.isExportingPdf.set(true);
 
     // Create a temporary clone of the preview for high-res rendering
