@@ -7,8 +7,8 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "test:coverage": "ng test --coverage",
-    "test:serve": "npx http-server coverage/smart-cv -o"
+    "test:coverage": "ng test --coverage --watch=false",
+    "test:serve": "npx http-server coverage/smart-cv -o -c-1"
   },
   "prettier": {
     "printWidth": 100,

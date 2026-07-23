@@ -135,6 +135,9 @@ describe('DashboardComponent', () => {
 
     const twoHoursAgo = new Date(now.getTime() - 2 * 3600000).toISOString();
     expect(component.formatDate(twoHoursAgo)).toBe('há 2h');
+
+    const twoDaysAgo = new Date(now.getTime() - 48 * 3600000);
+    expect(component.formatDate(twoDaysAgo.toISOString())).toBe(twoDaysAgo.toLocaleDateString('pt-BR'));
   });
 
   it('should get template name', () => {
@@ -157,6 +160,13 @@ describe('DashboardComponent', () => {
     component.fileInput = { nativeElement: { click: vi.fn() } } as any;
     component.triggerLinkedInImport();
     expect(component.fileInput.nativeElement.click).toHaveBeenCalled();
+  });
+
+  it('should return early on empty file selection', () => {
+    const event = { target: { files: [] } } as any;
+    component.onLinkedInFileSelected(event);
+    expect(mockToastrService.error).not.toHaveBeenCalled();
+    expect(mockAiService.importLinkedIn).not.toHaveBeenCalled();
   });
 
   it('should handle non-PDF file on LinkedIn import', () => {
@@ -207,5 +217,12 @@ describe('DashboardComponent', () => {
     component.onLinkedInFileSelected(event);
 
     expect(mockToastrService.error).toHaveBeenCalledWith('Erro ao salvar o currículo.');
+  });
+
+  it('should unsubscribe on destroy', () => {
+    const unsubscribeSpy = vi.fn();
+    (component as any).subs = [{ unsubscribe: unsubscribeSpy }];
+    component.ngOnDestroy();
+    expect(unsubscribeSpy).toHaveBeenCalled();
   });
 });
