@@ -132,14 +132,14 @@ describe('ResumeService', () => {
     service.loading$.subscribe(val => loadingState = val);
 
     service.loadResumes().subscribe({
-      error: () => {
-        expect(loadingState).toBe(false);
-      }
+      error: () => {}
     });
     expect(loadingState).toBe(true);
 
     const req = httpMock.expectOne(`${environment.apiUrl}/resumes`);
     req.flush('Error', { status: 500, statusText: 'Server Error' });
+
+    expect(loadingState).toBe(false);
 
     service.error$.subscribe(err => {
       expect(err).toBe('Erro ao carregar os currículos.');

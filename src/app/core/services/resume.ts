@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, throwError } from 'rxjs';
-import { tap, switchMap, catchError } from 'rxjs/operators';
+import { tap, switchMap, catchError, finalize } from 'rxjs/operators';
 import { Resume, DashboardStats, EMPTY_RESUME } from '@core/models/resume.model';
 import { environment } from '@env/environment';
 
@@ -36,14 +36,14 @@ export class ResumeService {
       : `${environment.apiUrl}/resumes`;
     return this.http.get<Resume[]>(url).pipe(
       tap(resumesList => {
-        this.resumesSubject.next(resumesList);
-        this.loadingSubject.next(false);
+        this.resumesSubject.next(resumesList ?? []);
       }),
       catchError(err => {
-        this.loadingSubject.next(false);
+        this.resumesSubject.next([]);
         this.errorSubject.next('Erro ao carregar os currículos.');
         return throwError(() => err);
-      })
+      }),
+      finalize(() => this.loadingSubject.next(false))
     );
   }
 
@@ -66,15 +66,15 @@ export class ResumeService {
 
   create(partial?: Partial<Resume>): Observable<Resume> {
     const resumePayload = {
-      title: partial?.title || EMPTY_RESUME.title,
-      template: partial?.template || EMPTY_RESUME.template,
-      colorTheme: partial?.colorTheme || EMPTY_RESUME.colorTheme,
-      fontFamily: partial?.fontFamily || EMPTY_RESUME.fontFamily,
-      spacingMode: partial?.spacingMode || EMPTY_RESUME.spacingMode,
-      personalInfo: partial?.personalInfo || EMPTY_RESUME.personalInfo,
-      experience: partial?.experience || EMPTY_RESUME.experience,
-      education: partial?.education || EMPTY_RESUME.education,
-      skills: partial?.skills || EMPTY_RESUME.skills,
+      title: partial?.title ?? EMPTY_RESUME.title,
+      template: partial?.template ?? EMPTY_RESUME.template,
+      colorTheme: partial?.colorTheme ?? EMPTY_RESUME.colorTheme,
+      fontFamily: partial?.fontFamily ?? EMPTY_RESUME.fontFamily,
+      spacingMode: partial?.spacingMode ?? EMPTY_RESUME.spacingMode,
+      personalInfo: partial?.personalInfo ?? EMPTY_RESUME.personalInfo,
+      experience: partial?.experience ?? EMPTY_RESUME.experience,
+      education: partial?.education ?? EMPTY_RESUME.education,
+      skills: partial?.skills ?? EMPTY_RESUME.skills,
     };
 
     return this.http.post<Resume>(`${environment.apiUrl}/resumes`, resumePayload).pipe(
