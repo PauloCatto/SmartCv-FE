@@ -1,9 +1,9 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { tap, switchMap } from 'rxjs/operators';
-import { Resume, DashboardStats, EMPTY_RESUME } from '../models/resume.model';
-import { environment } from '../../../environments/environment';
+import { BehaviorSubject, Observable, throwError } from 'rxjs';
+import { tap, switchMap, catchError } from 'rxjs/operators';
+import { Resume, DashboardStats, EMPTY_RESUME } from '@core/models/resume.model';
+import { environment } from '@env/environment';
 
 @Injectable({ providedIn: 'root' })
 export class ResumeService {
@@ -11,21 +11,38 @@ export class ResumeService {
 
   private resumesSubject = new BehaviorSubject<Resume[]>([]);
   private currentResumeSubject = new BehaviorSubject<Resume | null>(null);
+  private loadingSubject = new BehaviorSubject<boolean>(false);
+  private errorSubject = new BehaviorSubject<string | null>(null);
 
   readonly resumes$ = this.resumesSubject.asObservable();
   readonly currentResume$ = this.currentResumeSubject.asObservable();
+  readonly loading$ = this.loadingSubject.asObservable();
+  readonly error$ = this.errorSubject.asObservable();
 
   constructor() {
-    this.loadResumes().subscribe();
+    this.loadResumes().pipe(
+      catchError(err => {
+        console.error('Falha no carregamento inicial de currículos:', err);
+        return throwError(() => err);
+      })
+    ).subscribe({ error: () => {} });
   }
 
   loadResumes(completedOnly = false): Observable<Resume[]> {
+    this.loadingSubject.next(true);
+    this.errorSubject.next(null);
     const url = completedOnly
       ? `${environment.apiUrl}/resumes?completed=true`
       : `${environment.apiUrl}/resumes`;
     return this.http.get<Resume[]>(url).pipe(
       tap(resumesList => {
         this.resumesSubject.next(resumesList);
+        this.loadingSubject.next(false);
+      }),
+      catchError(err => {
+        this.loadingSubject.next(false);
+        this.errorSubject.next('Erro ao carregar os currículos.');
+        return throwError(() => err);
       })
     );
   }

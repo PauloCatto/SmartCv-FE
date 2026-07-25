@@ -126,4 +126,23 @@ describe('ResumeService', () => {
     expect(req.request.method).toBe('GET');
     req.flush({ totalResumes: 5, plan: 'FREE', aiActive: true });
   });
+
+  it('should handle reactive loading state and error stream during loadResumes failure', () => {
+    let loadingState = false;
+    service.loading$.subscribe(val => loadingState = val);
+
+    service.loadResumes().subscribe({
+      error: () => {
+        expect(loadingState).toBe(false);
+      }
+    });
+    expect(loadingState).toBe(true);
+
+    const req = httpMock.expectOne(`${environment.apiUrl}/resumes`);
+    req.flush('Error', { status: 500, statusText: 'Server Error' });
+
+    service.error$.subscribe(err => {
+      expect(err).toBe('Erro ao carregar os currículos.');
+    });
+  });
 });
