@@ -3,7 +3,7 @@ import { DashboardComponent } from './dashboard.component';
 import { ResumeService } from '../../core/services/resume';
 import { AuthService } from '../../core/services/auth';
 import { AiService } from '../../core/services/ai';
-import { ToastrService } from 'ngx-toastr';
+import { NotificationService } from '../../core/services/notification.service';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { BehaviorSubject, of, throwError } from 'rxjs';
 import { Router } from '@angular/router';
@@ -15,7 +15,7 @@ describe('DashboardComponent', () => {
   let mockResumeService: any;
   let mockAuthService: any;
   let mockAiService: any;
-  let mockToastrService: any;
+  let mockNotificationService: any;
   let mockRouter: any;
 
   beforeEach(async () => {
@@ -36,9 +36,11 @@ describe('DashboardComponent', () => {
       importLinkedIn: vi.fn().mockReturnValue(of({ title: 'Imported Resume' }))
     };
 
-    mockToastrService = {
+    mockNotificationService = {
       success: vi.fn(),
-      error: vi.fn()
+      error: vi.fn(),
+      warning: vi.fn(),
+      info: vi.fn()
     };
 
     mockRouter = {
@@ -52,7 +54,7 @@ describe('DashboardComponent', () => {
         { provide: ResumeService, useValue: mockResumeService },
         { provide: AuthService, useValue: mockAuthService },
         { provide: AiService, useValue: mockAiService },
-        { provide: ToastrService, useValue: mockToastrService }
+        { provide: NotificationService, useValue: mockNotificationService }
       ]
     })
       .compileComponents();
@@ -75,14 +77,14 @@ describe('DashboardComponent', () => {
     const mockResume: any = { id: 'test-123' };
     component.duplicate(mockResume);
     expect(mockResumeService.duplicate).toHaveBeenCalledWith('test-123');
-    expect(mockToastrService.success).toHaveBeenCalledWith('Currículo duplicado com sucesso!', 'Duplicado');
+    expect(mockNotificationService.success).toHaveBeenCalledWith({ pt: 'Currículo duplicado com sucesso!', en: 'Resume duplicated successfully!' }, { pt: 'Duplicado', en: 'Duplicated' });
   });
 
   it('should handle resume duplication error', () => {
     mockResumeService.duplicate.mockReturnValueOnce(throwError(() => new Error('Error')));
     const mockResume: any = { id: 'test-123' };
     component.duplicate(mockResume);
-    expect(mockToastrService.error).toHaveBeenCalledWith('Erro ao duplicar currículo.', 'Erro');
+    expect(mockNotificationService.error).toHaveBeenCalledWith({ pt: 'Erro ao duplicar currículo.', en: 'Error duplicating resume.' });
   });
 
   it('should request delete and confirm delete', () => {
@@ -91,7 +93,7 @@ describe('DashboardComponent', () => {
 
     component.confirmDelete();
     expect(mockResumeService.delete).toHaveBeenCalledWith('test-123');
-    expect(mockToastrService.success).toHaveBeenCalledWith('Currículo excluído com sucesso!', 'Excluído');
+    expect(mockNotificationService.success).toHaveBeenCalledWith({ pt: 'Currículo excluído com sucesso!', en: 'Resume deleted successfully!' }, { pt: 'Excluído', en: 'Deleted' });
     expect(component.deleteTargetId).toBeNull();
   });
 
@@ -99,7 +101,7 @@ describe('DashboardComponent', () => {
     mockResumeService.delete.mockReturnValueOnce(throwError(() => new Error('Error')));
     component.requestDelete('test-123');
     component.confirmDelete();
-    expect(mockToastrService.error).toHaveBeenCalledWith('Erro ao excluir currículo. Tente novamente.', 'Erro');
+    expect(mockNotificationService.error).toHaveBeenCalledWith({ pt: 'Erro ao excluir currículo. Tente novamente.', en: 'Error deleting resume. Try again.' });
   });
 
   it('should cancel delete', () => {
@@ -165,14 +167,14 @@ describe('DashboardComponent', () => {
   it('should return early on empty file selection', () => {
     const event = { target: { files: [] } } as any;
     component.onLinkedInFileSelected(event);
-    expect(mockToastrService.error).not.toHaveBeenCalled();
+    expect(mockNotificationService.error).not.toHaveBeenCalled();
     expect(mockAiService.importLinkedIn).not.toHaveBeenCalled();
   });
 
   it('should handle non-PDF file on LinkedIn import', () => {
     const event = { target: { files: [{ type: 'image/png' }] } } as any;
     component.onLinkedInFileSelected(event);
-    expect(mockToastrService.error).toHaveBeenCalledWith('Por favor, envie um arquivo PDF do LinkedIn.', 'Erro');
+    expect(mockNotificationService.error).toHaveBeenCalledWith({ pt: 'Por favor, envie um arquivo PDF do LinkedIn.', en: 'Please upload a LinkedIn PDF file.' });
     expect(mockAiService.importLinkedIn).not.toHaveBeenCalled();
   });
 
@@ -202,7 +204,7 @@ describe('DashboardComponent', () => {
 
     component.onLinkedInFileSelected(event);
 
-    expect(mockToastrService.error).toHaveBeenCalledWith('Falha ao processar o PDF do LinkedIn.', 'Erro');
+    expect(mockNotificationService.error).toHaveBeenCalledWith({ pt: 'Falha ao processar o PDF do LinkedIn.', en: 'Failed to process LinkedIn PDF.' });
   });
 
   it('should handle error when creating resume from LinkedIn import', () => {
@@ -216,7 +218,7 @@ describe('DashboardComponent', () => {
 
     component.onLinkedInFileSelected(event);
 
-    expect(mockToastrService.error).toHaveBeenCalledWith('Erro ao salvar o currículo.');
+    expect(mockNotificationService.error).toHaveBeenCalledWith({ pt: 'Erro ao salvar o currículo.', en: 'Error saving the resume.' });
   });
 
   it('should unsubscribe on destroy', () => {

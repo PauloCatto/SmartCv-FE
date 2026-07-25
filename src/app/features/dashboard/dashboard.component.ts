@@ -1,4 +1,4 @@
-import { Component, inject, ViewChild, ElementRef, OnInit, OnDestroy } from '@angular/core';
+import { Component, inject, ViewChild, ElementRef, OnInit, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
 import { RouterLink, Router } from '@angular/router';
 import { AsyncPipe } from '@angular/common';
 import { combineLatest, map, BehaviorSubject, Subscription, finalize, catchError, of } from 'rxjs';
@@ -8,7 +8,7 @@ import { Resume, DashboardStats, TEMPLATE_OPTIONS } from '../../core/models/resu
 import { JobMatcherModalComponent } from '../../shared/components/job-matcher-modal/job-matcher-modal.component';
 import { ConfirmModalComponent } from '../../shared/components/confirm-modal/confirm-modal.component';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { ToastrService } from 'ngx-toastr';
+import { NotificationService } from '../../core/services/notification.service';
 import { AiService } from '../../core/services/ai';
 
 @Component({
@@ -22,12 +22,13 @@ import { AiService } from '../../core/services/ai';
   ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DashboardComponent implements OnInit, OnDestroy {
   resumeService = inject(ResumeService);
   auth = inject(AuthService);
   private router = inject(Router);
-  private toastr = inject(ToastrService);
+  private notification = inject(NotificationService);
   private translate = inject(TranslateService);
   private aiService = inject(AiService);
 
@@ -43,38 +44,46 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   stats: DashboardStats = { totalResumes: 0, plan: 'FREE', aiActive: false };
 
-  resumes$ = this.resumeService.resumes$;
-  hasResumes$ = this.resumes$.pipe(map(r => r.length > 0));
+  resumes$ = this.resumeService.resumes$.pipe(map(res => res ?? []));
+  hasResumes$ = this.resumes$.pipe(map(r => (r?.length ?? 0) > 0));
   firstName$ = this.auth.user$.pipe(
-    map(u => u?.name?.split(' ')[0] || 'Usuário')
+    map(u => u?.name?.split(' ')[0] ?? 'Usuário')
   );
 
-  isImportingLinkedIn = false;
+  isImportingLinkedIn: boolean = false;
 
   dashboard$ = combineLatest([
     this.resumeService.resumes$,
     this.resumeService.getDashboardStats(),
   ]).pipe(
-    map(([resumes, stats]) => {
-      this.loadingSubject.next(false);
-      return { resumes, stats };
-    }),
-    catchError(() => {
-      this.loadingSubject.next(false);
-      return of({ resumes: [], stats: this.stats });
-    })
+    map(([resumes, stats]) => ({
+      resumes: resumes ?? [],
+      stats: stats ?? this.stats,
+    })),
+    catchError(() => of({
+      resumes: [],
+      stats: this.stats ?? { totalResumes: 0, plan: 'FREE', aiActive: false }
+    })),
+    finalize(() => this.loadingSubject.next(false))
   );
 
   private subs: Subscription[] = [];
 
   ngOnInit(): void {
-    this.resumeService.loadResumes(true).subscribe(resumes => {
-      this.loadingSubject.next(false);
+    const resumesSub = this.resumeService.loadResumes(true).pipe(
+      finalize(() => this.loadingSubject.next(false))
+    ).subscribe();
+
+    const statsSub = this.resumeService.getDashboardStats().subscribe({
+      next: (stats) => {
+        this.stats = stats ?? { totalResumes: 0, plan: 'FREE', aiActive: false };
+      },
+      error: () => {
+        this.stats = { totalResumes: 0, plan: 'FREE', aiActive: false };
+      }
     });
-    const sub = this.resumeService.getDashboardStats().subscribe(stats => {
-      this.stats = stats;
-    });
-    this.subs.push(sub);
+
+    this.subs.push(resumesSub, statsSub);
   }
 
   ngOnDestroy(): void {
@@ -101,10 +110,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
   duplicate(resume: Resume): void {
     this.resumeService.duplicate(resume.id).subscribe({
       next: () => {
-        this.toastr.success('Currículo duplicado com sucesso!', 'Duplicado');
+        this.notification.success({ pt: 'Currículo duplicado com sucesso!', en: 'Resume duplicated successfully!' }, { pt: 'Duplicado', en: 'Duplicated' });
       },
       error: () => {
-        this.toastr.error('Erro ao duplicar currículo.', 'Erro');
+        this.notification.error({ pt: 'Erro ao duplicar currículo.', en: 'Error duplicating resume.' });
       }
     });
   }
@@ -120,10 +129,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
     this.resumeService.delete(id).subscribe({
       next: () => {
-        this.toastr.success('Currículo excluído com sucesso!', 'Excluído');
+        this.notification.success({ pt: 'Currículo excluído com sucesso!', en: 'Resume deleted successfully!' }, { pt: 'Excluído', en: 'Deleted' });
       },
       error: () => {
-        this.toastr.error('Erro ao excluir currículo. Tente novamente.', 'Erro');
+        this.notification.error({ pt: 'Erro ao excluir currículo. Tente novamente.', en: 'Error deleting resume. Try again.' });
       }
     });
   }
@@ -192,7 +201,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
     const file = input.files[0];
     if (file.type !== 'application/pdf') {
-      this.toastr.error('Por favor, envie um arquivo PDF do LinkedIn.', 'Erro');
+      this.notification.error({ pt: 'Por favor, envie um arquivo PDF do LinkedIn.', en: 'Please upload a LinkedIn PDF file.' });
       return;
     }
 
@@ -218,14 +227,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
         this.resumeService.create(parsedResume).subscribe({
           next: (created) => {
-            this.toastr.success(isEn ? 'Resume created successfully!' : 'Currículo criado com sucesso!');
+            this.notification.success({ pt: 'Currículo criado com sucesso!', en: 'Resume created successfully!' });
             this.router.navigate(['/resume', this.slugify(created.title), 'edit']);
           },
-          error: () => this.toastr.error(isEn ? 'Error saving the resume.' : 'Erro ao salvar o currículo.')
+          error: () => this.notification.error({ pt: 'Erro ao salvar o currículo.', en: 'Error saving the resume.' })
         });
       },
       error: () => {
-        this.toastr.error(lang === 'en' ? 'Failed to process LinkedIn PDF.' : 'Falha ao processar o PDF do LinkedIn.', 'Erro');
+        this.notification.error({ pt: 'Falha ao processar o PDF do LinkedIn.', en: 'Failed to process LinkedIn PDF.' });
       }
     });
   }
