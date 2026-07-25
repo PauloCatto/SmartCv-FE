@@ -2,11 +2,15 @@
   <h1>✨ Smart CV &bull; Frontend</h1>
   <p><strong>A Plataforma Definitiva para Criação de Currículos com Inteligência Artificial & Engenharia de Alta Performance</strong></p>
   <p><em>⚠️ Projeto de vitrine técnica demonstrando padrões avançados em Angular & RxJS. ⚠️</em></p>
+  <br />
+  <h3>🌐 <a href="https://smart-cv-fe.vercel.app"><strong>Acesse o Deploy ao Vivo na Vercel</strong></a> 🚀</h3>
 </div>
 
 <br />
 
 ## 🚀 Visão Geral
+> 💡 **Ambiente Online:** Experimente a plataforma em tempo real acessando [https://smart-cv-fe.vercel.app](https://smart-cv-fe.vercel.app).
+
 O **Smart CV** é uma plataforma premium concebida para orientar profissionais na construção de currículos de impacto, adaptados nativamente para sistemas **ATS (Applicant Tracking Systems)** e com cartas de apresentação customizadas pelo Google Gemini em segundos. 
 
 Mais do que um simples produto visual, o projeto foi arquitetado com base em pilares rigorosos de **Engenharia de Software, Clean Code e Resiliência Reativa**, combinando interfaces modernas no modo escuro (*Dark Mode*) com uma das mais avançadas suítes de performance no ecossistema **Angular (Zoneless & OnPush)**.
