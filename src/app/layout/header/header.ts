@@ -1,4 +1,4 @@
-import { Component, inject, signal, HostListener } from '@angular/core';
+import { Component, inject, signal, HostListener, ChangeDetectionStrategy } from '@angular/core';
 import { RouterLink, Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth';
 import { AsyncPipe, UpperCasePipe } from '@angular/common';
@@ -10,6 +10,7 @@ import { SidebarService } from '../../core/services/sidebar.service';
   imports: [RouterLink, AsyncPipe, UpperCasePipe, TranslateModule],
   templateUrl: './header.html',
   styleUrl: './header.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HeaderComponent {
   auth = inject(AuthService);

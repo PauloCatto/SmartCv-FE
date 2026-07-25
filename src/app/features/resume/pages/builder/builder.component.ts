@@ -1,4 +1,4 @@
-import { Component, inject, signal, computed, OnInit, OnDestroy } from '@angular/core';
+import { Component, inject, signal, computed, OnInit, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
@@ -40,6 +40,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
   ],
   templateUrl: './builder.component.html',
   styleUrl: './builder.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BuilderComponent implements OnInit, OnDestroy, CanComponentDeactivate {
   private resumeService = inject(ResumeService);

@@ -6,6 +6,4 @@ import { Component } from '@angular/core';
   templateUrl: './resume-form.html',
   styleUrl: './resume-form.scss',
 })
-export class ResumeForm {
-
-}
+export class ResumeForm { }
