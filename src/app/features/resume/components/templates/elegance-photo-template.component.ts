@@ -110,10 +110,6 @@ import { environment } from '../../../../../environments/environment';
                 <div class="skill-item">
                   <div class="skill-name-row">
                     <span class="skill-name">{{ skill.name }}</span>
-                    <span class="skill-level-text">{{ getLevelLabel(skill.level) }}</span>
-                  </div>
-                  <div class="skill-bar">
-                    <div class="skill-fill" [style.width.%]="skill.level * 20"></div>
                   </div>
                 </div>
               }
@@ -130,7 +126,6 @@ import { environment } from '../../../../../environments/environment';
               @for (lang of resolvedResume().languages; track lang.id) {
                 <div class="language-item">
                   <span class="language-name">{{ lang.name }}</span>
-                  <span class="language-level">{{ lang.level }}</span>
                 </div>
               }
             </div>

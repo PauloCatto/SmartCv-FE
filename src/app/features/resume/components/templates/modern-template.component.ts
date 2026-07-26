@@ -65,11 +65,6 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
               @for (skill of resolvedResume().skills; track skill.id) {
                 <div class="skill-item">
                   <div class="skill-name">{{ skill.name }}</div>
-                  <div class="skill-dots">
-                    @for (d of [1,2,3,4,5]; track d) {
-                      <div class="skill-dot" [class.filled]="skill.level >= d"></div>
-                    }
-                  </div>
                 </div>
               }
             </div>
@@ -84,7 +79,6 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
               @for (lang of resolvedResume().languages; track lang.id) {
                 <div class="skill-item">
                   <div class="skill-name">{{ lang.name }}</div>
-                  <div style="font-size:10px;color:rgba(255,255,255,0.6);margin-top:2px;">{{ lang.level }}</div>
                 </div>
               }
             </div>

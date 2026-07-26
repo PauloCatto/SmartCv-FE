@@ -120,7 +120,7 @@ import { UpperCasePipe } from '@angular/common';
           <div class="col-content">
             <div class="skills-wrap">
               @for (lang of resolvedResume().languages; track lang.id) {
-                <span class="skill-tag lang-tag">{{ lang.name }} <em style="opacity:0.7;font-style:normal;font-size:10px;">{{ lang.level }}</em></span>
+                <span class="skill-tag lang-tag">{{ lang.name }}</span>
               }
             </div>
           </div>
@@ -224,10 +224,20 @@ import { UpperCasePipe } from '@angular/common';
     .skill-tag {
       font-size: 11px;
       padding: 4px 10px;
-      background: color-mix(in srgb, var(--cv-primary) 8%, transparent);
       color: var(--cv-primary);
       border-radius: 100px;
       font-weight: 600;
+      position: relative;
+      overflow: hidden;
+      z-index: 1;
+    }
+    .skill-tag::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: var(--cv-primary);
+      opacity: 0.08;
+      z-index: -1;
     }
 
     /* =======================================

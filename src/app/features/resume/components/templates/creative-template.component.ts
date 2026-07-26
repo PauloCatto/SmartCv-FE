@@ -119,10 +119,6 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
                 <div class="skill-item">
                   <div class="skill-info">
                     <span class="skill-name">{{ skill.name }}</span>
-                    <span class="skill-percent">{{ skill.level * 20 }}%</span>
-                  </div>
-                  <div class="skill-progress-bar">
-                    <div class="skill-progress-fill" [style.width.%]="skill.level * 20"></div>
                   </div>
                 </div>
               }
@@ -139,7 +135,6 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
                 <div class="skill-item">
                   <div class="skill-info">
                     <span class="skill-name">{{ lang.name }}</span>
-                    <span class="skill-percent">{{ lang.level }}</span>
                   </div>
                 </div>
               }

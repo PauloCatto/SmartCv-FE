@@ -128,15 +128,7 @@ import { environment } from '../../../../../environments/environment';
             <div class="skills-list">
               @for (skill of resolvedResume().skills; track skill.id) {
                 <div class="skill-item">
-                  <div class="skill-info">
-                    <span class="skill-name">{{ skill.name }}</span>
-                    <span class="skill-level-text">{{ getLevelLabel(skill.level) }}</span>
-                  </div>
-                  <div class="skill-dots">
-                    @for (dot of [1,2,3,4,5]; track dot) {
-                      <div class="dot" [class.active]="skill.level >= dot"></div>
-                    }
-                  </div>
+                  <span class="skill-name">{{ skill.name }}</span>
                 </div>
               }
             </div>
@@ -151,7 +143,6 @@ import { environment } from '../../../../../environments/environment';
               @for (lang of resolvedResume().languages; track lang.id) {
                 <div class="lang-item">
                   <span class="lang-name">{{ lang.name }}</span>
-                  <span class="lang-level">{{ lang.level }}</span>
                 </div>
               }
             </div>

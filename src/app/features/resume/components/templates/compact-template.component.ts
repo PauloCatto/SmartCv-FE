@@ -101,7 +101,6 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
               @for (skill of resolvedResume().skills; track skill.id) {
                 <div class="skill-tag-card">
                   <span class="skill-tag-name">{{ skill.name }}</span>
-                  <span class="skill-tag-level">{{ getLevelLabel(skill.level) }}</span>
                 </div>
               }
             </div>
@@ -116,7 +115,6 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
               @for (lang of resolvedResume().languages; track lang.id) {
                 <div class="skill-tag-card">
                   <span class="skill-tag-name">{{ lang.name }}</span>
-                  <span class="skill-tag-level">{{ lang.level }}</span>
                 </div>
               }
             </div>
@@ -288,11 +286,21 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
     .skill-tag-level {
       font-size: 9px;
-      background: color-mix(in srgb, var(--cv-primary) 10%, #fff);
       color: var(--cv-primary);
       padding: 2px 6px;
       border-radius: 100px;
       font-weight: 700;
+      position: relative;
+      overflow: hidden;
+      z-index: 1;
+    }
+    .skill-tag-level::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: var(--cv-primary);
+      opacity: 0.1;
+      z-index: -1;
     }
 
     /* =======================================

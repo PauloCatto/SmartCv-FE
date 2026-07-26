@@ -106,7 +106,6 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
                 <div class="skill-item">
                   <div class="skill-name-row">
                     <span class="skill-name">{{ skill.name }}</span>
-                    <span class="skill-level-text">{{ getLevelLabel(skill.level) }}</span>
                   </div>
                   <div class="skill-bar">
                     <div class="skill-fill" [style.width.%]="skill.level * 20"></div>
@@ -126,7 +125,6 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
               @for (lang of resolvedResume().languages; track lang.id) {
                 <div class="language-item">
                   <span class="language-name">{{ lang.name }}</span>
-                  <span class="language-level">{{ lang.level }}</span>
                 </div>
               }
             </div>
@@ -246,7 +244,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
     .language-item { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid #f1f5f9; }
     .language-item:last-child { border-bottom: none; }
     .language-name { font-size: 13px; font-weight: 600; color: #1e293b; font-family: 'Inter', sans-serif; }
-    .language-level { font-size: 11px; color: white; background: var(--cv-primary); padding: 2px 8px; border-radius: 100px; font-family: 'Inter', sans-serif; font-weight: 600; }
+    .language-level { font-size: 11px; color: white; background: var(--cv-primary); padding: 4px 10px; border-radius: 100px; font-family: 'Inter', sans-serif; font-weight: 600; display: inline-block; white-space: nowrap; text-align: center; }
 
 
     /* =======================================
