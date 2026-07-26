@@ -3,10 +3,11 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Router } from '@angular/router';
-import { ToastrService } from 'ngx-toastr';
+import { NotificationService } from '../../../../core/services/notification.service';
 import { ResumeService } from '../../../../core/services/resume';
 import { AiService } from '../../../../core/services/ai';
 import { Resume } from '../../../../core/models/resume.model';
+import { RoastResultPayload } from '../../../../core/models/ai.model';
 
 @Component({
   selector: 'app-roast-resume',
@@ -116,7 +117,7 @@ import { Resume } from '../../../../core/models/resume.model';
                       </div>
                       <div class="score-circle-wrapper">
                         <div class="score-circle">
-                          {{ roastResult().score }}
+                          {{ roastResult()?.score || 0 }}
                         </div>
                       </div>
                     </div>
@@ -129,7 +130,7 @@ import { Resume } from '../../../../core/models/resume.model';
                         {{ 'BUILDER.ROAST.STRENGTHS' | translate }}
                       </h4>
                       <ul>
-                        @for (s of roastResult().strengths; track s) { <li>{{ s }}</li> }
+                        @for (s of (roastResult()?.strengths || []); track s) { <li>{{ s }}</li> }
                       </ul>
                     </div>
                   }
@@ -144,7 +145,7 @@ import { Resume } from '../../../../core/models/resume.model';
                         {{ 'BUILDER.ROAST.WEAKNESSES' | translate }}
                       </h4>
                       <ul>
-                        @for (w of roastResult().weaknesses; track w) { <li>{{ w }}</li> }
+                        @for (w of (roastResult()?.weaknesses || []); track w) { <li>{{ w }}</li> }
                       </ul>
                     </div>
                   }
@@ -160,18 +161,18 @@ import { Resume } from '../../../../core/models/resume.model';
                         {{ 'BUILDER.ROAST.ACTIONABLE' | translate }}
                       </h4>
                       <ul>
-                        @for (a of roastResult().actionableFeedback; track a) { <li>{{ a }}</li> }
+                        @for (a of (roastResult()?.actionableFeedback || []); track a) { <li>{{ a }}</li> }
                       </ul>
                     </div>
                   }
                 </div>
 
                 <div class="next-steps-card animate-fade-in-up" style="margin-top: 24px; padding: 24px; background: var(--color-surface-2); border-radius: var(--radius-md); border: 1px solid var(--color-border); text-align: center;">
-                  <h3 style="margin-bottom: 8px; font-size: 16px; font-weight: 600;">Próximos Passos</h3>
-                  <p style="color: var(--color-text-muted); margin-bottom: 20px; font-size: 14px;">Use o feedback acima para melhorar seu currículo no editor e aumentar suas chances nas vagas.</p>
+                  <h3 style="margin-bottom: 8px; font-size: 16px; font-weight: 600;">{{ 'BUILDER.ROAST.NEXT_STEPS_TITLE' | translate }}</h3>
+                  <p style="color: var(--color-text-muted); margin-bottom: 20px; font-size: 14px;">{{ 'BUILDER.ROAST.NEXT_STEPS_DESC' | translate }}</p>
                   <div style="display: flex; gap: 16px; justify-content: center;">
-                     <button class="btn btn-primary" (click)="goToBuilder()">Melhorar Currículo Agora</button>
-                     <button class="btn btn-secondary" (click)="roastResume()">Reavaliar Currículo</button>
+                     <button class="btn btn-primary" (click)="goToBuilder()">{{ 'BUILDER.ROAST.IMPROVE_BTN' | translate }}</button>
+                     <button class="btn btn-secondary" (click)="roastResume()">{{ 'BUILDER.ROAST.REEVALUATE_BTN' | translate }}</button>
                   </div>
                 </div>
               } @else {
@@ -260,22 +261,22 @@ import { Resume } from '../../../../core/models/resume.model';
 export class RoastResumePageComponent implements OnInit {
   private resumeService = inject(ResumeService);
   private aiService = inject(AiService);
-  private toastr = inject(ToastrService);
+  private notification = inject(NotificationService);
   private translate = inject(TranslateService);
   private router = inject(Router);
 
   resumes = signal<Resume[]>([]);
-  isLoadingResumes = signal(true);
-  
-  selectedResumeId = '';
-  isRoasting = signal(false);
-  roastResult = signal<any>(null);
+  isLoadingResumes = signal<boolean>(true);
+
+  selectedResumeId: string = '';
+  isRoasting = signal<boolean>(false);
+  roastResult = signal<RoastResultPayload | null>(null);
   activeTab = signal<'summary' | 'ats' | 'actionable'>('summary');
   activeExampleTab = signal<'summary' | 'ats' | 'actionable'>('summary');
 
-  ngOnInit() {
-    this.resumeService.loadResumes(true).subscribe({
-      next: (data) => {
+  ngOnInit(): void {
+    this.resumeService.loadResumes().subscribe({
+      next: (data: Resume[]) => {
         this.resumes.set(data);
         if (data.length > 0) {
           this.selectedResumeId = data[0].id;
@@ -283,35 +284,44 @@ export class RoastResumePageComponent implements OnInit {
         this.isLoadingResumes.set(false);
       },
       error: () => {
-        this.toastr.error('Erro ao carregar currículos');
+        this.notification.error({ pt: 'Erro ao carregar currículos', en: 'Error loading resumes' });
         this.isLoadingResumes.set(false);
       }
     });
   }
 
-  roastResume() {
+  roastResume(): void {
     if (!this.selectedResumeId) {
-      this.toastr.warning('Selecione um currículo primeiro.', 'Atenção');
+      this.notification.warning(
+        { pt: 'Selecione um currículo primeiro.', en: 'Please select a resume first.' },
+        { pt: 'Atenção', en: 'Attention' }
+      );
       return;
     }
 
     this.isRoasting.set(true);
-    
-    const lang = this.translate.currentLang || 'pt';
+
+    const lang: string = this.translate.currentLang || 'pt';
     this.aiService.roastResume(this.selectedResumeId, lang).subscribe({
-      next: (res) => {
+      next: (res: RoastResultPayload) => {
         this.roastResult.set(res);
         this.isRoasting.set(false);
-        this.toastr.success('Avaliação concluída!', 'Sucesso');
+        this.notification.success(
+          { pt: 'Avaliação concluída!', en: 'Evaluation completed!' },
+          { pt: 'Sucesso', en: 'Success' }
+        );
       },
       error: () => {
-        this.toastr.error('Erro ao gerar avaliação. Tente novamente mais tarde.', 'Erro IA');
+        this.notification.error(
+          { pt: 'Erro ao gerar avaliação. Tente novamente mais tarde.', en: 'Error generating evaluation. Please try again later.' },
+          { pt: 'Erro IA', en: 'AI Error' }
+        );
         this.isRoasting.set(false);
       }
     });
   }
 
-  goToBuilder() {
+  goToBuilder(): void {
     if (this.selectedResumeId) {
       this.router.navigate(['/resume', this.selectedResumeId, 'edit']);
     }

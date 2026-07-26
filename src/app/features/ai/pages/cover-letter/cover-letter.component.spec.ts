@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { CoverLetterPageComponent } from './cover-letter.component';
 import { ResumeService } from '../../../../core/services/resume';
 import { AiService } from '../../../../core/services/ai';
-import { ToastrService } from 'ngx-toastr';
+import { NotificationService } from '../../../../core/services/notification.service';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { of, throwError } from 'rxjs';
 
@@ -26,7 +26,7 @@ describe('CoverLetterPageComponent', () => {
   let fixture: ComponentFixture<CoverLetterPageComponent>;
   let mockResumeService: Record<string, ReturnType<typeof vi.fn>>;
   let mockAiService: Record<string, ReturnType<typeof vi.fn>>;
-  let mockToastrService: Record<string, ReturnType<typeof vi.fn>>;
+  let mockNotificationService: Record<string, ReturnType<typeof vi.fn>>;
 
   beforeEach(async () => {
     mockResumeService = {
@@ -35,7 +35,7 @@ describe('CoverLetterPageComponent', () => {
     mockAiService = {
       generateCoverLetter: vi.fn().mockReturnValue(of({ result: { coverLetter: 'Dear hiring manager...', matchScore: 90 } }))
     };
-    mockToastrService = {
+    mockNotificationService = {
       success: vi.fn(),
       error: vi.fn(),
       warning: vi.fn()
@@ -46,7 +46,7 @@ describe('CoverLetterPageComponent', () => {
       providers: [
         { provide: ResumeService, useValue: mockResumeService },
         { provide: AiService, useValue: mockAiService },
-        { provide: ToastrService, useValue: mockToastrService }
+        { provide: NotificationService, useValue: mockNotificationService }
       ]
     })
     .compileComponents();
@@ -74,7 +74,10 @@ describe('CoverLetterPageComponent', () => {
   it('should show warning if generating letter without resume', () => {
     component.selectedResumeId = '';
     component.generateCoverLetter();
-    expect(mockToastrService.warning).toHaveBeenCalledWith('Selecione um currículo base primeiro.', 'Atenção');
+    expect(mockNotificationService.warning).toHaveBeenCalledWith(
+      { pt: 'Selecione um currículo base primeiro.', en: 'Please select a base resume first.' },
+      { pt: 'Atenção', en: 'Attention' }
+    );
   });
 
   it('should show warning if generating letter without enough job description', () => {
@@ -82,7 +85,10 @@ describe('CoverLetterPageComponent', () => {
     component.jobDescription = 'short';
     fixture.detectChanges();
     component.generateCoverLetter();
-    expect(mockToastrService.warning).toHaveBeenCalledWith('Por favor, cole uma descrição de vaga com pelo menos 20 caracteres.', 'Atenção');
+    expect(mockNotificationService.warning).toHaveBeenCalledWith(
+      { pt: 'Por favor, cole uma descrição de vaga com pelo menos 20 caracteres.', en: 'Please paste a job description with at least 20 characters.' },
+      { pt: 'Atenção', en: 'Attention' }
+    );
   });
 
   it('should generate cover letter successfully', () => {
@@ -94,7 +100,7 @@ describe('CoverLetterPageComponent', () => {
     
     expect(mockAiService.generateCoverLetter).toHaveBeenCalled();
     expect(component.generatedLetter()).toBe('Dear hiring manager...');
-    expect(mockToastrService.success).toHaveBeenCalled();
+    expect(mockNotificationService.success).toHaveBeenCalled();
   });
 
   it('should handle cover letter generation error', () => {
@@ -103,7 +109,7 @@ describe('CoverLetterPageComponent', () => {
     component.jobDescription = 'This is a long enough job description for the test to pass successfully and generate a cover letter.';
     
     component.generateCoverLetter();
-    expect(mockToastrService.error).toHaveBeenCalled();
+    expect(mockNotificationService.error).toHaveBeenCalled();
   });
 
   it('should copy letter to clipboard', () => {
@@ -113,7 +119,7 @@ describe('CoverLetterPageComponent', () => {
     component.copyLetter();
     expect(clipboardSpy).toHaveBeenCalledWith('Test letter');
     expect(component.isSavedOrExported).toBe(true);
-    expect(mockToastrService.success).toHaveBeenCalled();
+    expect(mockNotificationService.success).toHaveBeenCalled();
   });
 
   it('should slugify text', () => {
@@ -146,7 +152,7 @@ describe('CoverLetterPageComponent', () => {
   it('should test error on resume load', () => {
     mockResumeService.loadResumes.mockReturnValueOnce(throwError(() => new Error('Error')));
     component.ngOnInit();
-    expect(mockToastrService.error).toHaveBeenCalled();
+    expect(mockNotificationService.error).toHaveBeenCalled();
   });
 
   it('should generate cover letter with jobTitle', () => {
@@ -165,15 +171,17 @@ describe('CoverLetterPageComponent', () => {
       return originalGetElementById(id);
     });
 
-    // Mock html2canvas to throw an error
     const html2canvasMock = await import('html2canvas');
     vi.spyOn(html2canvasMock, 'default').mockRejectedValueOnce(new Error('Canvas Error'));
 
     component.viewMode.set('text');
     await component.exportPdf();
 
-    expect(mockToastrService.error).toHaveBeenCalledWith('Erro ao exportar PDF. Tente novamente.', 'Erro');
-    expect(component.viewMode()).toBe('text'); // Should restore mode
+    expect(mockNotificationService.error).toHaveBeenCalledWith(
+      { pt: 'Erro ao exportar PDF. Tente novamente.', en: 'Error exporting PDF. Please try again.' },
+      { pt: 'Erro', en: 'Error' }
+    );
+    expect(component.viewMode()).toBe('text');
 
     getElementSpy.mockRestore();
   });
@@ -189,8 +197,6 @@ describe('CoverLetterPageComponent', () => {
     await component.exportPdf();
     
     expect(component.exportingPdf()).toBe(false);
-    // The component has a bug where it doesn't restore viewMode if element is not found,
-    // so we expect 'paper' here. Or we could just not assert viewMode.
     expect(component.viewMode()).toBe('paper');
     
     getElementSpy.mockRestore();
@@ -211,7 +217,10 @@ describe('CoverLetterPageComponent', () => {
     
     expect(component.exportingPdf()).toBe(false);
     expect(component.isSavedOrExported).toBe(true);
-    expect(mockToastrService.success).toHaveBeenCalledWith('PDF baixado com sucesso!', 'Download');
+    expect(mockNotificationService.success).toHaveBeenCalledWith(
+      { pt: 'PDF baixado com sucesso!', en: 'PDF downloaded successfully!' },
+      { pt: 'Download', en: 'Download' }
+    );
     
     getElementSpy.mockRestore();
   });

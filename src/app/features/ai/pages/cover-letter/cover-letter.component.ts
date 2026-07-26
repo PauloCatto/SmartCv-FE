@@ -5,7 +5,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { ToastrService } from 'ngx-toastr';
+import { NotificationService } from '../../../../core/services/notification.service';
 import { ResumeService } from '../../../../core/services/resume';
 import { AiService } from '../../../../core/services/ai';
 import { Resume } from '../../../../core/models/resume.model';
@@ -177,7 +177,7 @@ import { Resume } from '../../../../core/models/resume.model';
                 </div>
               } @else {
                 <div class="workspace-placeholder-example">
-                  <div class="example-badge">Exemplo de Visualização</div>
+                  <div class="example-badge">{{ 'BUILDER.COVER_LETTER.EXAMPLE_BADGE' | translate }}</div>
                   
                   <div class="workspace-header-tabs" style="margin-top: 12px;">
                     <div class="tabs-buttons">
@@ -186,19 +186,19 @@ import { Resume } from '../../../../core/models/resume.model';
                           <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h12a2 2 0 002-2v-7" />
                           <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
                         </svg>
-                        Ver Texto
+                        {{ 'BUILDER.COVER_LETTER.TABS.EDIT_TEXT' | translate }}
                       </button>
                       <button class="tab-btn" [class.active]="activeExampleTab() === 'paper'" (click)="activeExampleTab.set('paper')">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                           <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                           <polyline points="14 2 14 8 20 8"></polyline>
                         </svg>
-                        Visualizar Papel
+                        {{ 'BUILDER.COVER_LETTER.TABS.VIEW_PAPER' | translate }}
                       </button>
                     </div>
                     <div class="match-rate-badge" [style.border-color]="selectedResumeColor()">
                       <div class="match-score" [style.color]="selectedResumeColor()">94%</div>
-                      <div class="match-label">Match Vaga</div>
+                      <div class="match-label">{{ 'BUILDER.COVER_LETTER.MATCH_RATE' | translate }}</div>
                     </div>
                   </div>
 
@@ -220,39 +220,20 @@ import { Resume } from '../../../../core/models/resume.model';
                     
                     @if (activeExampleTab() === 'text') {
                       <div class="editor-body" style="opacity: 0.55;">
-                        <textarea class="inline-editor-textarea" rows="12" readonly>⚠️ ESTE É APENAS UM EXEMPLO VISUAL ⚠️
-
-Preencha o cargo e a descrição da vaga no formulário ao lado e clique em "Gerar Carta com IA" para criar a sua carta de apresentação personalizada. 
-
-Uma vez gerada, você poderá editar este texto livremente, copiar ou baixar como PDF!
-
----
-Prezado(a) Gestor(a) de Contratação,
-
-Escrevo para expressar meu forte interesse na vaga anunciada...</textarea>
+                        <textarea class="inline-editor-textarea" rows="12" readonly>{{ 'BUILDER.COVER_LETTER.EXAMPLE_TEXT' | translate }}</textarea>
                       </div>
                     } @else {
                       <div class="box-body paper-preview" [style.font-family]="selectedResumeFont()" style="opacity: 0.55;">
                         <div class="letter-sender-header" [style.border-left-color]="selectedResumeColor()">
                           <h4 class="sender-name" [style.color]="selectedResumeColor()">{{ selectedResumeName() }}</h4>
                           <div class="sender-meta">
-                            <span>{{ selectedResumeEmail() || 'seu.email@dominio.com' }}</span>
+                            <span>{{ selectedResumeEmail() || ('BUILDER.COVER_LETTER.DEFAULT_EMAIL' | translate) }}</span>
                             @if (selectedResumePhone()) { <span> • {{ selectedResumePhone() }}</span> }
                             @if (selectedResumeLocation()) { <span> • {{ selectedResumeLocation() }}</span> }
                           </div>
                         </div>
-                        <div class="letter-content-text" style="text-align: left; font-size: 14px; line-height: 1.6;">
-⚠️ ESTE É APENAS UM EXEMPLO VISUAL ⚠️
-
-Preencha a descrição da vaga e clique em "Gerar Carta com IA" para criar a sua!
-
-Prezado(a) Gestor(a) de Contratação,
-
-Escrevo para expressar meu forte interesse na vaga anunciada. Com base no meu currículo profissional, possuo experiência no desenvolvimento de soluções eficientes...
-
-Atenciosamente,
-{{ selectedResumeName() }}
-                        </div>
+                        <div class="letter-content-text" style="text-align: left; font-size: 14px; line-height: 1.6; white-space: pre-wrap;">{{ 'BUILDER.COVER_LETTER.EXAMPLE_PAPER_TEXT' | translate }}
+{{ selectedResumeName() }}</div>
                       </div>
                     }
                   </div>
@@ -298,30 +279,30 @@ Atenciosamente,
 export class CoverLetterPageComponent implements OnInit, CanComponentDeactivate {
   private resumeService = inject(ResumeService);
   private aiService = inject(AiService);
-  private toastr = inject(ToastrService);
+  private notification = inject(NotificationService);
   private translate = inject(TranslateService);
 
   resumes = signal<Resume[]>([]);
-  isLoadingResumes = signal(true);
-  
-  selectedResumeId = '';
-  jobTitle = '';
-  jobDescription = '';
-  
-  isGenerating = signal(false);
+  isLoadingResumes = signal<boolean>(true);
 
-  showLeaveModal = signal(false);
+  selectedResumeId: string = '';
+  jobTitle: string = '';
+  jobDescription: string = '';
+
+  isGenerating = signal<boolean>(false);
+
+  showLeaveModal = signal<boolean>(false);
   private leaveSubject = new Subject<boolean>();
-  isSavedOrExported = false;
+  isSavedOrExported: boolean = false;
 
-  defaultLetterText = '';
+  defaultLetterText: string = '';
 
   generatedLetter = signal<string | null>(this.defaultLetterText);
-  generatedLetterEditable = this.defaultLetterText;
+  generatedLetterEditable: string = this.defaultLetterText;
   viewMode = signal<'text' | 'paper'>('text');
   matchScore = signal<number | null>(null);
   activeExampleTab = signal<'text' | 'paper'>('paper');
-  exportingPdf = signal(false);
+  exportingPdf = signal<boolean>(false);
 
   selectedResumeColor = signal<string>('#1e293b');
   selectedResumeFont = signal<string>("'Georgia', serif");
@@ -330,8 +311,8 @@ export class CoverLetterPageComponent implements OnInit, CanComponentDeactivate 
   selectedResumePhone = signal<string>('');
   selectedResumeLocation = signal<string>('');
 
-  ngOnInit() {
-    this.translate.stream('BUILDER.COVER_LETTER.DEFAULT_TEXT').subscribe(text => {
+  ngOnInit(): void {
+    this.translate.stream('BUILDER.COVER_LETTER.DEFAULT_TEXT').subscribe((text: string) => {
       if (this.generatedLetterEditable === this.defaultLetterText) {
         this.generatedLetterEditable = text;
         this.generatedLetter.set(text);
@@ -339,8 +320,8 @@ export class CoverLetterPageComponent implements OnInit, CanComponentDeactivate 
       this.defaultLetterText = text;
     });
 
-    this.resumeService.loadResumes(true).subscribe({
-      next: (data) => {
+    this.resumeService.loadResumes().subscribe({
+      next: (data: Resume[]) => {
         this.resumes.set(data);
         if (data.length > 0) {
           this.selectedResumeId = data[0].id;
@@ -349,65 +330,84 @@ export class CoverLetterPageComponent implements OnInit, CanComponentDeactivate 
         this.isLoadingResumes.set(false);
       },
       error: () => {
-        this.toastr.error('Erro ao carregar currículos');
+        this.notification.error({ pt: 'Erro ao carregar currículos', en: 'Error loading resumes' });
         this.isLoadingResumes.set(false);
       }
     });
   }
 
-  onResumeSelect() {
-    const selected = this.resumes().find(r => r.id === this.selectedResumeId);
+  onResumeSelect(): void {
+    const selected: Resume | undefined = this.resumes().find((r: Resume) => r.id === this.selectedResumeId);
     if (selected) {
       this.selectedResumeColor.set(selected.colorTheme || '#1e293b');
       this.selectedResumeFont.set(selected.fontFamily || "'Georgia', serif");
-      const personal = selected.personalInfo as any;
-      this.selectedResumeName.set(personal?.name || 'Candidato');
+      const personal = selected.personalInfo;
+      const defaultCandidate = this.translate.instant('BUILDER.COVER_LETTER.CANDIDATE_NAME_FALLBACK') || (this.translate.currentLang === 'en' ? 'Candidate' : 'Candidato');
+      this.selectedResumeName.set(personal?.name || defaultCandidate);
       this.selectedResumeEmail.set(personal?.email || '');
       this.selectedResumePhone.set(personal?.phone || '');
       this.selectedResumeLocation.set(personal?.location || '');
     }
   }
 
-  generateCoverLetter() {
+  generateCoverLetter(): void {
     if (!this.selectedResumeId) {
-      this.toastr.warning('Selecione um currículo base primeiro.', 'Atenção');
+      this.notification.warning(
+        { pt: 'Selecione um currículo base primeiro.', en: 'Please select a base resume first.' },
+        { pt: 'Atenção', en: 'Attention' }
+      );
       return;
     }
 
     if (!this.jobDescription || this.jobDescription.length < 20) {
-      this.toastr.warning('Por favor, cole uma descrição de vaga com pelo menos 20 caracteres.', 'Atenção');
+      this.notification.warning(
+        { pt: 'Por favor, cole uma descrição de vaga com pelo menos 20 caracteres.', en: 'Please paste a job description with at least 20 characters.' },
+        { pt: 'Atenção', en: 'Attention' }
+      );
       return;
     }
 
-    const fullDescription = this.jobTitle 
-      ? `Vaga: ${this.jobTitle}\n\nDescrição: ${this.jobDescription}`
+    const isEn: boolean = this.translate.currentLang === 'en';
+    const jobTitlePrefix = isEn ? 'Job Title: ' : 'Vaga: ';
+    const jobDescPrefix = isEn ? '\n\nDescription: ' : '\n\nDescrição: ';
+    const fullDescription: string = this.jobTitle
+      ? `${jobTitlePrefix}${this.jobTitle}${jobDescPrefix}${this.jobDescription}`
       : this.jobDescription;
 
     this.isGenerating.set(true);
-    const lang = this.translate.currentLang || 'pt';
+    const lang: string = this.translate.currentLang || 'pt';
     this.aiService.generateCoverLetter(this.selectedResumeId, fullDescription, lang).subscribe({
-      next: (res) => {
-        const coverLetterText = res.result.coverLetter;
-        const score = res.result.matchScore;
+      next: (res: { result: { coverLetter: string; matchScore: number } }) => {
+        const coverLetterText: string = res.result.coverLetter;
+        const score: number = res.result.matchScore;
         this.generatedLetter.set(coverLetterText);
         this.generatedLetterEditable = coverLetterText;
         this.matchScore.set(score);
         this.isGenerating.set(false);
-        this.toastr.success('Carta gerada com sucesso!', 'Sucesso');
+        this.notification.success(
+          { pt: 'Carta gerada com sucesso!', en: 'Cover letter generated successfully!' },
+          { pt: 'Sucesso', en: 'Success' }
+        );
       },
       error: () => {
-        this.toastr.error('Erro ao gerar carta. O limite gratuito pode ter sido atingido.', 'Erro IA');
+        this.notification.error(
+          { pt: 'Erro ao gerar carta com inteligência artificial. Tente novamente mais tarde.', en: 'Error generating letter with AI. Please try again later.' },
+          { pt: 'Erro IA', en: 'AI Error' }
+        );
         this.isGenerating.set(false);
       }
     });
   }
 
-  copyLetter() {
-    const letter = this.generatedLetterEditable;
+  copyLetter(): void {
+    const letter: string = this.generatedLetterEditable;
     if (letter) {
       navigator.clipboard.writeText(letter);
       this.isSavedOrExported = true;
-      this.toastr.success('Carta copiada para a área de transferência!', 'Sucesso');
+      this.notification.success(
+        { pt: 'Carta copiada para a área de transferência!', en: 'Cover letter copied to clipboard!' },
+        { pt: 'Sucesso', en: 'Success' }
+      );
     }
   }
 
@@ -428,48 +428,55 @@ export class CoverLetterPageComponent implements OnInit, CanComponentDeactivate 
     return true;
   }
 
-  confirmLeave() {
+  confirmLeave(): void {
     this.showLeaveModal.set(false);
     this.leaveSubject.next(true);
   }
 
-  cancelLeave() {
+  cancelLeave(): void {
     this.showLeaveModal.set(false);
     this.leaveSubject.next(false);
   }
 
-  async exportPdf() {
+  async exportPdf(): Promise<void> {
     this.exportingPdf.set(true);
-    // Switch to paper mode temporarily if in text mode to capture the beautiful layout
     const originalMode = this.viewMode();
     if (originalMode === 'text') {
       this.viewMode.set('paper');
-      // Wait for Angular to render the DOM change
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise<void>(resolve => setTimeout(resolve, 100));
     }
 
     try {
       const { default: jsPDF } = await import('jspdf');
       const { default: html2canvas } = await import('html2canvas');
 
-      const el = document.getElementById('cover-letter-paper');
-      if (!el) { this.exportingPdf.set(false); return; }
+      const el: HTMLElement | null = document.getElementById('cover-letter-paper');
+      if (!el) {
+        this.exportingPdf.set(false);
+        return;
+      }
 
       const canvas = await html2canvas(el, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
-      const imgData = canvas.toDataURL('image/jpeg', 0.95);
+      const imgData: string = canvas.toDataURL('image/jpeg', 0.95);
       const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-      
+      const pdfWidth: number = pdf.internal.pageSize.getWidth();
+      const pdfHeight: number = (canvas.height * pdfWidth) / canvas.width;
+
       pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
       pdf.save(`cover_letter_${this.slugify(this.selectedResumeName())}.pdf`);
-      
+
       this.isSavedOrExported = true;
       this.exportingPdf.set(false);
-      this.toastr.success('PDF baixado com sucesso!', 'Download');
-    } catch (e) {
+      this.notification.success(
+        { pt: 'PDF baixado com sucesso!', en: 'PDF downloaded successfully!' },
+        { pt: 'Download', en: 'Download' }
+      );
+    } catch (e: unknown) {
       console.error('PDF export error:', e);
-      this.toastr.error('Erro ao exportar PDF. Tente novamente.', 'Erro');
+      this.notification.error(
+        { pt: 'Erro ao exportar PDF. Tente novamente.', en: 'Error exporting PDF. Please try again.' },
+        { pt: 'Erro', en: 'Error' }
+      );
     }
 
     if (originalMode === 'text') {
