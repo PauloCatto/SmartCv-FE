@@ -256,7 +256,11 @@
         "VIEW_PAPER": "Visualizar Papel"
       },
       "MATCH_RATE": "Match Vaga",
-      "DEFAULT_TEXT": "Prezado(a) Gestor(a) de Contratação,\n\nEscrevo para expressar meu forte interesse na vaga anunciada. Com base no meu currículo profissional, possuo experiência no desenvolvimento de soluções eficientes e gostaria de contribuir para o sucesso da sua equipe.\n\nAtenciosamente,"
+      "DEFAULT_TEXT": "Prezado(a) Gestor(a) de Contratação,\n\nEscrevo para expressar meu forte interesse na vaga anunciada. Com base no meu currículo profissional, possuo experiência no desenvolvimento de soluções eficientes e gostaria de contribuir para o sucesso da sua equipe.\n\nAtenciosamente,",
+      "EXAMPLE_BADGE": "Exemplo de Visualização",
+      "DEFAULT_EMAIL": "seu.email@dominio.com",
+      "EXAMPLE_TEXT": "⚠️ ESTE É APENAS UM EXEMPLO VISUAL ⚠️\n\nPreencha o cargo e a descrição da vaga no formulário ao lado e clique em \"Gerar Carta com IA\" para criar a sua carta de apresentação personalizada.\n\nUma vez gerada, você poderá editar este texto livremente, copiar ou baixar como PDF!\n\n---\nPrezado(a) Gestor(a) de Contratação,\n\nEscrevo para expressar meu forte interesse na vaga anunciada...",
+      "EXAMPLE_PAPER_TEXT": "⚠️ ESTE É APENAS UM EXEMPLO VISUAL ⚠️\n\nPreencha a descrição da vaga e clique em \"Gerar Carta com IA\" para criar a sua!\n\nPrezado(a) Gestor(a) de Contratação,\n\nEscrevo para expressar meu forte interesse na vaga anunciada. Com base no meu currículo profissional, possuo experiência no desenvolvimento de soluções eficientes...\n\nAtenciosamente,"
     },
     "ROAST": {
       "BTN": "🔥 Analisar meu Currículo",
@@ -287,7 +291,11 @@
       "EXAMPLE_WEAKNESS_1": "Falta de métricas quantificáveis em algumas das experiências profissionais.",
       "EXAMPLE_WEAKNESS_2": "Formatação em múltiplas colunas pode dificultar a análise por parsers ATS antigos.",
       "EXAMPLE_ACTIONABLE_1": "Reescreva as conquistas usando a fórmula X-Y-Z (ex: Realizei X, medido por Y, fazendo Z).",
-      "EXAMPLE_ACTIONABLE_2": "Use modelos de currículo ATS-friendly de coluna única, como \"Minimal\" ou \"Elegance\"."
+      "EXAMPLE_ACTIONABLE_2": "Use modelos de currículo ATS-friendly de coluna única, como \"Minimal\" ou \"Elegance\".",
+      "NEXT_STEPS_TITLE": "Próximos Passos",
+      "NEXT_STEPS_DESC": "Use o feedback acima para melhorar seu currículo no editor e aumentar suas chances nas vagas.",
+      "IMPROVE_BTN": "Melhorar Currículo Agora",
+      "REEVALUATE_BTN": "Reavaliar Currículo"
     },
     "CV": {
       "ABOUT": "Sobre mim",

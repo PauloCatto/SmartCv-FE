@@ -256,7 +256,11 @@
         "VIEW_PAPER": "View Paper"
       },
       "MATCH_RATE": "Job Match",
-      "DEFAULT_TEXT": "Dear Hiring Manager,\n\nI am writing to express my strong interest in the advertised position. Based on my professional background, I have relevant experience in developing efficient solutions and I would love to contribute to your team's success.\n\nSincerely,"
+      "DEFAULT_TEXT": "Dear Hiring Manager,\n\nI am writing to express my strong interest in the advertised position. Based on my professional background, I have relevant experience in developing efficient solutions and I would love to contribute to your team's success.\n\nSincerely,",
+      "EXAMPLE_BADGE": "Example Preview",
+      "DEFAULT_EMAIL": "your.email@domain.com",
+      "EXAMPLE_TEXT": "⚠️ THIS IS JUST A VISUAL EXAMPLE ⚠️\n\nFill in the job title and description in the form on the left and click \"Generate Letter with AI\" to create your personalized cover letter.\n\nOnce generated, you can freely edit this text, copy it, or download it as a PDF!\n\n---\nDear Hiring Manager,\n\nI am writing to express my strong interest in the advertised position...",
+      "EXAMPLE_PAPER_TEXT": "⚠️ THIS IS JUST A VISUAL EXAMPLE ⚠️\n\nFill in the job description and click \"Generate Letter with AI\" to create yours!\n\nDear Hiring Manager,\n\nI am writing to express my strong interest in the advertised position. Based on my professional background, I have relevant experience in developing efficient solutions...\n\nSincerely,"
     },
     "ROAST": {
       "BTN": "🔥 Roast my CV",
@@ -287,7 +291,11 @@
       "EXAMPLE_WEAKNESS_1": "Lack of quantifiable metrics in some of the professional experiences.",
       "EXAMPLE_WEAKNESS_2": "Multi-column formatting may make it difficult for older ATS parsers to read.",
       "EXAMPLE_ACTIONABLE_1": "Rewrite achievements using the X-Y-Z formula (e.g. Accomplished X, as measured by Y, by doing Z).",
-      "EXAMPLE_ACTIONABLE_2": "Use ATS-friendly single-column resume templates, such as \"Minimal\" or \"Elegance\"."
+      "EXAMPLE_ACTIONABLE_2": "Use ATS-friendly single-column resume templates, such as \"Minimal\" or \"Elegance\".",
+      "NEXT_STEPS_TITLE": "Next Steps",
+      "NEXT_STEPS_DESC": "Use the feedback above to improve your resume in the editor and boost your chances with recruiters.",
+      "IMPROVE_BTN": "Improve Resume Now",
+      "REEVALUATE_BTN": "Re-evaluate Resume"
     },
     "CV": {
       "ABOUT": "About Me",

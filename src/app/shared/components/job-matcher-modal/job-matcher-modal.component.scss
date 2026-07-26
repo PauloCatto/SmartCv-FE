@@ -287,3 +287,67 @@
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
+
+@media (max-width: 520px) {
+  .modal-backdrop {
+    padding: 0.75rem;
+  }
+
+  .modal-card {
+    max-height: 92vh;
+    border-radius: 12px;
+  }
+
+  .modal-header {
+    padding: 1rem;
+  }
+
+  .modal-title {
+    font-size: 1.1rem;
+  }
+
+  .modal-body {
+    padding: 1rem;
+  }
+
+  .step-description {
+    font-size: 0.88rem;
+    margin-bottom: 1rem;
+  }
+
+  .text-area-job {
+    font-size: 0.85rem;
+    padding: 0.65rem 0.75rem;
+    height: 180px;
+  }
+
+  .modal-footer {
+    margin-top: 1.25rem;
+    flex-direction: column-reverse;
+    gap: 0.6rem;
+
+    button, .btn {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      font-size: 0.95rem;
+      justify-content: center;
+      text-align: center;
+    }
+  }
+
+  .score-container {
+    flex-direction: column;
+    text-align: center;
+    gap: 1rem;
+    padding: 1rem;
+  }
+
+  .score-radial {
+    width: 90px;
+    height: 90px;
+    
+    .score-value {
+      font-size: 1.5rem;
+    }
+  }
+}
