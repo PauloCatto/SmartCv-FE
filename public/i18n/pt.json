@@ -207,8 +207,8 @@
     "FINISH_INFO": "Seu currículo está sendo salvo automaticamente",
     "DOWNLOAD_PDF": "Baixar PDF",
     "FINISH": {
-      "TITLE": "Currículo Pronto! 🎉",
-      "SUBTITLE": "Revise o resumo abaixo e salve seu currículo para acessar no painel.",
+      "TITLE": "Currículo Concluído! 🎉",
+      "SUBTITLE": "Tudo pronto! Seu currículo está finalizado e pronto para impressionar.",
       "SUMMARY_NAME": "Nome do currículo",
       "SUMMARY_TEMPLATE": "Modelo",
       "SUMMARY_EXPERIENCE": "Experiências",
@@ -218,7 +218,8 @@
       "SAVING": "Salvando...",
       "SAVE_SUCCESS_TITLE": "Salvo!",
       "SAVE_SUCCESS_MSG": "Currículo salvo com sucesso!",
-      "AUTO_SAVE_NOTE": "Suas alterações são salvas automaticamente em tempo real"
+      "AUTO_SAVE_NOTE": "Suas alterações são salvas automaticamente em tempo real",
+      "REVIEW_TEXT": "Revise os detalhes na janela ao lado. Se tudo estiver correto, exporte seu currículo em alta qualidade usando o botão abaixo ou no topo da página."
     },
     "LEAVE_MODAL": {
       "TITLE": "Sair sem salvar?",
@@ -352,7 +353,9 @@
     "DUPLICATE_SUCCESS": "Currículo duplicado com sucesso!",
     "JUST_NOW": "agora mesmo",
     "MINUTES_AGO": "há {{count}} min",
-    "HOURS_AGO": "há {{count}}h"
+    "HOURS_AGO": "há {{count}}h",
+    "NO_NAME": "Sem nome",
+    "NO_JOB_TITLE": "Cargo não definido"
   },
 
   "HOME": {

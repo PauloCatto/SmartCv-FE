@@ -208,7 +208,7 @@
     "DOWNLOAD_PDF": "Download PDF",
     "FINISH": {
       "TITLE": "Resume Ready! 🎉",
-      "SUBTITLE": "Review the summary below and save your resume to access it in the dashboard.",
+      "SUBTITLE": "All set! Your resume is finished and ready to impress.",
       "SUMMARY_NAME": "Resume name",
       "SUMMARY_TEMPLATE": "Template",
       "SUMMARY_EXPERIENCE": "Experiences",
@@ -218,7 +218,8 @@
       "SAVING": "Saving...",
       "SAVE_SUCCESS_TITLE": "Saved!",
       "SAVE_SUCCESS_MSG": "Resume saved successfully!",
-      "AUTO_SAVE_NOTE": "Your changes are automatically saved in real time"
+      "AUTO_SAVE_NOTE": "Your changes are automatically saved in real time",
+      "REVIEW_TEXT": "Review the details on the side panel. If everything looks correct, export your resume in high quality using the button below or at the top of the page."
     },
     "LEAVE_MODAL": {
       "TITLE": "Leave without saving?",
@@ -352,7 +353,9 @@
     "DUPLICATE_SUCCESS": "Resume duplicated successfully!",
     "JUST_NOW": "just now",
     "MINUTES_AGO": "{{count}} min ago",
-    "HOURS_AGO": "{{count}}h ago"
+    "HOURS_AGO": "{{count}}h ago",
+    "NO_NAME": "No name",
+    "NO_JOB_TITLE": "No job title defined"
   },
 
   "HOME": {
