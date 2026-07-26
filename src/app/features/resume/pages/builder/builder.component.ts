@@ -105,6 +105,8 @@ export class BuilderComponent implements OnInit, OnDestroy, CanComponentDeactiva
   showLanguageDropdown: boolean = false;
   private languageSub!: Subscription;
 
+  layoutDensity = signal<'compact' | 'normal' | 'spacious'>('normal');
+
   atsScore = computed(() => {
     let score = 0;
     const d = this.draft();
@@ -262,6 +264,27 @@ export class BuilderComponent implements OnInit, OnDestroy, CanComponentDeactiva
 
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
+      const cached = this.resumeService.getCurrent() || this.resumeService.getAll().find(r => r.id === id || this.slugify(r.title) === id);
+      if (cached) {
+        this.draft.set({
+          ...EMPTY_RESUME,
+          ...cached,
+          personalInfo: {
+            ...EMPTY_RESUME.personalInfo,
+            ...(cached.personalInfo || {}),
+          },
+          template: cached.template || 'elegance',
+          colorTheme: cached.colorTheme || '#1e293b',
+          fontFamily: cached.fontFamily || "'Georgia', serif",
+          spacingMode: cached.spacingMode || 'normal',
+          experience: cached.experience || [],
+          education: cached.education || [],
+          skills: cached.skills || [],
+          languages: cached.languages || [],
+        });
+        this.resumeTitle = cached.title;
+      }
+
       this.resumeService.getById(id).subscribe({
         next: (existing) => {
           if (existing) {
@@ -884,34 +907,21 @@ export class BuilderComponent implements OnInit, OnDestroy, CanComponentDeactiva
     });
   }
 
-  async exportPdf(): Promise<void> {
-    this.exporting.set(true);
-    try {
-      // Small timeout to allow UI loading states to vanish before print dialog
-      setTimeout(() => {
-        window.print();
-        this.exporting.set(false);
-        this.toastr.success('Pronto para salvar como PDF!', 'Sucesso');
-
-        // Mark as published after successful print invocation
-        const current = this.draft();
-        if (current.id && !this.isPublishedLocally) {
-          this.resumeService.publish(current.id).subscribe({
-            next: () => { this.isPublishedLocally = true; }
-          });
-        }
-      }, 500);
-    } catch (e) {
-      console.error('PDF export error:', e);
-      this.toastr.error('Erro ao abrir impressão. Tente novamente.', 'Erro');
-      this.exporting.set(false);
-    }
-  }
-
   // Roast states
   showRoastModal = signal(false);
   isRoasting = signal(false);
   roastResult = signal<{ roast?: string; score?: number; feedback?: string; weaknesses?: string[]; actionableFeedback?: string[]; strengths?: string[] }>({});
+
+  // Export Modal state
+  showExportModal = signal(false);
+
+  openExportModal(): void {
+    this.showExportModal.set(true);
+  }
+
+  closeExportModal(): void {
+    this.showExportModal.set(false);
+  }
 
   generateCoverLetter(): void {
     if (!this.jobDescription || this.jobDescription.length < 20) {
@@ -974,7 +984,6 @@ export class BuilderComponent implements OnInit, OnDestroy, CanComponentDeactiva
   async exportToPDF(): Promise<void> {
     this.isExportingPdf.set(true);
 
-    // Create a temporary clone of the preview for high-res rendering
     const originalElement = document.querySelector('.preview-sheet') as HTMLElement;
     if (!originalElement) {
       this.isExportingPdf.set(false);
@@ -982,42 +991,59 @@ export class BuilderComponent implements OnInit, OnDestroy, CanComponentDeactiva
     }
 
     const clone = originalElement.cloneNode(true) as HTMLElement;
-
-    // Temporarily reset transforms and scale to capture in full resolution (A4 size approx)
+    // Permitir altura max-content e usar estilo off-screen para gerar o PDF sem tela branca
     Object.assign(clone.style, {
       transform: 'none',
-      position: 'fixed',
-      top: '0',
-      left: '0',
-      width: '794px', // Standard A4 width in px at 96 DPI
-      height: '1123px', // Standard A4 height in px
-      zIndex: '-9999',
-      backgroundColor: 'white'
+      position: 'relative',
+      width: '794px',
+      height: 'max-content',
+      minHeight: '1123px',
+      backgroundColor: 'white',
+      margin: '0',
+      padding: '0',
+      overflow: 'visible'
     });
-    document.body.appendChild(clone);
+
+    const wrapper = document.createElement('div');
+    Object.assign(wrapper.style, {
+      position: 'absolute',
+      top: '-9999px',
+      left: '-9999px',
+      width: '794px'
+    });
+    wrapper.appendChild(clone);
+    document.body.appendChild(wrapper);
 
     try {
-      const canvas = await html2canvas(clone, {
-        scale: 2, // Higher scale for better quality text
-        useCORS: true,
-        logging: false
-      });
+      const html2pdf = (await import('html2pdf.js')).default || (await import('html2pdf.js'));
 
-      const imgData = canvas.toDataURL('image/png');
-      const pdf = new jsPDF('p', 'mm', 'a4');
+      const opt = {
+        margin:       [15, 0, 15, 0] as [number, number, number, number], // 15mm de margem real evita colar no topo e rodape das proximas paginas
+        filename:     `${this.draft().title || 'Curriculo'}.pdf`,
+        image: { type: 'jpeg' as const, quality: 1 },
+        html2canvas: { scale: 2, useCORS: true, letterRendering: true, logging: false },
+        pagebreak: { mode: 'css', avoid: ['li', 'p', '.bullet-item', '.cv-item', '.timeline-item', '.skill-item', '.skill-tag', '.experience-item', '.education-item', '.language-item'] }
+      };
 
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+      await html2pdf().set(opt).from(clone).save();
 
-      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-      pdf.save(`${this.draft().title || 'Curriculo'}.pdf`);
+      const isEn = this.translate.currentLang === 'en';
+      this.toastr.success(isEn ? 'PDF generated successfully!' : 'PDF gerado com sucesso!');
+      this.closeExportModal();
 
-      this.toastr.success(this.translate.instant('BUILDER.DOWNLOAD_PDF') + ' gerado com sucesso!');
+      // Publica (salva localmente status final)
+      const current = this.draft();
+      if (current.id && !this.isPublishedLocally) {
+        this.resumeService.publish(current.id).subscribe({
+          next: () => { this.isPublishedLocally = true; }
+        });
+      }
     } catch (err) {
       console.error(err);
-      this.toastr.error('Erro ao gerar PDF. Tente novamente.', 'Erro');
+      const isEn = this.translate.currentLang === 'en';
+      this.toastr.error(isEn ? 'Error generating PDF. Try again.' : 'Erro ao gerar PDF. Tente novamente.', isEn ? 'Error' : 'Erro');
     } finally {
-      document.body.removeChild(clone);
+      document.body.removeChild(wrapper);
       this.isExportingPdf.set(false);
     }
   }

@@ -264,7 +264,8 @@
   }
 }
 
-.autocomplete-loading, .autocomplete-empty {
+.autocomplete-loading,
+.autocomplete-empty {
   padding: 14px;
   font-size: 13px;
   color: var(--color-text-subtle);
@@ -691,16 +692,22 @@
   padding: 30px;
   display: flex;
   justify-content: center;
+  align-items: flex-start;
+  /* Evita que o Flexbox corte o topo/base de itens que crescem muito */
 }
 
 .preview-sheet {
   width: 794px;
   min-height: 1123px;
+  height: max-content;
+  /* Permite esticar infinitamente conforme os templates inserem conteúdo */
   background: white;
   box-shadow: 0 10px 60px rgba(0, 0, 0, 0.4);
   transition: transform 0.3s ease;
   flex-shrink: 0;
   position: relative;
+  overflow: visible;
+  /* Garante que nada será clipado visualmente na base da tela */
 }
 
 /* Removed artificial page break line */
@@ -1032,9 +1039,18 @@
   border-radius: 2px;
   width: 100%;
 
-  &.text-long { width: 90%; }
-  &.text-mid { width: 70%; }
-  &.text-short { width: 45%; }
+  &.text-long {
+    width: 90%;
+  }
+
+  &.text-mid {
+    width: 70%;
+  }
+
+  &.text-short {
+    width: 45%;
+  }
+
   &.header-rule {
     height: 4px;
     width: 60%;
@@ -1044,11 +1060,13 @@
 
 .doc-modern {
   flex-direction: row !important;
+
   .doc-sidebar {
     width: 16px;
     height: 100%;
     flex-shrink: 0;
   }
+
   .doc-body {
     flex: 1;
     padding: 6px;
@@ -1070,7 +1088,7 @@
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  
+
   .doc-body {
     flex: 1;
     display: flex;
@@ -1143,10 +1161,11 @@
     transform: translateX(-50%);
     z-index: 99;
     background: var(--color-primary);
-    
+
     &.in-edit {
       bottom: 82px;
     }
+
     color: white;
     border: none;
     border-radius: 100px;
@@ -1197,42 +1216,54 @@
 @media (max-width: 768px) {
   .topbar-left {
     gap: 6px;
+
     .btn span {
       display: none;
     }
   }
+
   .topbar-right {
     gap: 6px;
   }
+
   .resume-title-input {
     min-width: 80px !important;
     max-width: 130px;
     font-size: 14px;
   }
+
   .ats-score-label {
     display: none !important;
   }
+
   .save-indicator {
     display: none !important;
   }
+
   .btn-export-pdf span {
     display: none;
   }
+
   .topbar-divider {
     display: none !important;
   }
+
   .builder-topbar {
     padding: 0 8px;
   }
+
   .step-section {
     padding: 12px;
   }
+
   .form-grid {
     grid-template-columns: 1fr;
+
     .col-2 {
       grid-column: span 1;
     }
   }
+
   .preview-container {
     padding: 10px;
   }
@@ -1426,8 +1457,15 @@
 }
 
 @keyframes finish-pop {
-  0% { transform: scale(0.3); opacity: 0; }
-  100% { transform: scale(1); opacity: 1; }
+  0% {
+    transform: scale(0.3);
+    opacity: 0;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 .finish-title {
@@ -1473,7 +1511,9 @@
   color: var(--color-text-muted);
   font-weight: 500;
 
-  svg { flex-shrink: 0; }
+  svg {
+    flex-shrink: 0;
+  }
 }
 
 .finish-summary-value {
@@ -1516,9 +1556,17 @@
   border-radius: 99px;
   transition: width 0.8s ease;
 
-  &.score-low { background: #ef4444; }
-  &.score-medium { background: #f59e0b; }
-  &.score-high { background: #10b981; }
+  &.score-low {
+    background: #ef4444;
+  }
+
+  &.score-medium {
+    background: #f59e0b;
+  }
+
+  &.score-high {
+    background: #10b981;
+  }
 }
 
 .finish-ats-value {
@@ -1527,9 +1575,17 @@
   min-width: 50px;
   text-align: right;
 
-  &.score-low { color: #ef4444; }
-  &.score-medium { color: #f59e0b; }
-  &.score-high { color: #10b981; }
+  &.score-low {
+    color: #ef4444;
+  }
+
+  &.score-medium {
+    color: #f59e0b;
+  }
+
+  &.score-high {
+    color: #10b981;
+  }
 }
 
 .finish-actions {
