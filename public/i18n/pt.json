@@ -22,7 +22,8 @@
       "FORGOT_PASSWORD": "Esqueceu a senha?",
       "OR_CONTINUE": "ou continue com",
       "NO_ACCOUNT": "Não tem uma conta?",
-      "REGISTER": "Crie agora"
+      "REGISTER": "Crie agora",
+      "GOOGLE_BTN": "Entrar com Google"
     },
     "REGISTER": {
       "TITLE": "Crie sua conta grátis",
@@ -38,6 +39,7 @@
       "OR_CREATE": "ou crie com",
       "HAS_ACCOUNT": "Já tem conta?",
       "LOGIN": "Entrar agora",
+      "GOOGLE_BTN": "Criar conta com Google",
       "TERMS": "Ao criar uma conta, você concorda com os <a href='#' class='terms-link'>Termos de Uso</a> e a <a href='#' class='terms-link'>Política de Privacidade</a>.",
       "BENEFITS": {
         "0": "Currículos ilimitados e gratuitos",

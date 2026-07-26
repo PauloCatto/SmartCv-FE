@@ -22,7 +22,8 @@
       "FORGOT_PASSWORD": "Forgot your password?",
       "OR_CONTINUE": "or continue with",
       "NO_ACCOUNT": "Don't have an account?",
-      "REGISTER": "Create now"
+      "REGISTER": "Create now",
+      "GOOGLE_BTN": "Sign in with Google"
     },
     "REGISTER": {
       "TITLE": "Create your free account",
@@ -38,6 +39,7 @@
       "OR_CREATE": "or create with",
       "HAS_ACCOUNT": "Already have an account?",
       "LOGIN": "Sign in now",
+      "GOOGLE_BTN": "Create account with Google",
       "TERMS": "By creating an account, you agree to the <a href='#' class='terms-link'>Terms of Service</a> and <a href='#' class='terms-link'>Privacy Policy</a>.",
       "BENEFITS": {
         "0": "Unlimited free resumes",
