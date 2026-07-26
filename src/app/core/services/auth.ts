@@ -129,9 +129,10 @@ export class AuthService {
     );
   }
 
-  forgotPassword(email: string): Observable<{ message: string }> {
+  forgotPassword(email: string, lang?: string): Observable<{ message: string }> {
     this.loadingSubject.next(true);
-    return this.http.post<{ message: string }>(`${environment.apiUrl}/auth/forgot-password`, { email }).pipe(
+    const language = lang || localStorage.getItem('smartcv_lang') || 'pt';
+    return this.http.post<{ message: string }>(`${environment.apiUrl}/auth/forgot-password`, { email, language }).pipe(
       tap({
         next: () => this.loadingSubject.next(false),
         error: () => this.loadingSubject.next(false)
