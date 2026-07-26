@@ -58,6 +58,7 @@
       "EMAIL_PLACEHOLDER": "seu@email.com",
       "SUBMIT": "Enviar link de recuperação",
       "SUBMITTING": "Enviando...",
+      "SENT": "Enviado!",
       "REMEMBERED": "Lembrou a senha?",
       "BACK_LOGIN": "Voltar ao login"
     },
