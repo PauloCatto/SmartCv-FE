@@ -5,6 +5,7 @@ import { map, tap } from 'rxjs/operators';
 import { User } from '../models/resume.model';
 import { environment } from '../../../environments/environment';
 import { BackendUser, AuthResponse } from '../models/auth.model';
+import { SocialAuthService } from '@abacritt/angularx-social-login';
 
 const STORAGE_KEY = 'smartcv_user';
 const STORAGE_TOKEN = 'smartcv_token';
@@ -12,6 +13,7 @@ const STORAGE_TOKEN = 'smartcv_token';
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private http = inject(HttpClient);
+  private socialAuthService = inject(SocialAuthService);
 
   private userSubject = new BehaviorSubject<User | null>(this.loadCachedUser());
   private loadingSubject = new BehaviorSubject<boolean>(false);
@@ -117,9 +119,9 @@ export class AuthService {
     );
   }
 
-  changePassword(newPassword: string, oldPassword?: string): Observable<{message: string}> {
+  changePassword(newPassword: string, oldPassword?: string): Observable<{ message: string }> {
     this.loadingSubject.next(true);
-    return this.http.post<{message: string}>(`${environment.apiUrl}/auth/change-password`, { oldPassword, newPassword }).pipe(
+    return this.http.post<{ message: string }>(`${environment.apiUrl}/auth/change-password`, { oldPassword, newPassword }).pipe(
       tap({
         next: () => this.loadingSubject.next(false),
         error: () => this.loadingSubject.next(false)
@@ -127,9 +129,9 @@ export class AuthService {
     );
   }
 
-  forgotPassword(email: string): Observable<{message: string}> {
+  forgotPassword(email: string): Observable<{ message: string }> {
     this.loadingSubject.next(true);
-    return this.http.post<{message: string}>(`${environment.apiUrl}/auth/forgot-password`, { email }).pipe(
+    return this.http.post<{ message: string }>(`${environment.apiUrl}/auth/forgot-password`, { email }).pipe(
       tap({
         next: () => this.loadingSubject.next(false),
         error: () => this.loadingSubject.next(false)
@@ -137,9 +139,9 @@ export class AuthService {
     );
   }
 
-  resetPassword(token: string, newPassword: string): Observable<{message: string}> {
+  resetPassword(token: string, newPassword: string): Observable<{ message: string }> {
     this.loadingSubject.next(true);
-    return this.http.post<{message: string}>(`${environment.apiUrl}/auth/reset-password`, { token, newPassword }).pipe(
+    return this.http.post<{ message: string }>(`${environment.apiUrl}/auth/reset-password`, { token, newPassword }).pipe(
       tap({
         next: () => this.loadingSubject.next(false),
         error: () => this.loadingSubject.next(false)
@@ -151,6 +153,7 @@ export class AuthService {
     this.userSubject.next(null);
     localStorage.removeItem(STORAGE_KEY);
     localStorage.removeItem(STORAGE_TOKEN);
+    this.socialAuthService.signOut(true).catch(() => { });
   }
 
   getToken(): string | null {

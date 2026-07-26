@@ -2,14 +2,14 @@ import { Component, inject, signal, OnInit, OnDestroy } from '@angular/core';
 import { RouterLink, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../../core/services/auth';
-import { SocialAuthService, GoogleSigninButtonModule } from '@abacritt/angularx-social-login';
+import { SocialAuthService, GoogleLoginProvider } from '@abacritt/angularx-social-login';
 import { Subscription } from 'rxjs';
 import { AsyncPipe } from '@angular/common';
 import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-login',
-  imports: [RouterLink, FormsModule, AsyncPipe, GoogleSigninButtonModule, TranslateModule],
+  imports: [RouterLink, FormsModule, AsyncPipe, TranslateModule],
   templateUrl: './login.html',
   styleUrl: './login.scss'
 })
@@ -25,8 +25,16 @@ export class Login implements OnInit, OnDestroy {
   showPassword = signal(false);
   authSubscription!: Subscription;
 
+  private isInitializing: boolean = true;
+
   ngOnInit(): void {
     this.authSubscription = this.socialAuthService.authState.subscribe((user) => {
+      if (this.isInitializing) {
+        // Ignora a emissão automática na inicialização do componente
+        this.isInitializing = false;
+        return;
+      }
+
       if (user && user.idToken) {
         this.auth.googleLogin(user.idToken as string).subscribe({
           next: () => {
@@ -44,6 +52,11 @@ export class Login implements OnInit, OnDestroy {
     if (this.authSubscription) {
       this.authSubscription.unsubscribe();
     }
+  }
+
+  signInWithGoogle(): void {
+    this.isInitializing = false;
+    this.socialAuthService.signIn(GoogleLoginProvider.PROVIDER_ID);
   }
 
   onSubmit(): void {
