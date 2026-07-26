@@ -69,8 +69,7 @@ describe('DashboardComponent', () => {
   });
 
   it('should load resumes on init', () => {
-    expect(mockResumeService.loadResumes).toHaveBeenCalledWith(true);
-    expect(mockResumeService.getDashboardStats).toHaveBeenCalled();
+    expect(mockResumeService.loadResumes).toHaveBeenCalledWith();
   });
 
   it('should handle resume duplication successfully', () => {

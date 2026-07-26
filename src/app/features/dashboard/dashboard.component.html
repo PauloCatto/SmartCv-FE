@@ -122,7 +122,7 @@
             </svg>
           </div>
           <div>
-            <div class="stat-value">{{ vm.stats.totalResumes }}</div>
+            <div class="stat-value">{{ vm.resumes.length }}</div>
             <div class="stat-name">{{ 'DASHBOARD.RESUMES' | translate }}</div>
           </div>
         </div>
@@ -133,7 +133,7 @@
             </svg>
           </div>
           <div>
-            <div class="stat-value">{{ vm.stats.aiActive ? ('DASHBOARD.ACTIVE' | translate) : ('DASHBOARD.INACTIVE' | translate) }}</div>
+            <div class="stat-value">{{ 'DASHBOARD.ACTIVE' | translate }}</div>
             <div class="stat-name">{{ 'DASHBOARD.GEMINI_ACTIVE' | translate }}</div>
           </div>
         </div>

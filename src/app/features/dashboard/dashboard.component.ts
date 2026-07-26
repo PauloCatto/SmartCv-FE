@@ -1,10 +1,10 @@
 import { Component, inject, ViewChild, ElementRef, OnInit, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
 import { RouterLink, Router } from '@angular/router';
 import { AsyncPipe } from '@angular/common';
-import { combineLatest, map, BehaviorSubject, Subscription, finalize, catchError, of } from 'rxjs';
+import { Observable, map, BehaviorSubject, Subscription, finalize, catchError, of } from 'rxjs';
 import { ResumeService } from '../../core/services/resume';
 import { AuthService } from '../../core/services/auth';
-import { Resume, DashboardStats, TEMPLATE_OPTIONS } from '../../core/models/resume.model';
+import { Resume, TEMPLATE_OPTIONS } from '../../core/models/resume.model';
 import { JobMatcherModalComponent } from '../../shared/components/job-matcher-modal/job-matcher-modal.component';
 import { ConfirmModalComponent } from '../../shared/components/confirm-modal/confirm-modal.component';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
@@ -42,27 +42,24 @@ export class DashboardComponent implements OnInit, OnDestroy {
   private loadingSubject = new BehaviorSubject<boolean>(true);
   loading$ = this.loadingSubject.asObservable();
 
-  stats: DashboardStats = { totalResumes: 0, plan: 'FREE', aiActive: false };
-
-  resumes$ = this.resumeService.resumes$.pipe(map(res => res ?? []));
-  hasResumes$ = this.resumes$.pipe(map(r => (r?.length ?? 0) > 0));
-  firstName$ = this.auth.user$.pipe(
-    map(u => u?.name?.split(' ')[0] ?? 'Usuário')
+  resumes$: Observable<Resume[]> = this.resumeService.resumes$.pipe(map(res => res ?? []));
+  hasResumes$: Observable<boolean> = this.resumes$.pipe(map(r => (r?.length ?? 0) > 0));
+  firstName$: Observable<string> = this.auth.user$.pipe(
+    map(u => {
+      if (u?.name) return u.name.split(' ')[0];
+      const isEn = this.translate.currentLang === 'en';
+      return isEn ? 'User' : 'Usuário';
+    })
   );
 
   isImportingLinkedIn: boolean = false;
 
-  dashboard$ = combineLatest([
-    this.resumeService.resumes$,
-    this.resumeService.getDashboardStats(),
-  ]).pipe(
-    map(([resumes, stats]) => ({
+  dashboard$: Observable<{ resumes: Resume[] }> = this.resumes$.pipe(
+    map(resumes => ({
       resumes: resumes ?? [],
-      stats: stats ?? this.stats,
     })),
     catchError(() => of({
       resumes: [],
-      stats: this.stats ?? { totalResumes: 0, plan: 'FREE', aiActive: false }
     })),
     finalize(() => this.loadingSubject.next(false))
   );
@@ -70,20 +67,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
   private subs: Subscription[] = [];
 
   ngOnInit(): void {
-    const resumesSub = this.resumeService.loadResumes(true).pipe(
+    const resumesSub = this.resumeService.loadResumes().pipe(
       finalize(() => this.loadingSubject.next(false))
     ).subscribe();
 
-    const statsSub = this.resumeService.getDashboardStats().subscribe({
-      next: (stats) => {
-        this.stats = stats ?? { totalResumes: 0, plan: 'FREE', aiActive: false };
-      },
-      error: () => {
-        this.stats = { totalResumes: 0, plan: 'FREE', aiActive: false };
-      }
-    });
-
-    this.subs.push(resumesSub, statsSub);
+    this.subs.push(resumesSub);
   }
 
   ngOnDestroy(): void {
@@ -92,19 +80,23 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   getTemplateName(template: string): string {
     const opt = this.templateOptions.find(t => t.id === template);
-    return opt?.ptName ?? template;
+    if (!opt) return template;
+    const isEn = this.translate.currentLang === 'en';
+    return isEn ? (opt.name || opt.ptName) : (opt.ptName || opt.name);
   }
 
   formatDate(dateStr: string): string {
     const date = new Date(dateStr);
     const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
-    const diffMins = Math.floor(diffMs / 60000);
-    if (diffMins < 1) return 'agora mesmo';
-    if (diffMins < 60) return `há ${diffMins} min`;
-    const diffHours = Math.floor(diffMins / 60);
-    if (diffHours < 24) return `há ${diffHours}h`;
-    return date.toLocaleDateString('pt-BR');
+    const diffMs: number = now.getTime() - date.getTime();
+    const diffMins: number = Math.floor(diffMs / 60000);
+    const isEn: boolean = this.translate.currentLang === 'en';
+
+    if (diffMins < 1) return isEn ? 'just now' : 'agora mesmo';
+    if (diffMins < 60) return isEn ? `${diffMins} min ago` : `há ${diffMins} min`;
+    const diffHours: number = Math.floor(diffMins / 60);
+    if (diffHours < 24) return isEn ? `${diffHours}h ago` : `há ${diffHours}h`;
+    return date.toLocaleDateString(isEn ? 'en-US' : 'pt-BR');
   }
 
   duplicate(resume: Resume): void {
@@ -124,7 +116,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   confirmDelete(): void {
     if (!this.deleteTargetId) return;
-    const id = this.deleteTargetId;
+    const id: string = this.deleteTargetId;
     this.deleteTargetId = null;
 
     this.resumeService.delete(id).subscribe({
@@ -154,17 +146,17 @@ export class DashboardComponent implements OnInit, OnDestroy {
       .replace(/^-+|-+$/g, '');
   }
 
-  createWithTemplate(tmpl: { id: string, name?: string, ptName?: string, customColor?: string, customFont?: string }): void {
+  createWithTemplate(tmpl: { id: string; name?: string; ptName?: string; customColor?: string; customFont?: string }): void {
     const isEn = this.translate.currentLang === 'en';
     const titulo = isEn && tmpl.name ? tmpl.name : tmpl.ptName;
 
     this.resumeService.create({
-      template: tmpl.id as any,
+      template: tmpl.id as Resume['template'],
       colorTheme: tmpl.customColor || '#1e293b',
       fontFamily: tmpl.customFont || "'Inter', sans-serif",
       title: titulo
     }).subscribe({
-      next: (created) => {
+      next: (created: Resume) => {
         this.router.navigate(['/resume', this.slugify(created.title), 'edit']);
       }
     });
