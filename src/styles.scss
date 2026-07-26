@@ -488,45 +488,39 @@ textarea.form-control {
    PRINT / PDF EXPORT STYLES
    ============================================= */
 @media print {
-  body {
+  /* Resets imperativos para quebra de página (Page Break flow) */
+  html, body, app-root, app-builder, .builder-page, .builder-layout, .preview-panel, .preview-container, .app-layout-body, .app-layout-main, .builder-main {
+    display: block !important;
+    position: relative !important;
+    height: auto !important;
+    min-height: 100% !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
     background: white !important;
   }
   
-  app-sidebar, app-header, app-footer, .builder-sidebar, .builder-header, .btn, .leave-modal-overlay, .ats-modal-overlay {
+  /* Esconde barras e modais que não devem sair no PDF */
+  app-sidebar, app-header, app-footer, .builder-sidebar, .builder-header, .builder-topbar, .preview-topbar, .form-panel, .mobile-view-toggle, .btn, .leave-modal-overlay, .ats-modal-overlay, .cdk-overlay-container, .toast-container, .modal-overlay {
     display: none !important;
-  }
-  
-  .app-layout-body, .builder-layout {
-    display: block !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    height: auto !important;
-  }
-  
-  .app-layout-main, .builder-main {
-    margin: 0 !important;
-    padding: 0 !important;
-    display: block !important;
-    overflow: visible !important;
-  }
-
-  .preview-container {
-    padding: 0 !important;
-    margin: 0 !important;
-    overflow: visible !important;
-    display: block !important;
   }
 
   .preview-sheet {
-    box-shadow: none !important;
+    position: relative !important;
     margin: 0 !important;
+    padding: 0 !important;
     width: 210mm !important; /* A4 width */
-    transform: none !important;
     min-height: 297mm !important;
-    page-break-after: always;
+    height: auto !important;
+    box-shadow: none !important;
+    transform: none !important; /* Remove escalas visuais e matrizes */
+    overflow: visible !important;
+    page-break-inside: auto !important;
   }
   
-  .cv-item, .timeline-item, .skill-item, .experience-item, .education-item {
+  /* Protege os itens internos do CV para não serem cortados na metade */
+  .cv-section, .cv-item, .skill-item, .language-item, .doc-section, .doc-item, .timeline-item, .experience-item, .education-item {
     page-break-inside: avoid !important;
     break-inside: avoid !important;
   }

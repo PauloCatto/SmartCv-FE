@@ -58,7 +58,7 @@ import { Resume } from '../../../../core/models/resume.model';
                 <select class="form-control" [(ngModel)]="selectedResumeId" (change)="onResumeSelect()">
                   <option value="" disabled selected>{{ 'BUILDER.COVER_LETTER.CHOOSE_RESUME' | translate }}</option>
                   @for (resume of resumes(); track resume.id) {
-                    <option [value]="resume.id">{{ resume.title }}</option>
+                    <option [value]="resume.id">{{ getResumeTitle(resume.title) }}</option>
                   }
                 </select>
               </div>
@@ -348,6 +348,10 @@ export class CoverLetterPageComponent implements OnInit, CanComponentDeactivate 
       this.selectedResumePhone.set(personal?.phone || '');
       this.selectedResumeLocation.set(personal?.location || '');
     }
+  }
+
+  getResumeTitle(title: string): string {
+    return this.resumeService.getTranslatedTitle(title, this.translate.currentLang || 'pt');
   }
 
   generateCoverLetter(): void {

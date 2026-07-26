@@ -56,6 +56,10 @@ export class ResumeService {
     return this.resumesSubject.value;
   }
 
+  getCurrent(): Resume | null {
+    return this.currentResumeSubject.value;
+  }
+
   getById(id: string): Observable<Resume> {
     return this.http.get<Resume>(`${environment.apiUrl}/resumes/detail/${id}`).pipe(
       tap(resume => {
@@ -132,5 +136,37 @@ export class ResumeService {
 
   getDashboardStats(): Observable<DashboardStats> {
     return this.http.get<DashboardStats>(`${environment.apiUrl}/resumes/dashboard/stats`);
+  }
+
+  getTranslatedTitle(title: string, lang?: string): string {
+    if (!title) return '';
+    const isEn = lang === 'en';
+    let result = title;
+
+    if (isEn) {
+      result = result
+        .replace(/Currículo Importado/gi, 'Imported Resume')
+        .replace(/Currículo LinkedIn/gi, 'LinkedIn Resume')
+        .replace(/Currículo/gi, 'Resume')
+        .replace(/\(cópia\)/gi, '(copy)')
+        .replace(/^Elegância$/i, 'Elegance')
+        .replace(/^Minimalista$/i, 'Minimal')
+        .replace(/^Moderno$/i, 'Modern')
+        .replace(/^Criativo$/i, 'Creative')
+        .replace(/^Compacto$/i, 'Compact');
+    } else {
+      result = result
+        .replace(/Imported Resume/gi, 'Currículo Importado')
+        .replace(/LinkedIn Resume/gi, 'Currículo LinkedIn')
+        .replace(/Resume LinkedIn/gi, 'Currículo LinkedIn')
+        .replace(/Resume/gi, 'Currículo')
+        .replace(/\(copy\)/gi, '(cópia)')
+        .replace(/^Elegance$/i, 'Elegância')
+        .replace(/^Minimal$/i, 'Minimalista')
+        .replace(/^Modern$/i, 'Moderno')
+        .replace(/^Creative$/i, 'Criativo')
+        .replace(/^Compact$/i, 'Compacto');
+    }
+    return result;
   }
 }
