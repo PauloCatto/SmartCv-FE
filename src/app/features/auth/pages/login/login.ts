@@ -2,14 +2,14 @@ import { Component, inject, signal, OnInit, OnDestroy } from '@angular/core';
 import { RouterLink, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../../core/services/auth';
-import { SocialAuthService, GoogleLoginProvider } from '@abacritt/angularx-social-login';
+import { SocialAuthService, GoogleSigninButtonModule, SocialUser } from '@abacritt/angularx-social-login';
 import { Subscription } from 'rxjs';
 import { AsyncPipe } from '@angular/common';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-login',
-  imports: [RouterLink, FormsModule, AsyncPipe, TranslateModule],
+  imports: [RouterLink, FormsModule, AsyncPipe, TranslateModule, GoogleSigninButtonModule],
   templateUrl: './login.html',
   styleUrl: './login.scss'
 })
@@ -17,31 +17,25 @@ export class Login implements OnInit, OnDestroy {
   auth = inject(AuthService);
   private router = inject(Router);
   private socialAuthService = inject(SocialAuthService);
+  private translate = inject(TranslateService);
 
   email: string = '';
   password: string = '';
-  error = signal('');
-  submitted = signal(false);
-  showPassword = signal(false);
+  error = signal<string>('');
+  submitted = signal<boolean>(false);
+  showPassword = signal<boolean>(false);
   authSubscription!: Subscription;
 
-  private isInitializing: boolean = true;
-
   ngOnInit(): void {
-    this.authSubscription = this.socialAuthService.authState.subscribe((user) => {
-      if (this.isInitializing) {
-        // Ignora a emissão automática na inicialização do componente
-        this.isInitializing = false;
-        return;
-      }
-
+    this.authSubscription = this.socialAuthService.authState.subscribe((user: SocialUser | null) => {
       if (user && user.idToken) {
-        this.auth.googleLogin(user.idToken as string).subscribe({
+        this.auth.googleLogin(user.idToken).subscribe({
           next: () => {
             this.router.navigate(['/dashboard']);
           },
           error: (err: Error) => {
-            this.error.set(err.message || 'Falha no login com Google');
+            const isEn = this.translate.currentLang === 'en';
+            this.error.set(err.message || (isEn ? 'Google login failed' : 'Falha no login com Google'));
           }
         });
       }
@@ -52,11 +46,6 @@ export class Login implements OnInit, OnDestroy {
     if (this.authSubscription) {
       this.authSubscription.unsubscribe();
     }
-  }
-
-  signInWithGoogle(): void {
-    this.isInitializing = false;
-    this.socialAuthService.signIn(GoogleLoginProvider.PROVIDER_ID);
   }
 
   onSubmit(): void {
@@ -70,7 +59,8 @@ export class Login implements OnInit, OnDestroy {
         this.router.navigate(['/dashboard']);
       },
       error: (err: Error) => {
-        this.error.set(err.message || 'Falha no login');
+        const isEn = this.translate.currentLang === 'en';
+        this.error.set(err.message || (isEn ? 'Login failed' : 'Falha no login'));
       }
     });
   }

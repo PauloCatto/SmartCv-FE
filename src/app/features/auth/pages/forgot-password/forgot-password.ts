@@ -3,7 +3,7 @@ import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../../core/services/auth';
 import { AsyncPipe } from '@angular/common';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-forgot-password',
@@ -14,11 +14,12 @@ import { TranslateModule } from '@ngx-translate/core';
 })
 export class ForgotPassword implements OnInit {
   auth = inject(AuthService);
+  private translate = inject(TranslateService);
 
   email: string = '';
-  message = signal('');
-  error = signal('');
-  submitted = signal(false);
+  message = signal<string>('');
+  error = signal<string>('');
+  submitted = signal<boolean>(false);
 
   ngOnInit(): void { }
 
@@ -30,11 +31,12 @@ export class ForgotPassword implements OnInit {
     if (!this.email) return;
 
     this.auth.forgotPassword(this.email).subscribe({
-      next: (res) => {
+      next: (res: { message: string }) => {
         this.message.set(res.message);
       },
       error: (err: Error) => {
-        this.error.set(err.message || 'Falha ao solicitar recuperação');
+        const isEn: boolean = this.translate.currentLang === 'en';
+        this.error.set(err.message || (isEn ? 'Failed to request recovery' : 'Falha ao solicitar recuperação'));
       }
     });
   }
