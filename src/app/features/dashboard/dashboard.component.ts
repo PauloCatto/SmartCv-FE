@@ -85,6 +85,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
     return isEn ? (opt.name || opt.ptName) : (opt.ptName || opt.name);
   }
 
+  getResumeTitle(title: string): string {
+    return this.resumeService.getTranslatedTitle(title, this.translate.currentLang);
+  }
+
   formatDate(dateStr: string): string {
     const date = new Date(dateStr);
     const now = new Date();

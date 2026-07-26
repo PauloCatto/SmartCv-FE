@@ -183,8 +183,8 @@
               <div class="preview-header">
                 <div class="preview-avatar"></div>
                 <div class="preview-info">
-                  <div class="preview-name">{{ resume.personalInfo.name || 'Sem nome' }}</div>
-                  <div class="preview-job">{{ resume.personalInfo.jobTitle || 'Cargo não definido' }}</div>
+                  <div class="preview-name">{{ resume.personalInfo.name || ('DASHBOARD.NO_NAME' | translate) }}</div>
+                  <div class="preview-job">{{ resume.personalInfo.jobTitle || ('DASHBOARD.NO_JOB_TITLE' | translate) }}</div>
                 </div>
               </div>
               <div class="preview-lines">
@@ -197,7 +197,7 @@
 
           <div class="resume-info">
             <div class="resume-meta">
-              <h3 class="resume-title-text">{{ resume.title }}</h3>
+              <h3 class="resume-title-text">{{ getResumeTitle(resume.title) }}</h3>
               <span class="template-tag">{{ getTemplateName(resume.template) }}</span>
             </div>
             <p class="resume-date">{{ 'DASHBOARD.EDITED' | translate }} {{ formatDate(resume.updatedAt) }}</p>
@@ -246,10 +246,10 @@
 
   @if (deleteTargetId) {
     <app-confirm-modal
-      title="Excluir currículo"
-      message="Tem certeza que deseja excluir este currículo? Esta ação não pode ser desfeita."
-      confirmText="Excluir"
-      cancelText="Cancelar"
+      [title]="'DASHBOARD.DELETE_TITLE' | translate"
+      [message]="'DASHBOARD.DELETE_MESSAGE' | translate"
+      [confirmText]="'DASHBOARD.DELETE_CONFIRM' | translate"
+      [cancelText]="'DASHBOARD.DELETE_CANCEL' | translate"
       type="danger"
       (confirm)="confirmDelete()"
       (cancel)="cancelDelete()"

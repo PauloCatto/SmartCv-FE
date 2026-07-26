@@ -53,7 +53,7 @@ import { RoastResultPayload } from '../../../../core/models/ai.model';
                 <select class="form-control" [(ngModel)]="selectedResumeId">
                   <option value="" disabled selected>{{ 'BUILDER.ROAST.CHOOSE_RESUME' | translate }}</option>
                   @for (resume of resumes(); track resume.id) {
-                    <option [value]="resume.id">{{ resume.title }}</option>
+                    <option [value]="resume.id">{{ getResumeTitle(resume.title) }}</option>
                   }
                 </select>
               </div>
@@ -273,6 +273,10 @@ export class RoastResumePageComponent implements OnInit {
   roastResult = signal<RoastResultPayload | null>(null);
   activeTab = signal<'summary' | 'ats' | 'actionable'>('summary');
   activeExampleTab = signal<'summary' | 'ats' | 'actionable'>('summary');
+
+  getResumeTitle(title: string): string {
+    return this.resumeService.getTranslatedTitle(title, this.translate.currentLang || 'pt');
+  }
 
   ngOnInit(): void {
     this.resumeService.loadResumes().subscribe({
