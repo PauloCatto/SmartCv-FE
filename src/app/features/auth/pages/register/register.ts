@@ -2,14 +2,14 @@ import { Component, inject, signal, OnInit, OnDestroy } from '@angular/core';
 import { RouterLink, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../../core/services/auth';
-import { SocialAuthService, GoogleSigninButtonModule } from '@abacritt/angularx-social-login';
+import { SocialAuthService, GoogleLoginProvider } from '@abacritt/angularx-social-login';
 import { Subscription } from 'rxjs';
 import { AsyncPipe } from '@angular/common';
 import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-register',
-  imports: [RouterLink, FormsModule, AsyncPipe, GoogleSigninButtonModule, TranslateModule],
+  imports: [RouterLink, FormsModule, AsyncPipe, TranslateModule],
   templateUrl: './register.html',
   styleUrl: './register.scss'
 })
@@ -24,6 +24,7 @@ export class Register implements OnInit, OnDestroy {
   error = signal('');
   showPassword = signal(false);
   authSubscription!: Subscription;
+  private isInitializing: boolean = true;
 
   benefits = [
     'AUTH.REGISTER.BENEFITS.0',
@@ -35,6 +36,11 @@ export class Register implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.authSubscription = this.socialAuthService.authState.subscribe((user) => {
+      if (this.isInitializing) {
+        this.isInitializing = false;
+        return;
+      }
+
       if (user && user.idToken) {
         this.auth.googleLogin(user.idToken as string).subscribe({
           next: () => {
@@ -46,6 +52,11 @@ export class Register implements OnInit, OnDestroy {
         });
       }
     });
+  }
+
+  signInWithGoogle(): void {
+    this.isInitializing = false;
+    this.socialAuthService.signIn(GoogleLoginProvider.PROVIDER_ID);
   }
 
   ngOnDestroy(): void {

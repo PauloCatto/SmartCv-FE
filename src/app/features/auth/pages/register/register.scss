@@ -110,3 +110,31 @@
   &::before { margin-right: 1em; }
   &::after { margin-left: 1em; }
 }
+
+.btn-google {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  max-width: 320px;
+  padding: 11px 20px;
+  background: #fff;
+  color: #3c4043;
+  border: 1px solid #dadce0;
+  border-radius: 9999px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  justify-content: center;
+  transition: box-shadow 0.2s, background 0.2s;
+  font-family: inherit;
+
+  &:hover {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+    background: #f8f8f8;
+  }
+
+  &:active {
+    background: #f0f0f0;
+  }
+}
