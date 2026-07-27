@@ -258,7 +258,7 @@ export class BuilderComponent implements OnInit, OnDestroy, CanComponentDeactiva
     ).subscribe({
       error: () => {
         this.saveState.set('idle');
-        this.toastr.error('Erro ao salvar. Verifique sua conexão.', 'Erro');
+        this.toastr.error(this.currentLang === 'en' ? 'Error saving. Check your connection.' : 'Erro ao salvar. Verifique sua conexão.', this.currentLang === 'en' ? 'Error' : 'Erro');
       }
     });
 
@@ -330,7 +330,6 @@ export class BuilderComponent implements OnInit, OnDestroy, CanComponentDeactiva
         }
         this.draft.set({ ...created });
         if (tplParam) {
-          // Salva imediatamente com o template escolhido
           this.onFieldChange();
         }
         this.resumeTitle = created.title;
@@ -424,13 +423,69 @@ export class BuilderComponent implements OnInit, OnDestroy, CanComponentDeactiva
         },
         error: () => {
           this.saveState.set('idle');
-          this.toastr.error('Erro ao salvar título', 'Erro');
+          this.toastr.error(this.currentLang === 'en' ? 'Error saving title' : 'Erro ao salvar título', this.currentLang === 'en' ? 'Error' : 'Erro');
         }
       });
     }
   }
 
+  cleanupEmptyEntries(): void {
+    this.draft.update(d => {
+      const experience = d.experience.filter(e => e.role.trim() || e.company.trim() || e.description.trim());
+      const education = d.education.filter(e => e.institution.trim() || e.degree.trim());
+      return { ...d, experience, education };
+    });
+  }
+
+  private hasIncompleteExperience(): boolean {
+    return this.draft().experience.some(e => !e.role.trim() || !e.company.trim());
+  }
+
+  private hasIncompleteEducation(): boolean {
+    return this.draft().education.some(e => !e.institution.trim() || !e.degree.trim());
+  }
+
+  private scrollToFirstIncompleteExp(): void {
+    const idx = this.draft().experience.findIndex(e => !e.role.trim() || !e.company.trim());
+    if (idx >= 0) {
+      this.expandedItem.set(`exp-${idx}`);
+      setTimeout(() => {
+        const el = document.querySelector(`[data-exp-index="${idx}"]`);
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 100);
+    }
+  }
+
+  private scrollToFirstIncompleteEdu(): void {
+    const idx = this.draft().education.findIndex(e => !e.institution.trim() || !e.degree.trim());
+    if (idx >= 0) {
+      this.expandedItem.set(`edu-${idx}`);
+      setTimeout(() => {
+        const el = document.querySelector(`[data-edu-index="${idx}"]`);
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 100);
+    }
+  }
+
   goToStep(step: Step): void {
+    const cur = this.currentStep();
+    if (cur === 'experience' && this.hasIncompleteExperience()) {
+      this.toastr.warning(
+        this.currentLang === 'en' ? 'Please fill in or remove incomplete experiences before continuing.' : 'Preencha ou remova as experiências incompletas antes de continuar.',
+        this.currentLang === 'en' ? 'Attention' : 'Atenção'
+      );
+      this.scrollToFirstIncompleteExp();
+      return;
+    }
+    if (cur === 'education' && this.hasIncompleteEducation()) {
+      this.toastr.warning(
+        this.currentLang === 'en' ? 'Please fill in or remove incomplete education entries before continuing.' : 'Preencha ou remova as educações incompletas antes de continuar.',
+        this.currentLang === 'en' ? 'Attention' : 'Atenção'
+      );
+      this.scrollToFirstIncompleteEdu();
+      return;
+    }
+    this.cleanupEmptyEntries();
     this.currentStep.set(step);
     this.showValidation.set(false);
     if (step === 'template') {
@@ -448,11 +503,31 @@ export class BuilderComponent implements OnInit, OnDestroy, CanComponentDeactiva
   }
 
   nextStep(): void {
-    if (this.currentStep() === 'personal') {
+    const cur = this.currentStep();
+
+    if (cur === 'experience' && this.hasIncompleteExperience()) {
+      this.toastr.warning(
+        this.currentLang === 'en' ? 'Please fill in or remove incomplete experiences before continuing.' : 'Preencha ou remova as experiências incompletas antes de continuar.',
+        this.currentLang === 'en' ? 'Attention' : 'Atenção'
+      );
+      this.scrollToFirstIncompleteExp();
+      return;
+    }
+    if (cur === 'education' && this.hasIncompleteEducation()) {
+      this.toastr.warning(
+        this.currentLang === 'en' ? 'Please fill in or remove incomplete education entries before continuing.' : 'Preencha ou remova as educações incompletas antes de continuar.',
+        this.currentLang === 'en' ? 'Attention' : 'Atenção'
+      );
+      this.scrollToFirstIncompleteEdu();
+      return;
+    }
+
+    this.cleanupEmptyEntries();
+    if (cur === 'personal') {
       const d = this.draft();
       if (!d.personalInfo.name.trim() || !d.personalInfo.email.trim()) {
         this.showValidation.set(true);
-        this.toastr.warning('Preencha os campos obrigatórios antes de avançar.', 'Atenção');
+        this.toastr.warning(this.currentLang === 'en' ? 'Please fill out all required fields before proceeding.' : 'Preencha os campos obrigatórios antes de avançar.', this.currentLang === 'en' ? 'Attention' : 'Atenção');
         return;
       }
     }
@@ -465,6 +540,7 @@ export class BuilderComponent implements OnInit, OnDestroy, CanComponentDeactiva
   }
 
   prevStep(): void {
+    this.cleanupEmptyEntries();
     this.showValidation.set(false);
     const idx = this.steps.findIndex(s => s.id === this.currentStep());
     if (idx > 0) {
@@ -483,6 +559,17 @@ export class BuilderComponent implements OnInit, OnDestroy, CanComponentDeactiva
   }
 
   addExperience(): void {
+    // Block if there's already an incomplete experience open
+    if (this.hasIncompleteExperience()) {
+      this.toastr.warning(
+        this.currentLang === 'en'
+          ? 'Please fill in the current experience (Role and Company are required) or remove it before adding another.'
+          : 'Preencha a experiência atual (Cargo e Empresa são obrigatórios) ou remova-a antes de adicionar outra.',
+        this.currentLang === 'en' ? 'Incomplete Entry' : 'Entrada Incompleta'
+      );
+      this.scrollToFirstIncompleteExp();
+      return;
+    }
     const exp: Experience = {
       id: crypto.randomUUID(), company: '', role: '',
       startDate: '', endDate: '', current: false, description: '',
@@ -498,6 +585,17 @@ export class BuilderComponent implements OnInit, OnDestroy, CanComponentDeactiva
   }
 
   addEducation(): void {
+    // Block if there's already an incomplete education entry open
+    if (this.hasIncompleteEducation()) {
+      this.toastr.warning(
+        this.currentLang === 'en'
+          ? 'Please fill in the current education (Degree and Institution are required) or remove it before adding another.'
+          : 'Preencha a educação atual (Curso e Instituição são obrigatórios) ou remova-a antes de adicionar outra.',
+        this.currentLang === 'en' ? 'Incomplete Entry' : 'Entrada Incompleta'
+      );
+      this.scrollToFirstIncompleteEdu();
+      return;
+    }
     const edu: Education = {
       id: crypto.randomUUID(), institution: '', degree: '',
       field: '', startDate: '', endDate: '', current: false,
@@ -534,7 +632,7 @@ export class BuilderComponent implements OnInit, OnDestroy, CanComponentDeactiva
     const name = this.newLanguageName.trim();
     if (!name) return;
     if (this.languageExists(name)) {
-      this.toastr.warning('Este idioma já foi adicionado.', 'Aviso');
+      this.toastr.warning(this.currentLang === 'en' ? 'This language has already been added.' : 'Este idioma já foi adicionado.', this.currentLang === 'en' ? 'Warning' : 'Aviso');
       return;
     }
     const lang = {
@@ -605,12 +703,10 @@ export class BuilderComponent implements OnInit, OnDestroy, CanComponentDeactiva
       'Currículo Importado', 'Imported Resume',
     ];
 
-    // Check if it starts with LinkedIn default prefixes (PT/EN)
     if (title.startsWith('Currículo LinkedIn') || title.startsWith('Resume LinkedIn')) {
       return true;
     }
 
-    // Check if it matches any template's name or ptName
     for (const opt of this.templateOptions) {
       defaults.push(opt.name);
       defaults.push(opt.ptName);
@@ -691,10 +787,10 @@ export class BuilderComponent implements OnInit, OnDestroy, CanComponentDeactiva
           }));
           this.isAILoading.set(null);
           this.onFieldChange();
-          this.toastr.success('Resumo melhorado com IA!', '✨ IA');
+          this.toastr.success(this.currentLang === 'en' ? 'Summary improved with AI!' : 'Resumo melhorado com IA!', '✨ AI');
         },
         error: () => {
-          this.toastr.error('Erro ao melhorar resumo com IA. Tente novamente.', 'Erro IA');
+          this.toastr.error(this.currentLang === 'en' ? 'Error improving summary with AI. Try again.' : 'Erro ao melhorar resumo com IA. Tente novamente.', this.currentLang === 'en' ? 'AI Error' : 'Erro IA');
           this.isAILoading.set(null);
         }
       });
@@ -710,10 +806,10 @@ export class BuilderComponent implements OnInit, OnDestroy, CanComponentDeactiva
           });
           this.isAILoading.set(null);
           this.onFieldChange();
-          this.toastr.success('Experiência melhorada com IA!', '✨ IA');
+          this.toastr.success(this.currentLang === 'en' ? 'Experience improved with AI!' : 'Experiência melhorada com IA!', '✨ AI');
         },
         error: () => {
-          this.toastr.error('Erro ao melhorar experiência com IA. Tente novamente.', 'Erro IA');
+          this.toastr.error(this.currentLang === 'en' ? 'Error improving experience with AI. Try again.' : 'Erro ao melhorar experiência com IA. Tente novamente.', this.currentLang === 'en' ? 'AI Error' : 'Erro IA');
           this.isAILoading.set(null);
         }
       });
@@ -819,7 +915,7 @@ export class BuilderComponent implements OnInit, OnDestroy, CanComponentDeactiva
       const file = input.files[0];
 
       if (file.size > 2 * 1024 * 1024) {
-        this.toastr.warning('A imagem deve ter no máximo 2MB', 'Aviso');
+        this.toastr.warning(this.currentLang === 'en' ? 'Image must be less than 2MB' : 'A imagem deve ter no máximo 2MB', this.currentLang === 'en' ? 'Warning' : 'Aviso');
         return;
       }
 
@@ -869,7 +965,7 @@ export class BuilderComponent implements OnInit, OnDestroy, CanComponentDeactiva
       },
       error: () => {
         this.isSaving.set(false);
-        this.toastr.error('Erro ao salvar currículo. Tente novamente.', 'Erro');
+        this.toastr.error(this.currentLang === 'en' ? 'Error saving resume. Try again.' : 'Erro ao salvar currículo. Tente novamente.', this.currentLang === 'en' ? 'Error' : 'Erro');
       }
     });
   }
@@ -907,25 +1003,13 @@ export class BuilderComponent implements OnInit, OnDestroy, CanComponentDeactiva
     });
   }
 
-  // Roast states
   showRoastModal = signal(false);
   isRoasting = signal(false);
   roastResult = signal<{ roast?: string; score?: number; feedback?: string; weaknesses?: string[]; actionableFeedback?: string[]; strengths?: string[] }>({});
 
-  // Export Modal state
-  showExportModal = signal(false);
-
-  openExportModal(): void {
-    this.showExportModal.set(true);
-  }
-
-  closeExportModal(): void {
-    this.showExportModal.set(false);
-  }
-
   generateCoverLetter(): void {
     if (!this.jobDescription || this.jobDescription.length < 20) {
-      this.toastr.warning('Por favor, cole uma descrição de vaga com pelo menos 20 caracteres.', 'Atenção');
+      this.toastr.warning(this.currentLang === 'en' ? 'Please paste a job description with at least 20 characters.' : 'Por favor, cole uma descrição de vaga com pelo menos 20 caracteres.', this.currentLang === 'en' ? 'Attention' : 'Atenção');
       return;
     }
 
@@ -939,7 +1023,7 @@ export class BuilderComponent implements OnInit, OnDestroy, CanComponentDeactiva
         this.isGeneratingCoverLetter.set(false);
       },
       error: () => {
-        this.toastr.error('Erro ao gerar carta. O limite gratuito pode ter sido atingido.', 'Erro IA');
+        this.toastr.error(this.currentLang === 'en' ? 'Error generating letter. Free limit may be reached.' : 'Erro ao gerar carta. O limite gratuito pode ter sido atingido.', this.currentLang === 'en' ? 'AI Error' : 'Erro IA');
         this.isGeneratingCoverLetter.set(false);
       }
     });
@@ -959,7 +1043,7 @@ export class BuilderComponent implements OnInit, OnDestroy, CanComponentDeactiva
         this.isRoasting.set(false);
       },
       error: () => {
-        this.toastr.error('O recrutador foi tomar um café, tente novamente.', 'Erro IA');
+        this.toastr.error(this.currentLang === 'en' ? 'The recruiter went for coffee, try again.' : 'O recrutador foi tomar um café, tente novamente.', this.currentLang === 'en' ? 'AI Error' : 'Erro IA');
         this.isRoasting.set(false);
         this.showRoastModal.set(false);
       }
@@ -972,7 +1056,7 @@ export class BuilderComponent implements OnInit, OnDestroy, CanComponentDeactiva
 
   copyCoverLetter(): void {
     navigator.clipboard.writeText(this.generatedCoverLetter());
-    this.toastr.success('Carta copiada para a área de transferência!', 'Sucesso');
+    this.toastr.success(this.currentLang === 'en' ? 'Letter copied to clipboard!' : 'Carta copiada para a área de transferência!', this.currentLang === 'en' ? 'Success' : 'Sucesso');
   }
 
   closeCoverLetterModal(): void {
@@ -991,47 +1075,60 @@ export class BuilderComponent implements OnInit, OnDestroy, CanComponentDeactiva
     }
 
     const clone = originalElement.cloneNode(true) as HTMLElement;
-    // Permitir altura max-content e usar estilo off-screen para gerar o PDF sem tela branca
     Object.assign(clone.style, {
       transform: 'none',
       position: 'relative',
       width: '794px',
-      height: 'max-content',
-      minHeight: '1123px',
-      backgroundColor: 'white',
-      margin: '0',
-      padding: '0',
-      overflow: 'visible'
+      height: 'fit-content',
+      minHeight: 'auto',
+      paddingBottom: '0',
+      marginBottom: '0',
+      overflow: 'hidden'
     });
 
     const wrapper = document.createElement('div');
-    Object.assign(wrapper.style, {
-      position: 'absolute',
-      top: '-9999px',
-      left: '-9999px',
-      width: '794px'
-    });
+    wrapper.style.position = 'absolute';
+    wrapper.style.top = '-9999px';
+    wrapper.style.left = '-9999px';
+    wrapper.style.width = '794px';
+    wrapper.style.height = 'fit-content';
+    Object.assign(wrapper.style, { margin: '0', padding: '0' });
     wrapper.appendChild(clone);
     document.body.appendChild(wrapper);
 
     try {
       const html2pdf = (await import('html2pdf.js')).default || (await import('html2pdf.js'));
+      await new Promise(resolve => setTimeout(resolve, 150));
+
+      // Sem margem no topo: templates full-bleed (elegance, compact) ficam com faixa branca visível.
+      // Apenas 10mm no rodapé para respiração antes da quebra de página.
+      const MARGIN_BOT_PX  = Math.round(10 * 3.7795); // 10mm rodapé em px
+      const A4_FULL_PX     = 1123;
+      const A4_USABLE_PX   = A4_FULL_PX - MARGIN_BOT_PX; // ~1085px
+
+      const contentHeight  = clone.scrollHeight;
+      const overflowRatio  = contentHeight / A4_USABLE_PX;
+
+      // Se o conteúdo ultrapassar levemente 1 página utilizável (até 20%), comprime com zoom
+      if (overflowRatio > 1 && overflowRatio <= 1.20) {
+        const fitZoom = (A4_USABLE_PX / contentHeight) * 0.975;
+        clone.style.zoom = `${fitZoom}`;
+      }
 
       const opt = {
-        margin:       [15, 0, 15, 0] as [number, number, number, number], // 15mm de margem real evita colar no topo e rodape das proximas paginas
-        filename:     `${this.draft().title || 'Curriculo'}.pdf`,
+        margin: [0, 0, 10, 0] as [number, number, number, number], // 0 topo (sem faixa branca), 10mm rodapé
+        filename: `${this.draft().title || 'Curriculo'}.pdf`,
         image: { type: 'jpeg' as const, quality: 1 },
-        html2canvas: { scale: 2, useCORS: true, letterRendering: true, logging: false },
-        pagebreak: { mode: 'css', avoid: ['li', 'p', '.bullet-item', '.cv-item', '.timeline-item', '.skill-item', '.skill-tag', '.experience-item', '.education-item', '.language-item'] }
+        html2canvas: { scale: 2, useCORS: true, letterRendering: true, logging: false, scrollY: 0 },
+        jsPDF: { unit: 'mm' as const, format: 'a4' as const, orientation: 'portrait' as const },
+        pagebreak: { mode: ['css', 'legacy'], avoid: ['li', '.bullet-item', '.cv-item', '.timeline-item', '.skill-item', '.experience-item', '.education-item'] }
       };
 
       await html2pdf().set(opt).from(clone).save();
 
       const isEn = this.translate.currentLang === 'en';
       this.toastr.success(isEn ? 'PDF generated successfully!' : 'PDF gerado com sucesso!');
-      this.closeExportModal();
 
-      // Publica (salva localmente status final)
       const current = this.draft();
       if (current.id && !this.isPublishedLocally) {
         this.resumeService.publish(current.id).subscribe({

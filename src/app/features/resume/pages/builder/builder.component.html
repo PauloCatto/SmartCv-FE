@@ -806,13 +806,18 @@
                 {{ 'BUILDER.FINISH.REVIEW_TEXT' | translate }}
               </p>
             </div>
-            <button class="btn btn-primary btn-lg" style="margin-top: 16px;" (click)="openExportModal()">
+            <button class="btn btn-primary btn-lg" style="margin-top: 16px;" (click)="exportToPDF()" [disabled]="isExportingPdf()">
+              @if (isExportingPdf()) {
+                <div class="spinner" style="width: 18px; height: 18px; border-width: 2px; margin-right: 8px;"></div>
+                <span>{{ 'BUILDER.GENERATING_PDF' | translate }}</span>
+              } @else {
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                   <polyline points="7 10 12 15 17 10"></polyline>
                   <line x1="12" y1="15" x2="12" y2="3"></line>
                 </svg>
                 <span>{{ 'BUILDER.DOWNLOAD_PDF' | translate }}</span>
+              }
             </button>
           </div>
         </div>
@@ -1042,49 +1047,6 @@
 
     <div class="modal-footer" style="padding: 20px 24px; border-top: 1px solid var(--color-border);">
       <button class="btn btn-primary" style="width: 100%; justify-content: center;" (click)="showAtsInfoModal.set(false)">{{ 'BUILDER.ATS_MODAL.CLOSE' | translate }}</button>
-    </div>
-  </div>
-</div>
-}
-
-@if (showExportModal()) {
-<div class="modal-overlay export-modal-overlay animate-fade-in" (click)="closeExportModal()">
-  <div class="modal-content export-modal animate-fade-in-up" (click)="$event.stopPropagation()">
-    <button class="modal-close-btn" (click)="closeExportModal()">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-    </button>
-    
-    <div class="modal-header">
-      <div class="modal-icon" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6;">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line>
-        </svg>
-      </div>
-      <h2 style="margin:0; font-size: 20px; font-weight: 700;">Configurações de Exportação</h2>
-    </div>
-
-    <div class="modal-body" style="padding: 24px; color: var(--color-text-muted); font-size: 15px;">
-      <p style="margin-bottom: 20px;">Ajuste o layout e margens do seu currículo para garantir que ele caiba perfeitamente no PDF.</p>
-      
-      <div class="finish-spacing-row" style="margin-bottom: 24px;">
-        <span class="finish-summary-label" style="display: block; margin-bottom: 8px; font-weight: 600;">Espaçamento e Densidade</span>
-        <div style="display: flex; gap: 8px;">
-          <button class="btn btn-sm" [class.btn-primary]="layoutDensity() === 'compact'" [class.btn-outline]="layoutDensity() !== 'compact'" (click)="layoutDensity.set('compact')">Compacto</button>
-          <button class="btn btn-sm" [class.btn-primary]="layoutDensity() === 'normal'" [class.btn-outline]="layoutDensity() !== 'normal'" (click)="layoutDensity.set('normal')">Normal</button>
-          <button class="btn btn-sm" [class.btn-primary]="layoutDensity() === 'spacious'" [class.btn-outline]="layoutDensity() !== 'spacious'" (click)="layoutDensity.set('spacious')">Espaçoso</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="modal-footer" style="padding: 20px 24px; border-top: 1px solid var(--color-border);">
-      <button class="btn btn-primary btn-lg" style="width: 100%; justify-content: center;" (click)="exportToPDF()" [disabled]="isExportingPdf()">
-        @if (isExportingPdf()) {
-          <div class="spinner" style="margin-right: 8px;"></div> Gerando PDF...
-        } @else {
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:8px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-          Gerar PDF Agora
-        }
-      </button>
     </div>
   </div>
 </div>

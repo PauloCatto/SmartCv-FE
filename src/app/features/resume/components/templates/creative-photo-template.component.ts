@@ -333,14 +333,17 @@ import { environment } from '../../../../../environments/environment';
     .contact-item {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
     }
 
     .contact-icon {
       font-size: 13px;
       color: var(--cv-primary);
-      width: 16px;
-      text-align: center;
+      width: 22px;
+      flex-shrink: 0;
+      display: flex;
+      justify-content: center;
+      font-weight: 700;
     }
 
     .contact-text {
