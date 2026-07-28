@@ -58,7 +58,7 @@ import { RoastResultPayload } from '../../../../core/models/ai.model';
                 </select>
               </div>
 
-              <button class="btn btn-primary btn-full roast-btn" (click)="roastResume()" 
+              <button type="button" class="btn btn-primary btn-full roast-btn" (click)="roastResume()" 
                       [disabled]="isRoasting() || !selectedResumeId">
                 @if (isRoasting()) {
                   <div class="spinner"></div>

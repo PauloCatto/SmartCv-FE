@@ -222,10 +222,10 @@
       "REVIEW_TEXT": "Review the details on the side panel. If everything looks correct, export your resume in high quality using the button below or at the top of the page."
     },
     "LEAVE_MODAL": {
-      "TITLE": "Leave without saving?",
-      "DESC": "Your resume hasn't been published yet. If you leave, it won't appear in the dashboard. Do you want to continue?",
+      "TITLE": "Leave editor?",
+      "DESC": "Your latest changes have been saved as a draft. Are you sure you want to leave?",
       "STAY": "Keep editing",
-      "LEAVE": "Leave anyway"
+      "LEAVE": "Leave"
     },
     "COVER_LETTER_LEAVE": {
       "TITLE": "Leave without saving?",

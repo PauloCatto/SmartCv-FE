@@ -74,7 +74,7 @@ import { Resume } from '../../../../core/models/resume.model';
                   [placeholder]="'BUILDER.COVER_LETTER.JOB_DESC_PLACEHOLDER' | translate"></textarea>
               </div>
 
-              <button class="btn btn-primary btn-full" style="margin-top: 24px;" (click)="generateCoverLetter()" 
+              <button type="button" class="btn btn-primary btn-full" style="margin-top: 24px;" (click)="generateCoverLetter()" 
                       [disabled]="isGenerating() || !selectedResumeId || !jobDescription || jobDescription.length < 20">
                 @if (isGenerating()) {
                   <div class="spinner"></div>

@@ -222,10 +222,10 @@
       "REVIEW_TEXT": "Revise os detalhes na janela ao lado. Se tudo estiver correto, exporte seu currículo em alta qualidade usando o botão abaixo ou no topo da página."
     },
     "LEAVE_MODAL": {
-      "TITLE": "Sair sem salvar?",
-      "DESC": "Seu currículo ainda não foi publicado. Se você sair, ele não aparecerá no painel. Deseja continuar?",
+      "TITLE": "Sair da edição?",
+      "DESC": "Suas alterações mais recentes foram salvas como rascunho. Tem certeza que deseja sair?",
       "STAY": "Continuar editando",
-      "LEAVE": "Sair mesmo assim"
+      "LEAVE": "Sair"
     },
     "COVER_LETTER_LEAVE": {
       "TITLE": "Sair sem salvar?",
