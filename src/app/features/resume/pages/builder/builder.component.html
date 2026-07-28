@@ -12,20 +12,6 @@
         (blur)="saveTitle()" />
     </div>
     <div class="topbar-right">
-      <div class="ats-score-widget" (click)="showAtsInfoModal.set(true)" style="cursor: pointer;"
-        [class]="'score-' + (atsScore() >= 80 ? 'high' : atsScore() >= 50 ? 'medium' : 'low')" [title]="'BUILDER.ATS_SCORE' | translate">
-        <div class="ats-score-circle">
-          <svg viewBox="0 0 36 36" class="circular-chart">
-            <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-            <path class="circle" [attr.stroke-dasharray]="atsScore() + ', 100'"
-              d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-          </svg>
-          <span class="ats-score-text">{{atsScore()}}</span>
-        </div>
-        <span class="ats-score-label">{{ 'BUILDER.ATS_SCORE' | translate }}</span>
-      </div>
-      <div class="topbar-divider"></div>
-
       <!-- 3-State Save Indicator -->
       <span class="save-indicator" [class.saving]="saveState() === 'saving'" [class.saved]="saveState() === 'saved'">
         @if (saveState() === 'saving') {
@@ -39,7 +25,20 @@
         }
       </span>
 
+      <div class="topbar-divider"></div>
 
+      <div class="ats-score-widget" (click)="showAtsInfoModal.set(true)" style="cursor: pointer;"
+        [class]="'score-' + (atsScore() >= 80 ? 'high' : atsScore() >= 50 ? 'medium' : 'low')" [title]="'BUILDER.ATS_SCORE' | translate">
+        <div class="ats-score-circle">
+          <svg viewBox="0 0 36 36" class="circular-chart">
+            <path class="circle-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+            <path class="circle" [attr.stroke-dasharray]="atsScore() + ', 100'"
+              d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+          </svg>
+          <span class="ats-score-text">{{atsScore()}}</span>
+        </div>
+        <span class="ats-score-label">{{ 'BUILDER.ATS_SCORE' | translate }}</span>
+      </div>
     </div>
   </div>
 

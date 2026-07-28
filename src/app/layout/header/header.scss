@@ -265,6 +265,9 @@
 }
 
 @media (max-width: 768px) {
+  .navbar {
+    padding: 0 12px;
+  }
   .hamburger-menu-btn {
     display: flex;
   }
@@ -272,28 +275,41 @@
     display: none; /* Hide anchor links on mobile to save space */
   }
   .navbar-actions {
-    gap: 6px;
+    gap: 8px;
   }
   .lang-code {
-    display: none; /* Hide language text, keep icon */
+    display: inline-block;
+    font-size: 10px;
   }
   .lang-btn {
-    padding: 6px;
+    padding: 4px 8px;
+    gap: 4px;
+    font-size: 11px;
+    svg {
+      width: 14px;
+      height: 14px;
+    }
   }
   .logo-text {
     font-size: 16px;
   }
   .logo-icon {
-    width: 30px;
-    height: 30px;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    svg {
+      width: 16px;
+      height: 16px;
+    }
   }
   .btn-sm {
-    padding: 6px 10px;
+    padding: 6px 12px;
     font-size: 12px;
   }
   .navbar-inner {
-    padding: 0 4px;
+    padding: 0;
     gap: 8px;
+    height: 60px;
   }
 }
 

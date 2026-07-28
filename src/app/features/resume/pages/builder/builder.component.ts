@@ -1100,18 +1100,16 @@ export class BuilderComponent implements OnInit, OnDestroy, CanComponentDeactiva
       const html2pdf = (await import('html2pdf.js')).default || (await import('html2pdf.js'));
       await new Promise(resolve => setTimeout(resolve, 150));
 
-      // Sem margem no topo: templates full-bleed (elegance, compact) ficam com faixa branca visível.
       // Apenas 10mm no rodapé para respiração antes da quebra de página.
-      const MARGIN_BOT_PX  = Math.round(10 * 3.7795); // 10mm rodapé em px
-      const A4_FULL_PX     = 1123;
-      const A4_USABLE_PX   = A4_FULL_PX - MARGIN_BOT_PX; // ~1085px
+      const MARGIN_BOT_PX = Math.round(10 * 3.7795); // 10mm rodapé em px
+      const A4_FULL_PX = 1123;
+      const A4_USABLE_PX = A4_FULL_PX - MARGIN_BOT_PX; // ~1085px
 
-      const contentHeight  = clone.scrollHeight;
-      const overflowRatio  = contentHeight / A4_USABLE_PX;
+      const contentHeight = clone.scrollHeight;
+      const overflowRatio = contentHeight / A4_USABLE_PX;
 
-      // Se o conteúdo ultrapassar levemente 1 página utilizável (até 20%), comprime com zoom
-      if (overflowRatio > 1 && overflowRatio <= 1.20) {
-        const fitZoom = (A4_USABLE_PX / contentHeight) * 0.975;
+      if (overflowRatio > 1 && overflowRatio <= 1.15) {
+        const fitZoom = (A4_USABLE_PX / contentHeight) * 0.98;
         clone.style.zoom = `${fitZoom}`;
       }
 
@@ -1121,7 +1119,14 @@ export class BuilderComponent implements OnInit, OnDestroy, CanComponentDeactiva
         image: { type: 'jpeg' as const, quality: 1 },
         html2canvas: { scale: 2, useCORS: true, letterRendering: true, logging: false, scrollY: 0 },
         jsPDF: { unit: 'mm' as const, format: 'a4' as const, orientation: 'portrait' as const },
-        pagebreak: { mode: ['css', 'legacy'], avoid: ['li', '.bullet-item', '.cv-item', '.timeline-item', '.skill-item', '.experience-item', '.education-item'] }
+        pagebreak: {
+          mode: ['css', 'legacy'],
+          avoid: [
+            'li', '.bullet-item', '.cv-item', '.timeline-item', '.skill-item',
+            '.exp-item', '.edu-item', '.contact-row', '.contact-item',
+            '.sidebar-section', '.sidebar-box', '.language-item', '.skill-pill'
+          ]
+        }
       };
 
       await html2pdf().set(opt).from(clone).save();

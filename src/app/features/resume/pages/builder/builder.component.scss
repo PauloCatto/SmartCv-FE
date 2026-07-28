@@ -708,6 +708,10 @@
   position: relative;
   overflow: visible;
   /* Garante que nada será clipado visualmente na base da tela */
+
+  /* Guia visual de quebra de página A4 no editor */
+  background-image: linear-gradient(to bottom, transparent 1122px, #e2e8f0 1122px, #e2e8f0 1124px, transparent 1124px);
+  background-size: 100% 1123px;
 }
 
 /* Removed artificial page break line */
@@ -1216,6 +1220,8 @@
 @media (max-width: 768px) {
   .topbar-left {
     gap: 6px;
+    flex: 1;
+    min-width: 0;
 
     .btn span {
       display: none;
@@ -1223,13 +1229,15 @@
   }
 
   .topbar-right {
-    gap: 6px;
+    gap: 8px;
+    flex-shrink: 0;
   }
 
   .resume-title-input {
-    min-width: 80px !important;
-    max-width: 130px;
-    font-size: 14px;
+    min-width: 60px !important;
+    max-width: 140px;
+    font-size: 13px;
+    text-overflow: ellipsis;
   }
 
   .ats-score-label {
@@ -1237,19 +1245,21 @@
   }
 
   .save-indicator {
-    display: none !important;
-  }
-
-  .btn-export-pdf span {
-    display: none;
+    display: flex !important;
+    font-size: 11px;
+    span {
+      display: none;
+    }
   }
 
   .topbar-divider {
-    display: none !important;
+    display: block !important;
+    height: 16px;
+    margin: 0 2px;
   }
 
   .builder-topbar {
-    padding: 0 8px;
+    padding: 0 12px;
   }
 
   .step-section {
