@@ -190,7 +190,7 @@
             <div class="form-group col-2">
               <div class="label-with-action">
                 <label class="form-label">{{ 'BUILDER.PERSONAL.BIO' | translate }}</label>
-                <button class="btn btn-ghost btn-sm ai-text-btn" (click)="improveWithAI('bio', null, 'bio')"
+                <button type="button" class="btn btn-ghost btn-sm ai-text-btn" (click)="improveWithAI('bio', null, 'bio')"
                   [disabled]="isAILoading() === 'bio-all-bio'">
                   @if (isAILoading() === 'bio-all-bio') {
                   <div class="spinner" style="width:12px;height:12px;border-width:2px"></div>
@@ -281,7 +281,7 @@
                   <div class="form-group col-2">
                     <div class="label-with-action">
                       <label class="form-label">{{ 'BUILDER.EXPERIENCE.DESCRIPTION' | translate }}</label>
-                      <button class="btn btn-ghost btn-sm ai-text-btn"
+                      <button type="button" class="btn btn-ghost btn-sm ai-text-btn"
                         (click)="improveWithAI('experience', i, 'description')"
                         [disabled]="isAILoading() === 'experience-' + i + '-description'">
                         @if (isAILoading() === 'experience-' + i + '-description') {

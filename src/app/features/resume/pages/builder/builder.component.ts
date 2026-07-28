@@ -773,6 +773,7 @@ export class BuilderComponent implements OnInit, OnDestroy, CanComponentDeactiva
 
   improveWithAI(type: 'bio' | 'experience', index: number | null, field: string) {
     const key = `${type}-${index !== null ? index : 'all'}-${field}`;
+    if (this.isAILoading()) return;
     this.isAILoading.set(key);
 
     const d = this.draft();
@@ -781,9 +782,10 @@ export class BuilderComponent implements OnInit, OnDestroy, CanComponentDeactiva
       const bioText = d.personalInfo.bio;
       this.aiService.improveBio(bioText, this.translate.currentLang).subscribe({
         next: (improved) => {
+          const cleanedText = (improved || '').trim();
           this.draft.update(current => ({
             ...current,
-            personalInfo: { ...current.personalInfo, bio: improved }
+            personalInfo: { ...current.personalInfo, bio: cleanedText }
           }));
           this.isAILoading.set(null);
           this.onFieldChange();
@@ -799,9 +801,10 @@ export class BuilderComponent implements OnInit, OnDestroy, CanComponentDeactiva
       const descText = expItem.description;
       this.aiService.improveExperience(descText, expItem.role, this.translate.currentLang).subscribe({
         next: (improved) => {
+          const cleanedText = (improved || '').trim();
           this.draft.update(current => {
             const exp = [...current.experience];
-            exp[index] = { ...exp[index], description: improved };
+            exp[index] = { ...exp[index], description: cleanedText };
             return { ...current, experience: exp };
           });
           this.isAILoading.set(null);
