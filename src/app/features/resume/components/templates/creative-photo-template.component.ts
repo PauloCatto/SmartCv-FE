@@ -254,6 +254,16 @@ import { environment } from '../../../../../environments/environment';
       margin-top: 2px;
     }
 
+    .exp-item, .edu-item, .skill-item, .contact-row, .sidebar-box {
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .section-title, .sidebar-title {
+      break-after: avoid;
+      page-break-after: avoid;
+    }
+
     .exp-company, .edu-institution {
       font-size: 13px;
       font-weight: 600;

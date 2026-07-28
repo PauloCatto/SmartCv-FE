@@ -226,6 +226,16 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
       gap: 2px;
     }
 
+    .exp-item, .edu-item, .skill-pill, .language-pill, .contact-item {
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .section-title {
+      break-after: avoid;
+      page-break-after: avoid;
+    }
+
     .item-meta {
       display: flex;
       align-items: center;

@@ -249,6 +249,16 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
       white-space: nowrap;
     }
 
+    .exp-item, .edu-item, .skill-item, .contact-row, .sidebar-box {
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .section-title, .sidebar-title {
+      break-after: avoid;
+      page-break-after: avoid;
+    }
+
     .exp-company, .edu-institution {
       font-size: 12px;
       font-weight: 600;
