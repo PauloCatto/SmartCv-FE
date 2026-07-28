@@ -40,8 +40,9 @@ export class JobMatcherModalComponent {
         this.result.set(res);
         this.loading.set(false);
       },
-      error: (err: Error) => {
-        this.error.set(err.message || 'Falha ao analisar a vaga. Verifique a chave de API da IA.');
+      error: (err: any) => {
+        const backendMsg = err?.error?.error || err?.error?.message || err?.message;
+        this.error.set(backendMsg || 'Falha ao analisar a vaga. Verifique a conexão ou tente novamente.');
         this.loading.set(false);
       }
     });
