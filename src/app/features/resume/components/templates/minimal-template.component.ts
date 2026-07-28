@@ -240,6 +240,16 @@ import { UpperCasePipe } from '@angular/common';
       z-index: -1;
     }
 
+    .cv-item, .skill-tag, .contact-item {
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .section-title {
+      break-after: avoid;
+      page-break-after: avoid;
+    }
+
     /* =======================================
        DENSITY MODIFIERS (SPACING CONTROLS)
        ======================================= */

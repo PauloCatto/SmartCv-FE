@@ -248,6 +248,16 @@ import { environment } from '../../../../../environments/environment';
     .language-level { font-size: 11px; color: white; background: var(--cv-primary); padding: 2px 8px; border-radius: 100px; font-family: 'Inter', sans-serif; font-weight: 600; }
 
 
+    .cv-item, .skill-item, .language-item, .contact-item {
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .section-title, .section-line {
+      break-after: avoid;
+      page-break-after: avoid;
+    }
+
     /* =======================================
        DENSITY MODIFIERS (SPACING CONTROLS)
        ======================================= */

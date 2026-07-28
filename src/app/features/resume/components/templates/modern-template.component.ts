@@ -274,6 +274,16 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
     .timeline-company { font-size: 12px; color: var(--cv-primary); font-weight: 600; }
     .timeline-desc { font-size: 11px; color: #64748b; line-height: 1.5; margin-top: 4px; white-space: pre-wrap; word-break: break-word; }
 
+    .timeline-item, .skill-item, .contact-row, .sidebar-section {
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .main-title, .sidebar-title {
+      break-after: avoid;
+      page-break-after: avoid;
+    }
+
     /* =======================================
        DENSITY MODIFIERS (SPACING CONTROLS)
        ======================================= */

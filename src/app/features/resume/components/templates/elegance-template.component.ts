@@ -247,6 +247,20 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
     .language-level { font-size: 11px; color: white; background: var(--cv-primary); padding: 4px 10px; border-radius: 100px; font-family: 'Inter', sans-serif; font-weight: 600; display: inline-block; white-space: nowrap; text-align: center; }
 
 
+    .cv-item, .skill-item, .language-item, .contact-item {
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+
+    .cv-section {
+      break-inside: auto;
+    }
+
+    .section-title, .section-line {
+      break-after: avoid;
+      page-break-after: avoid;
+    }
+
     /* =======================================
        DENSITY MODIFIERS (SPACING CONTROLS)
        ======================================= */
