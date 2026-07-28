@@ -355,6 +355,8 @@ export class CoverLetterPageComponent implements OnInit, CanComponentDeactivate 
   }
 
   generateCoverLetter(): void {
+    if (this.isGenerating()) return;
+
     if (!this.selectedResumeId) {
       this.notification.warning(
         { pt: 'Selecione um currículo base primeiro.', en: 'Please select a base resume first.' },
@@ -378,7 +380,6 @@ export class CoverLetterPageComponent implements OnInit, CanComponentDeactivate 
       ? `${jobTitlePrefix}${this.jobTitle}${jobDescPrefix}${this.jobDescription}`
       : this.jobDescription;
 
-    this.isGenerating.set(true);
     const lang: string = this.translate.currentLang || 'pt';
     this.aiService.generateCoverLetter(this.selectedResumeId, fullDescription, lang).subscribe({
       next: (res: { result: { coverLetter: string; matchScore: number } }) => {
@@ -393,9 +394,14 @@ export class CoverLetterPageComponent implements OnInit, CanComponentDeactivate 
           { pt: 'Sucesso', en: 'Success' }
         );
       },
-      error: () => {
+      error: (err: any) => {
+        const backendMsg = err?.error?.error || err?.error?.message || err?.message;
+        const errorMsg = backendMsg 
+          ? (this.translate.currentLang === 'en' ? `Error: ${backendMsg}` : `Erro: ${backendMsg}`)
+          : (this.translate.currentLang === 'en' ? 'Error generating letter with AI. Please try again later.' : 'Erro ao gerar carta com inteligência artificial. Tente novamente mais tarde.');
+        
         this.notification.error(
-          { pt: 'Erro ao gerar carta com inteligência artificial. Tente novamente mais tarde.', en: 'Error generating letter with AI. Please try again later.' },
+          { pt: errorMsg, en: errorMsg },
           { pt: 'Erro IA', en: 'AI Error' }
         );
         this.isGenerating.set(false);

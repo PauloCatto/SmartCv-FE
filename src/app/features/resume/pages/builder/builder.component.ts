@@ -791,8 +791,10 @@ export class BuilderComponent implements OnInit, OnDestroy, CanComponentDeactiva
           this.onFieldChange();
           this.toastr.success(this.currentLang === 'en' ? 'Summary improved with AI!' : 'Resumo melhorado com IA!', '✨ AI');
         },
-        error: () => {
-          this.toastr.error(this.currentLang === 'en' ? 'Error improving summary with AI. Try again.' : 'Erro ao melhorar resumo com IA. Tente novamente.', this.currentLang === 'en' ? 'AI Error' : 'Erro IA');
+        error: (err: any) => {
+          const backendMsg = err?.error?.error || err?.error?.message || err?.message;
+          const errorMsg = backendMsg ? `Erro: ${backendMsg}` : (this.currentLang === 'en' ? 'Error improving summary with AI. Try again.' : 'Erro ao melhorar resumo com IA. Tente novamente.');
+          this.toastr.error(errorMsg, this.currentLang === 'en' ? 'AI Error' : 'Erro IA');
           this.isAILoading.set(null);
         }
       });
@@ -811,8 +813,10 @@ export class BuilderComponent implements OnInit, OnDestroy, CanComponentDeactiva
           this.onFieldChange();
           this.toastr.success(this.currentLang === 'en' ? 'Experience improved with AI!' : 'Experiência melhorada com IA!', '✨ AI');
         },
-        error: () => {
-          this.toastr.error(this.currentLang === 'en' ? 'Error improving experience with AI. Try again.' : 'Erro ao melhorar experiência com IA. Tente novamente.', this.currentLang === 'en' ? 'AI Error' : 'Erro IA');
+        error: (err: any) => {
+          const backendMsg = err?.error?.error || err?.error?.message || err?.message;
+          const errorMsg = backendMsg ? `Erro: ${backendMsg}` : (this.currentLang === 'en' ? 'Error improving experience with AI. Try again.' : 'Erro ao melhorar experiência com IA. Tente novamente.');
+          this.toastr.error(errorMsg, this.currentLang === 'en' ? 'AI Error' : 'Erro IA');
           this.isAILoading.set(null);
         }
       });

@@ -295,6 +295,8 @@ export class RoastResumePageComponent implements OnInit {
   }
 
   roastResume(): void {
+    if (this.isRoasting()) return;
+
     if (!this.selectedResumeId) {
       this.notification.warning(
         { pt: 'Selecione um currículo primeiro.', en: 'Please select a resume first.' },
@@ -315,9 +317,14 @@ export class RoastResumePageComponent implements OnInit {
           { pt: 'Sucesso', en: 'Success' }
         );
       },
-      error: () => {
+      error: (err: any) => {
+        const backendMsg = err?.error?.error || err?.error?.message || err?.message;
+        const errorMsg = backendMsg 
+          ? (this.translate.currentLang === 'en' ? `Error: ${backendMsg}` : `Erro: ${backendMsg}`)
+          : (this.translate.currentLang === 'en' ? 'Error generating evaluation. Please try again later.' : 'Erro ao gerar avaliação. Tente novamente mais tarde.');
+
         this.notification.error(
-          { pt: 'Erro ao gerar avaliação. Tente novamente mais tarde.', en: 'Error generating evaluation. Please try again later.' },
+          { pt: errorMsg, en: errorMsg },
           { pt: 'Erro IA', en: 'AI Error' }
         );
         this.isRoasting.set(false);
