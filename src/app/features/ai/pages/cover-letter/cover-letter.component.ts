@@ -381,10 +381,25 @@ export class CoverLetterPageComponent implements OnInit, CanComponentDeactivate 
       : this.jobDescription;
 
     const lang: string = this.translate.currentLang || 'pt';
+    this.isGenerating.set(true);
     this.aiService.generateCoverLetter(this.selectedResumeId, fullDescription, lang).subscribe({
       next: (res: { result: { coverLetter: string; matchScore: number } }) => {
-        const coverLetterText: string = res.result.coverLetter;
-        const score: number = res.result.matchScore;
+        const coverLetterText: string = res.result?.coverLetter || '';
+        const score: number = res.result?.matchScore ?? 0;
+
+        if (score === 0 || coverLetterText.includes('temporarily unavailable') || coverLetterText.includes('could not generate')) {
+          const errorMsg = this.translate.currentLang === 'en'
+            ? 'The AI service is temporarily unavailable. Please try again.'
+            : 'O serviço de IA está temporariamente indisponível. Por favor, tente novamente.';
+
+          this.notification.error(
+            { pt: errorMsg, en: errorMsg },
+            { pt: 'Erro IA', en: 'AI Error' }
+          );
+          this.isGenerating.set(false);
+          return;
+        }
+
         this.generatedLetter.set(coverLetterText);
         this.generatedLetterEditable = coverLetterText;
         this.matchScore.set(score);
@@ -396,10 +411,10 @@ export class CoverLetterPageComponent implements OnInit, CanComponentDeactivate 
       },
       error: (err: any) => {
         const backendMsg = err?.error?.error || err?.error?.message || err?.message;
-        const errorMsg = backendMsg 
+        const errorMsg = backendMsg
           ? (this.translate.currentLang === 'en' ? `Error: ${backendMsg}` : `Erro: ${backendMsg}`)
           : (this.translate.currentLang === 'en' ? 'Error generating letter with AI. Please try again later.' : 'Erro ao gerar carta com inteligência artificial. Tente novamente mais tarde.');
-        
+
         this.notification.error(
           { pt: errorMsg, en: errorMsg },
           { pt: 'Erro IA', en: 'AI Error' }

@@ -310,6 +310,20 @@ export class RoastResumePageComponent implements OnInit {
     const lang: string = this.translate.currentLang || 'pt';
     this.aiService.roastResume(this.selectedResumeId, lang).subscribe({
       next: (res: RoastResultPayload) => {
+        // Defensive check for mock/error payload returned with 200 OK
+        if (!res || res.score === 0 || (res.weaknesses && res.weaknesses.some(w => w.includes('temporarily unavailable') || w.includes('could not generate')))) {
+          const errorMsg = this.translate.currentLang === 'en'
+            ? 'The AI service is temporarily unavailable. Please try again.'
+            : 'O serviço de IA está temporariamente indisponível. Por favor, tente novamente.';
+          
+          this.notification.error(
+            { pt: errorMsg, en: errorMsg },
+            { pt: 'Erro IA', en: 'AI Error' }
+          );
+          this.isRoasting.set(false);
+          return;
+        }
+
         this.roastResult.set(res);
         this.isRoasting.set(false);
         this.notification.success(
