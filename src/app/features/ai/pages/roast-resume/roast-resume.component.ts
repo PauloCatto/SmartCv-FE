@@ -167,10 +167,10 @@ import { RoastResultPayload } from '../../../../core/models/ai.model';
                   }
                 </div>
 
-                <div class="next-steps-card animate-fade-in-up" style="margin-top: 24px; padding: 24px; background: var(--color-surface-2); border-radius: var(--radius-md); border: 1px solid var(--color-border); text-align: center;">
-                  <h3 style="margin-bottom: 8px; font-size: 16px; font-weight: 600;">{{ 'BUILDER.ROAST.NEXT_STEPS_TITLE' | translate }}</h3>
-                  <p style="color: var(--color-text-muted); margin-bottom: 20px; font-size: 14px;">{{ 'BUILDER.ROAST.NEXT_STEPS_DESC' | translate }}</p>
-                  <div style="display: flex; gap: 16px; justify-content: center;">
+                <div class="next-steps-card animate-fade-in-up">
+                  <h3>{{ 'BUILDER.ROAST.NEXT_STEPS_TITLE' | translate }}</h3>
+                  <p>{{ 'BUILDER.ROAST.NEXT_STEPS_DESC' | translate }}</p>
+                  <div class="next-steps-actions">
                      <button class="btn btn-primary" (click)="goToBuilder()">{{ 'BUILDER.ROAST.IMPROVE_BTN' | translate }}</button>
                      <button class="btn btn-secondary" (click)="roastResume()">{{ 'BUILDER.ROAST.REEVALUATE_BTN' | translate }}</button>
                   </div>

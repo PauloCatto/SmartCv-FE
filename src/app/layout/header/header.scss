@@ -310,6 +310,30 @@
     padding: 0;
     gap: 8px;
     height: 60px;
+    overflow: hidden;
+  }
+  .navbar-logo {
+    min-width: 0;
+    overflow: hidden;
+  }
+  .logo-text {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 120px;
+  }
+}
+
+@media (max-width: 380px) {
+  .logo-text {
+    max-width: 90px;
+    font-size: 14px;
+  }
+  .navbar-inner {
+    gap: 4px;
+  }
+  .navbar-actions {
+    gap: 4px;
   }
 }
 
